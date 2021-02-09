@@ -1,18 +1,14 @@
 import { Component } from "../../src";
 
 const componentName = "Header";
-const debug = require("debug")(`front:${componentName}`);
+const debug = require("debug")(`composition:${componentName}`);
 
 export default class Header extends Component {
-  constructor(e) {
-    super(e);
-  }
-
 
   public mount() {
     debug("MOUNT !!!!", this);
     this.resizeHandler();
-    window.addEventListener("resize", this.resizeHandler);
+    window.addEventListener("resize", this.resizeHandler, false);
   }
 
   public unmount() {

@@ -1,25 +1,25 @@
 import { Component } from "../../src";
 import Header from "./Header";
+import MainButton from "./MainButton";
 
 const componentName = "App";
-const debug = require("debug")(`front:${componentName}`);
+const debug = require("debug")(`composition:${componentName}`);
 
 export default class App extends Component {
-  protected header: Header;
-
   public components() {
     return {
       Header: Header,
+      MainButton: MainButton,
     };
   }
 
   public mount() {
-    this.header = new Header("Header");
+    //super.mount();
     debug("App is mounted", this.$element);
   }
 
   public unmount() {
+    //super.unmount();
     debug("App is unmounted", this.$element);
-    this.header.unmount();
   }
 }
