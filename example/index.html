@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Composition</title>
+  </head>
+
+  <body>
+    <div id="root">
+      <button
+        id="MainButton"
+        class="App_mainButton MainButton MainButton-mount"
+        data-component="MainButton"
+      >
+        mount
+      </button>
+
+      <main class="App" data-component="App">
+        <header class="Header App_header" data-component="Header">
+          <h1 class="Header_title">Composition</h1>
+        </header>
+      </main>
+    </div>
+    <script src="index.ts"></script>
+  </body>
+</html>
