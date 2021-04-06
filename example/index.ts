@@ -4,6 +4,7 @@ import App from "./components/App";
 console.log("Hello Composition!");
 
 const app = new App("App");
+app.mount()
 
 const toggleButton = document.getElementById("MainButton");
 let toggle = true;

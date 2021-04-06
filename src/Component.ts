@@ -1,112 +1,44 @@
 const componentName = "Component"
 const debug = require("debug")(`composition:${componentName}`)
 
+
+const DATA_COMPONENT_ATTR = "data-component";
+
+const getElement = (name: string, attr = DATA_COMPONENT_ATTR): HTMLElement => {
+  return document.querySelector(`*[${attr}=${name}]`)
+}
+
+export const compo = (name:string, instance: any) => ({
+  $root: getElement(name),
+  instance: new instance(name)
+})
+
+
+// -------
+
 export default class Component {
 
-  public $element: HTMLElement
-  public static readonly DATA_COMPONENT_ATTR = "data-component"
-  protected _name: string
-  private _components: { [x: string]: any }
-  private _instances: Component[] = [];
+  public $root: HTMLElement
 
-  constructor(name: string)
-  {
-    // get component name from constructor
-    this._name = name
-
-    // get dom element
-    this.$element = this.getDomElement()
-
-    // get availables components
-    this._components = this.components()
-
-    // prepare components
-    this.prepareComponents();
-
-    this.mount();
-  }
-
-  // --------------------------------------------------------------------------- LOCAL
-
-
-  /**
-   * Get DOM element from data-component attr
-   * TODO le querySelector doit se faire depuis le root
-   */
-  private getDomElement(name = this._name, attr = Component.DATA_COMPONENT_ATTR): HTMLElement
-  {
-    return document.querySelector(`*[${attr}=${name}]`)
-  }
-
-  /**
-   * On veut mount tous les sous composants et les stocker dans une locale
-   */
-  private prepareComponents(): void
-  {
-    if (!this._components) return
-    Object.keys(this._components).forEach((name) =>
-    {
-      this._instances = [
-        ...this._instances,
-        new this._components[name](`${name}`),
-      ]
-    })
-  }
-
-  /**
-   *
-   * @private
-   */
-  private mountComponents(): void
-  {
-    debug(this._name, this._instances)
-    this._instances?.forEach(instance => instance?.mount())
-  }
-
-  /**
-   *
-   * @private
-   */
-  private unmountComponents(): void
-  {
-    this._instances?.forEach(instance => instance?.unmount())
-  }
-
-  // --------------------------------------------------------------------------- API
-
-  /**
-   * Register components inside current instance
-   */
-  public components(): { [x: string]: any }
-  {
-    return
+  constructor(name) {
+    this.$root = getElement(name);
+    const mount = this.mount.bind(this);
   }
 
   /**
    * When component is mounted
    */
-  public mount(): void
-  {
-      this.mountComponents();
-  }
+  public mount(): void {}
 
   /**
    * When component is unmount
    */
-  public unmount(): void
-  {
-    this.unmountComponents();
-    debug(this._name, 'unmount')
-  }
+  public unmount(): void {}
 
   /**
    *  Watch component via observer
-   *  TODO Besoin de watch si l'instance a été mount ou unmount
+   *  TODO Besoin de watch si le noeuf DOM a changé
    */
-  public watch(): void
-  {
-
-  }
-
+  public watch(): void {}
 
 }
