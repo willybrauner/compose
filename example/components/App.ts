@@ -17,7 +17,7 @@ export default class App extends Component {
     super(e);
     this.init();
     setTimeout(() => {
-      this.children.header.$root.remove();
+//      this.children.header.$root.remove();
     }, 2400);
   }
 

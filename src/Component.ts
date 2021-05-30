@@ -86,7 +86,7 @@ export default class Component {
         id,
       };
 
-      this.$root.setAttribute(Component.DATA_COMPONENT_ID_ATTR, `${id}`);
+      compo.$root.setAttribute(Component.DATA_COMPONENT_ID_ATTR, `${id}`);
       COMPONENTS_LIST.push(compo);
       local.push(compo);
     }
