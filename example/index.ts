@@ -1,14 +1,8 @@
 import "./index.css";
 import App from "./components/App";
+const componentName = "index";
+const debug = require("debug")(`composition:${componentName}`);
 
-console.log("Hello Composition!");
+// ------------------------------------------------
 
-const app = new App("App");
-app.mount()
-
-const toggleButton = document.getElementById("MainButton");
-let toggle = true;
-toggleButton.onclick = () => {
-  toggle = !toggle;
-  toggle ? app.mount() : app.unmount();
-};
+new App("App");

@@ -7,19 +7,15 @@
 
   <body>
     <div id="root">
-      <button id="MainButton">mount</button>
-
       <main class="App" data-component="App">
-        <header class="Header App_header" data-component="Header">
-          <h1 class="Header_title">Composition</h1>
+        <h1 class="App_title">App</h1>
+        <header class="Header" data-component="Header">
+          <h1 class="Header_title">Header</h1>
+          <button class="MainButton MainButton-1" data-component="Header_mainButton">MainButton</button>
+          <button class="MainButton MainButton-2" data-component="Header_mainButton">MainButton</button>
+          <button class="MainButton MainButton-3" data-component="Header_mainButton">MainButton</button>
+          <button class="MainButton MainButton-4" data-component="Header_mainButton">MainButton</button>
         </header>
-
-        <button
-          class="App_mainButton MainButton"
-          data-component="MainButton"
-        >
-          button instance
-        </button>
       </main>
     </div>
     <script src="index.ts"></script>

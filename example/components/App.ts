@@ -1,22 +1,37 @@
 import { Component } from "../../src";
 import Header from "./Header";
-import { compo } from "../../src/Component";
+import { TRegister } from "../../src/Component";
 
 const componentName = "App";
 const debug = require("debug")(`composition:${componentName}`);
 
+/**
+ * @name App
+ */
 export default class App extends Component {
-  protected header = compo("Header", Header);
+  protected children = {
+    header: this.register<TRegister>("Header", Header),
+  };
 
-  public mount() {
-    debug("App is mounted", this.$root);
-    this.header.instance.mount();
+  constructor(e) {
+    super(e);
+    this.init();
+    setTimeout(() => {
+      this.children.header.$root.remove();
+    }, 2400);
   }
 
-  public unmount() {
-    debug("App is unmounted");
-    this.header.instance.unmount();
-  }
+  protected resizeHandler = () => {
+    debug("window.innerWidth", window.innerWidth);
+  };
 
-  watch(): void {}
+  public onMount() {
+    debug("start mount from App");
+    window.addEventListener("resize", this.resizeHandler);
+  }
+  public onUnmount() {
+    super.onUnmount();
+    debug("UN mount from App");
+    window.removeEventListener("resize", this.resizeHandler);
+  }
 }

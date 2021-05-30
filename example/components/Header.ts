@@ -1,22 +1,34 @@
 import { Component } from "../../src";
-
+import MainButton from "./MainButton";
+import { TRegister } from "../../src/Component";
 const componentName = "Header";
 const debug = require("debug")(`composition:${componentName}`);
 
+/**
+ * @name Header
+ */
 export default class Header extends Component {
+  protected children = {
+    mainButton: this.register<TRegister[]>("Header_mainButton", MainButton),
+  };
 
-  public mount() {
-    debug("MOUNT !!!!", this);
-    this.resizeHandler();
+  constructor(e) {
+    super(e);
+    this.init();
+  }
+
+  protected resizeHandler = () => {
+    debug("window.innerWidth", window.innerWidth);
+  };
+
+  public onMount() {
+    debug("start mount from header");
     window.addEventListener("resize", this.resizeHandler);
   }
 
-  public unmount() {
-    debug("unmounted !!!! ", this);
+  public onUnmount() {
+    super.onUnmount();
+    debug("UN mount from header");
     window.removeEventListener("resize", this.resizeHandler);
   }
-
-  public resizeHandler = () => {
-    debug("window.innerWidth", window.innerWidth, this.$root);
-  };
 }
