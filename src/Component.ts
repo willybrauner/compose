@@ -7,13 +7,15 @@ export type TRegister = {
   id: number;
 };
 
-// --------------------------------------------------------------------------------------- GLOBAL
-
+/**
+ * Store
+ */
 let COMPONENT_ID = 0;
 const COMPONENTS_LIST = [];
 
-// --------------------------------------------------------------------------------------- CLASS
-
+/**
+ * Component
+ */
 export default class Component {
   public static DATA_COMPONENT_ATTR = "data-component";
   public static DATA_COMPONENT_ID_ATTR = "data-component-id";
@@ -53,8 +55,10 @@ export default class Component {
 
         if (Array.isArray(child as TRegister)) {
           child?.forEach((el) => el.instance.onUnmount());
+          // TODO remove from global arr
         } else {
           (child as TRegister)?.instance.onUnmount();
+          // TODO remove from global arr
         }
       });
   }

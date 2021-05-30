@@ -1,6 +1,6 @@
-import { Component } from "../../src";
+import { Component, TRegister } from "../../src";
 import MainButton from "./MainButton";
-import { TRegister } from "../../src/Component";
+
 const componentName = "Header";
 const debug = require("debug")(`composition:${componentName}`);
 
