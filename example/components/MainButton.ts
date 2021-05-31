@@ -16,13 +16,13 @@ export default class MainButton extends Component {
     debug("window.innerWidth", window.innerWidth);
   };
 
-  public onMount() {
+  public mount() {
     debug("start mount from MainButton");
     window.addEventListener("resize", this.resizeHandler);
   }
 
-  public onUnmount() {
-    super.onUnmount();
+  public unmount() {
+    super.unmount();
     debug("UN mount from MainButton");
     window.removeEventListener("resize", this.resizeHandler);
   }

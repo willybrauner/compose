@@ -34,39 +34,30 @@ export default class Component {
    * Init to call in contructor (to keep context)
    */
   protected init() {
-    this.onMount();
+    this.beforeMount();
+    this.mount();
     this.watch();
   }
+
+  protected beforeMount(): void {}
 
   /**
    * When component is mounted
    */
-  protected onMount(): void {}
+  protected mount(): void {}
 
   /**
    * When component is unmounted
-   * - execute onUnmount() method of children components
+   * - execute unmount() method of children components
    */
-  protected onUnmount(): void {
-    this.children &&
-      Object.keys(this.children).forEach((c) => {
-        const child = this.children?.[c];
-        if (!child) return;
-
-        if (Array.isArray(child as TRegister)) {
-          child?.forEach((el) => el.instance.onUnmount());
-          // TODO remove from global arr
-        } else {
-          (child as TRegister)?.instance.onUnmount();
-          // TODO remove from global arr
-        }
-      });
+  protected unmount(): void {
+    this.unmountChildren();
   }
 
   /**
    * Callback of watch method execute each time current DOM node change
    */
-  protected onChange(mutation): void {}
+  protected onUpdate(mutation): void {}
 
   /**
    * Get nested component
@@ -101,6 +92,25 @@ export default class Component {
   // ------------------------------------------------------------------------------------- CORE
 
   /**
+   * Unmount children components
+   */
+  private unmountChildren(): void {
+    this.children &&
+      Object.keys(this.children).forEach((c) => {
+        const child = this.children?.[c];
+        if (!child) return;
+
+        if (Array.isArray(child as TRegister)) {
+          child?.forEach((el) => el.instance.unmount());
+          // TODO remove from global arr
+        } else {
+          (child as TRegister)?.instance.unmount();
+          // TODO remove from global arr
+        }
+      });
+  }
+
+  /**
    * Get DOM
    */
   private static getDomElement(name: string): HTMLElement[] {
@@ -126,18 +136,18 @@ export default class Component {
         for (const node of mutation.addedNodes) {
           if (isRootNode(node)) {
             debug("has been added", node);
-            this.onMount();
+            this.mount();
           }
         }
         for (const node of mutation.removedNodes) {
           if (isRootNode(node)) {
             debug("has been removed", node);
-            this.onUnmount();
+            this.unmount();
             this.observer.disconnect();
           }
         }
         // each time some
-        this.onChange(mutation);
+        this.onUpdate(mutation);
       }
     };
 
