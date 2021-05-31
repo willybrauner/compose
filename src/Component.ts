@@ -35,7 +35,7 @@ export default class Component {
    */
   protected init() {
     this.beforeMount();
-    this.mount();
+    this.mounted();
     this.watch();
   }
 
@@ -44,20 +44,20 @@ export default class Component {
   /**
    * When component is mounted
    */
-  protected mount(): void {}
+  protected mounted(): void {}
 
   /**
    * When component is unmounted
-   * - execute unmount() method of children components
+   * - execute unmounted() method of children components
    */
-  protected unmount(): void {
+  protected unmounted(): void {
     this.unmountChildren();
   }
 
   /**
    * Callback of watch method execute each time current DOM node change
    */
-  protected onUpdate(mutation): void {}
+  protected updated(mutation): void {}
 
   /**
    * Get nested component
@@ -101,10 +101,10 @@ export default class Component {
         if (!child) return;
 
         if (Array.isArray(child as TRegister)) {
-          child?.forEach((el) => el.instance.unmount());
+          child?.forEach((el) => el.instance.unmounted());
           // TODO remove from global arr
         } else {
-          (child as TRegister)?.instance.unmount();
+          (child as TRegister)?.instance.unmounted();
           // TODO remove from global arr
         }
       });
@@ -136,18 +136,18 @@ export default class Component {
         for (const node of mutation.addedNodes) {
           if (isRootNode(node)) {
             debug("has been added", node);
-            this.mount();
+            this.mounted();
           }
         }
         for (const node of mutation.removedNodes) {
           if (isRootNode(node)) {
             debug("has been removed", node);
-            this.unmount();
+            this.unmounted();
             this.observer.disconnect();
           }
         }
         // each time some
-        this.onUpdate(mutation);
+        this.updated(mutation);
       }
     };
 

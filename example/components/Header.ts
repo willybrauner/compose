@@ -21,13 +21,13 @@ export default class Header extends Component {
     debug("window.innerWidth", window.innerWidth);
   };
 
-  public mount() {
+  public mounted() {
     debug("start mount from header");
     window.addEventListener("resize", this.resizeHandler);
   }
 
-  public unmount() {
-    super.unmount();
+  public unmounted() {
+    super.unmounted();
     debug("UN mount from header");
     window.removeEventListener("resize", this.resizeHandler);
   }

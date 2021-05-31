@@ -20,21 +20,19 @@ export default class App extends Component {
     }, 2400);
   }
 
-  mount() {
+  mounted() {
     debug("start mount from App");
     window.addEventListener("resize", this.resizeHandler);
   }
-  unmount() {
-    super.unmount();
+  unmounted() {
+    super.unmounted();
     debug("UN mount from App");
     window.removeEventListener("resize", this.resizeHandler);
   }
 
-  onUpdate(mutation) {}
-
+  updated(mutation) {}
 
   protected resizeHandler = () => {
     debug("window.innerWidth", window.innerWidth);
   };
-
 }
