@@ -8,13 +8,14 @@ const debug = require("debug")(`composition:${componentName}`);
  * @name Header
  */
 export default class Header extends Component {
-  protected children = {
-    mainButton: this.register<TRegister[]>("Header_mainButton", MainButton),
+  public children = {
+    mainButton: this.register<MainButton[]>(MainButton, "Header_mainButton"),
   };
 
   constructor(e) {
     super(e);
     this.init();
+    debug(this.children.mainButton);
   }
 
   protected resizeHandler = () => {

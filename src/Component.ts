@@ -1,15 +1,7 @@
+type TFlat<T> = T extends any[] ? T[number] : T;
+
 const componentName = "Component";
 const debug = require("debug")(`composition:${componentName}`);
-
-export type TRegister = {
-  $root: HTMLElement;
-  instance: any;
-  id: number;
-};
-
-/**
- * Store
- */
 let COMPONENT_ID = 0;
 const COMPONENTS_LIST = [];
 
@@ -17,12 +9,14 @@ const COMPONENTS_LIST = [];
  * Component
  */
 export default class Component {
+
   public static DATA_COMPONENT_ATTR = "data-component";
   public static DATA_COMPONENT_ID_ATTR = "data-component-id";
 
-  protected name: string;
-  protected $root: HTMLElement;
-  protected children: { [x: string]: any };
+  public name: string;
+  public $root: HTMLElement;
+  public children: { [x: string]: any };
+
   protected observer: MutationObserver;
 
   constructor(name: string) {
@@ -59,31 +53,28 @@ export default class Component {
    */
   protected updated(mutation): void {}
 
-  /**
-   * Get nested component
-   */
-  protected register<T = TRegister | TRegister[]>(
-    dataComponentName: string,
-    classComponent: any
-  ): T | undefined {
-    let local = [];
-    const elements = Component.getDomElement(dataComponentName);
 
-    if (!elements) {
+  /**
+   * Register component
+   */
+  protected register<T>(
+    classComponent: new (name: string) => TFlat<Component>,
+    name: string
+  ): T {
+    let local = [];
+    const elements = Component.getDomElement(name);
+    if (!elements || elements.length === 0) {
       return undefined;
     }
 
     for (const element of elements) {
       const id = COMPONENT_ID++;
-      let compo: TRegister = {
-        $root: element,
-        instance: new classComponent(dataComponentName),
-        id,
-      };
 
-      compo.$root.setAttribute(Component.DATA_COMPONENT_ID_ATTR, `${id}`);
-      COMPONENTS_LIST.push(compo);
-      local.push(compo);
+      const classInstance: TFlat<Component> = new classComponent(name);
+
+      classInstance.$root.setAttribute(Component.DATA_COMPONENT_ID_ATTR, `${id}`);
+      COMPONENTS_LIST.push(classInstance);
+      local.push(classInstance);
     }
 
     return local.length === 1 ? local[0] : local;
@@ -100,11 +91,11 @@ export default class Component {
         const child = this.children?.[c];
         if (!child) return;
 
-        if (Array.isArray(child as TRegister)) {
-          child?.forEach((el) => el.instance.unmounted());
+        if (Array.isArray(child)) {
+          child?.forEach((el) => el.unmounted());
           // TODO remove from global arr
         } else {
-          (child as TRegister)?.instance.unmounted();
+          child?.unmounted();
           // TODO remove from global arr
         }
       });

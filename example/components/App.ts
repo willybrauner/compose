@@ -8,13 +8,14 @@ const debug = require("debug")(`composition:${componentName}`);
  * @name App
  */
 export default class App extends Component {
-  protected children = {
-    header: this.register<TRegister>("Header", Header),
+  public children = {
+    header: this.register<Header>(Header, "Header"),
   };
 
   constructor(e) {
     super(e);
     this.init();
+    debug("this.children.header", this.children.header);
     setTimeout(() => {
       this.children.header.$root.remove();
     }, 2400);
