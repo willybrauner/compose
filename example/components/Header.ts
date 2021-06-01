@@ -1,4 +1,4 @@
-import { Component, TRegister } from "../../src";
+import { Component } from "../../src";
 import MainButton from "./MainButton";
 
 const componentName = "Header";

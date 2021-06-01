@@ -1,4 +1,4 @@
-import { Component, TRegister } from "../../src";
+import { Component } from "../../src";
 import Header from "./Header";
 
 const componentName = "App";
@@ -15,7 +15,8 @@ export default class App extends Component {
   constructor(e) {
     super(e);
     this.init();
-    debug("this.children.header", this.children.header);
+
+    // test
     setTimeout(() => {
       this.children.header.$root.remove();
     }, 2400);

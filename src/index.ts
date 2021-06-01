@@ -1,1 +1,1 @@
-export { default as Component, TRegister } from "./Component";
+export { default as Component } from "./Component";

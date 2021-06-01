@@ -1,27 +1,27 @@
 type TFlat<T> = T extends any[] ? T[number] : T;
+type TClassComponent = new (name: string) => Component;
 
 const componentName = "Component";
 const debug = require("debug")(`composition:${componentName}`);
+
+// stores
 let COMPONENT_ID = 0;
-const COMPONENTS_LIST = [];
 
 /**
  * Component
  */
 export default class Component {
-
-  public static DATA_COMPONENT_ATTR = "data-component";
-  public static DATA_COMPONENT_ID_ATTR = "data-component-id";
-
   public name: string;
   public $root: HTMLElement;
-  public children: { [x: string]: any };
+  public children: { [x: string]: Component | Component[] };
 
   protected observer: MutationObserver;
+  protected componentAttr = "data-component";
+  protected idAttr = "data-component-id";
 
   constructor(name: string) {
     this.name = name;
-    this.$root = Component.getDomElement(this.name)[0];
+    this.$root = this.getDomElement(this.name)?.[0];
   }
 
   /**
@@ -51,33 +51,33 @@ export default class Component {
   /**
    * Callback of watch method execute each time current DOM node change
    */
-  protected updated(mutation): void {}
-
+  protected updated(mutation: MutationRecord): void {}
 
   /**
    * Register component
    */
-  protected register<T>(
-    classComponent: new (name: string) => TFlat<Component>,
-    name: string
-  ): T {
-    let local = [];
-    const elements = Component.getDomElement(name);
-    if (!elements || elements.length === 0) {
-      return undefined;
-    }
+  protected register<T>(classComponent: TClassComponent, name: string): T {
+    // prepare instances array
+    const localInstances = [];
+    // get DOM elements
+    const elements = this.getDomElement(name);
+    // if no elements, exit
+    if (!elements.length) return;
 
+    // map elements
     for (const element of elements) {
+      // increment ID
       const id = COMPONENT_ID++;
-
+      // create child instance
       const classInstance: TFlat<Component> = new classComponent(name);
-
-      classInstance.$root.setAttribute(Component.DATA_COMPONENT_ID_ATTR, `${id}`);
-      COMPONENTS_LIST.push(classInstance);
-      local.push(classInstance);
+      // set ID on child DOM element
+      classInstance.$root.setAttribute(this.idAttr, `${id}`);
+      // push it store and local list
+      localInstances.push(classInstance);
     }
 
-    return local.length === 1 ? local[0] : local;
+    // return single instance or instances array
+    return localInstances.length === 1 ? localInstances[0] : localInstances;
   }
 
   // ------------------------------------------------------------------------------------- CORE
@@ -87,29 +87,26 @@ export default class Component {
    */
   private unmountChildren(): void {
     this.children &&
-      Object.keys(this.children).forEach((c) => {
-        const child = this.children?.[c];
+      Object.keys(this.children).forEach((component) => {
+        const child = this.children?.[component];
         if (!child) return;
 
         if (Array.isArray(child)) {
           child?.forEach((el) => el.unmounted());
-          // TODO remove from global arr
         } else {
-          child?.unmounted();
-          // TODO remove from global arr
+          (child as any)?.unmounted();
         }
       });
   }
 
   /**
-   * Get DOM
+   * Get DOM element
    */
-  private static getDomElement(name: string): HTMLElement[] {
+  private getDomElement(name: string): HTMLElement[] {
     return [
       // @ts-ignore
-      ...((this.$root || document).querySelectorAll(
-        `*[${Component.DATA_COMPONENT_ATTR}=${name}]`
-      ) || []),
+      ...((this.$root || document).querySelectorAll(`*[${this.componentAttr}=${name}]`) ||
+        []),
     ];
   }
 
@@ -121,15 +118,17 @@ export default class Component {
       // map on mutations
       for (const mutation of mutationsList) {
         // define what is root node (because target is parent of $root)
-        const isRootNode = (node) =>
-          node.getAttribute(Component.DATA_COMPONENT_ATTR) === this.name;
+        const isRootNode = (node) => node.getAttribute(this.componentAttr) === this.name;
 
+        // add nodes action
         for (const node of mutation.addedNodes) {
           if (isRootNode(node)) {
             debug("has been added", node);
             this.mounted();
           }
         }
+
+        // remove nodes action
         for (const node of mutation.removedNodes) {
           if (isRootNode(node)) {
             debug("has been removed", node);
