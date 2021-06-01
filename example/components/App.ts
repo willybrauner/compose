@@ -16,6 +16,8 @@ export default class App extends Component {
     super(e);
     this.init();
 
+    const title = this.find<HTMLElement>("title");
+    debug("title", title);
     // test
     setTimeout(() => {
       this.children.header.$root.remove();

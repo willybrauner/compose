@@ -80,6 +80,30 @@ export default class Component {
     return localInstances.length === 1 ? localInstances[0] : localInstances;
   }
 
+  /**
+   * Find HTML element with BEM element name
+   * ex:
+   *  if class name is "Block_section"
+   *  this.find("section") will return DOM element with "Block_section" class
+   */
+  protected find<T extends HTMLElement | HTMLElement[]>(
+    bemElementName: string,
+    className = this.$root?.classList?.[0]
+  ): T {
+    // check and exit
+    if (!className || !bemElementName) return;
+    // query elements
+    const elements = this.$root.querySelectorAll(`.${className}_${bemElementName}`);
+    debug('elemeslslnts',elements)
+
+    // check
+    if (!elements.length) return;
+    // transform to array
+    const formatElements: T = Array.from(elements) as T;
+    // return 1 element or array of elements
+    return (formatElements as any).length === 1 ? formatElements[0] : formatElements;
+  }
+
   // ------------------------------------------------------------------------------------- CORE
 
   /**
