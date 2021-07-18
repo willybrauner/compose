@@ -1,3 +1,6 @@
+import debugModule from "debug";
+const debug = debugModule(`front:Component`);
+
 export type TComponents = {
   [name: string]: Component | Component[];
 };
@@ -18,7 +21,6 @@ type TProps = { [x: string]: any } | void;
 
 // globals
 let COMPONENT_ID = 0;
-const debug = require("debug")(`front:Component`);
 
 /**
  * Component

@@ -1,8 +1,7 @@
-import { Component } from "../../src";
+import { Component } from "../../../src";
 import Header from "./Header";
-
-const componentName = "App";
-const debug = require("debug")(`front:${componentName}`);
+import debugModule from "debug";
+const debug = debugModule(`front:App`);
 
 /**
  * @name App

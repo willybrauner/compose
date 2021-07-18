@@ -5,14 +5,8 @@ body {
   color: #eee;
 }
 
-code {
-  color: #999;
-  font-size: 0.9em;
-  display: block;
-  margin-top: 0.3em;
-}
-
 button {
+  margin-top: 1rem;
   cursor: pointer;
   background: #000;
   border: none;
@@ -22,22 +16,24 @@ button {
   font-size: 0.9rem;
   outline: none;
 }
+
 button:hover {
   background: #444;
 }
 
-.Link {
-  color: #999;
+.link {
+  color: red;
+}
+
+.Page {
+  margin-top: 2rem;
+}
+
+code {
+  display: block;
+  margin-top: 3rem;
 }
 
 .active {
   color: orange;
-}
-
-.Stack {
-  padding-left: 1rem;
-}
-
-.Stack > * {
-  padding-left: 2rem;
 }

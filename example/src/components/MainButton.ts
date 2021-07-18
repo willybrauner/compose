@@ -1,7 +1,6 @@
-import { Component } from "../../src";
-
-const componentName = "MainButton";
-const debug = require("debug")(`front:${componentName}`);
+import { Component } from "../../../src";
+import debugModule from "debug";
+const debug = debugModule(`front:MainButton`);
 
 /**
  * @name MainButton
