@@ -15,18 +15,12 @@ export default class Header extends Component {
     this.init();
   }
 
-  public components = {
-    MainButton: this.add(MainButton),
-  };
-
   public mounted() {
-    super.mounted();
-    debug("start mount from header", this.components.MainButton);
+    debug("start mount from header");
     window.addEventListener("resize", this.resizeHandler);
   }
 
   public unmounted() {
-    super.unmounted();
     debug("UN mount from header");
     window.removeEventListener("resize", this.resizeHandler);
   }

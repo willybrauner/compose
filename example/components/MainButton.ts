@@ -15,15 +15,15 @@ export default class MainButton extends Component {
   }
 
   public mounted() {
-    super.mounted()
-    debug("start mount from MainButton");
-    window.addEventListener("resize", this.resizeHandler);
+    // super.mounted()
+    // debug("start mount from MainButton");
+    // window.addEventListener("resize", this.resizeHandler);
   }
 
   public unmounted() {
-    super.unmounted();
-    debug("UN mount from MainButton");
-    window.removeEventListener("resize", this.resizeHandler);
+    //super.unmounted();
+    // debug("UN mount from MainButton");
+    // window.removeEventListener("resize", this.resizeHandler);
   }
 
   protected resizeHandler = () => {

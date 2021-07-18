@@ -55,29 +55,39 @@ export default class Component<Props = TProps> {
    * Init to call in contructor (to keep context)
    */
   protected init() {
-    this.beforeMount();
-    this.mounted();
-    this.watchChildren();
+    this._beforeMount();
+    this._mounted();
+    this._watchChildren();
   }
 
+  /**
+   * Before mounted
+   */
   public beforeMount(): void {}
+  private _beforeMount(): void {
+    this.beforeMount();
+  }
 
   /**
    * When component is mounted
    */
-  public mounted(): void {
+  public mounted(): void {}
+  private _mounted(): void {
     this.isMounted = true;
     debug("MOUNTED!", this.name);
+    this.mounted();
   }
 
   /**
    * When component is unmounted
-   * - execute unmounted() method of components
+   * Will execute unmounted() method of children components
    */
-  public unmounted(): void {
+  public unmounted() {}
+  private _unmounted(): void {
     this.isMounted = false;
     debug("UNMOUNTED", this.name);
-    this.onChildrenComponents((component: Component) => component?.unmounted?.());
+    this.unmounted();
+    this.onChildrenComponents((component: Component) => component?._unmounted?.());
   }
 
   /**
@@ -197,9 +207,9 @@ export default class Component<Props = TProps> {
   }
 
   /**
-   *  Watch component changes
+   *  Watch children components changed
    */
-  private watchChildren(): void {
+  private _watchChildren(): void {
     const onChange = (mutationsList) => {
       for (const mutation of mutationsList) {
         // add node actions
@@ -226,7 +236,7 @@ export default class Component<Props = TProps> {
             if (nodeRemovedId === component.id && component.isMounted) {
               // prettier-ignore
               debug("!!! has been removed", { name: component, isMounted: component.isMounted, node })
-              component.unmounted();
+              component._unmounted();
               component.observer.disconnect();
             }
           });

@@ -19,13 +19,15 @@ export default class App extends Component {
     Header: this.add(Header),
   };
 
-  mounted() {
-    super.mounted()
-    debug("start mount from App");
+  public mounted() {
+    debug("COUCOU start mount from App");
     window.addEventListener("resize", this.resizeHandler);
+
+    // setTimeout(() => {
+    //   this.components.Header.$root.remove();
+    // }, 2000);
   }
-  unmounted() {
-    super.unmounted();
+  public unmounted() {
     debug("UN mount from App");
     window.removeEventListener("resize", this.resizeHandler);
   }
