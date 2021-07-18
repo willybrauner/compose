@@ -1,7 +1,7 @@
 import { Component } from "./";
 import { StateSignal } from "@solid-js/signal";
 import debugModule from "debug";
-import {TAddComponent} from "./Component"
+import { TAddComponent } from "./Component";
 const debug = debugModule(`front:Stack-`);
 
 export interface IPage {
@@ -123,8 +123,11 @@ export class Stack extends Component {
   protected handleHistory = async (event) => {
     // TODO ne pas bloquer la transition mais killer l'existante
     if (this.pageIsAnimating) return;
+
+    // get URL to request
     const requestUrl = event?.["arguments"]?.[2] || window.location.href;
     debug("url", requestUrl);
+
     if (!requestUrl || requestUrl === this.currentUrl) return;
     this.currentUrl = requestUrl;
 
@@ -132,9 +135,7 @@ export class Stack extends Component {
     Stack.pageIsAnimatingState.dispatch(true);
     this.pageIsAnimating = true;
 
-    /**
-     * Prepare current page to be playOut
-     */
+    // Prepare current page to be playOut
     const page = this.currentPage;
     const playOut = (goFrom: string, autoUnmountOnComplete = true) => {
       this.playOutComplete = false;
@@ -154,9 +155,7 @@ export class Stack extends Component {
       unmount,
     };
 
-    /**
-     * Prepare mount new page to be playIn
-     */
+    // Prepare mount new page to be playIn
     const mountNewPage = async (): Promise<IPage> => {
       // fetch new page document
       const newDocument = await this.fetchNewDocument(requestUrl);
@@ -192,10 +191,7 @@ export class Stack extends Component {
       };
     };
 
-    /**
-     * Start page transition manager who resolve newPage obj
-     */
-
+    // Start page transition manager who resolve newPage obj
     try {
       const newPage = await this.pageTransitions({
         currentPage,
