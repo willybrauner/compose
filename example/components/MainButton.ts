@@ -14,8 +14,8 @@ export default class MainButton extends Component {
     this.init();
   }
 
-
   public mounted() {
+    super.mounted()
     debug("start mount from MainButton");
     window.addEventListener("resize", this.resizeHandler);
   }

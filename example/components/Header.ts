@@ -16,11 +16,11 @@ export default class Header extends Component {
   }
 
   public components = {
-    MainButton: this.add<MainButton>(MainButton),
+    MainButton: this.add(MainButton),
   };
 
-
   public mounted() {
+    super.mounted();
     debug("start mount from header", this.components.MainButton);
     window.addEventListener("resize", this.resizeHandler);
   }

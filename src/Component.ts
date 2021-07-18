@@ -100,11 +100,9 @@ export default class Component<Props = TProps> {
 
     // get string name instance from from param or static attrName property
     const name: string = attrName || classComponent?.["attrName"];
-    debug("add name", name);
 
     // get DOM elements
     const elements = this.getDomElement(this.$root, name);
-    debug("add elements: ", elements, this.$root, name);
 
     // if no elements, exit
     if (!elements.length) return;

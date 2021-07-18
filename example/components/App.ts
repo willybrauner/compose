@@ -20,8 +20,8 @@ export default class App extends Component {
   };
 
   mounted() {
+    super.mounted()
     debug("start mount from App");
-    debug(">>ww>>", this.components.Header);
     window.addEventListener("resize", this.resizeHandler);
   }
   unmounted() {
