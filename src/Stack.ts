@@ -66,23 +66,27 @@ export class Stack extends Component {
   /**
    * Life cycle
    */
-  public start() {
+  protected start() {
     this.initEvents();
   }
 
-  public update() {
+  protected update() {
     this.removeEvents();
     this.initEvents();
   }
 
-  public stop() {
+  protected stop() {
     this.removeEvents();
   }
+
+  protected onTransitionStart(): void {}
+
+  protected onTransitionComplete(): void {}
 
   /**
    * EVENTS
    */
-  protected initEvents() {
+  private initEvents() {
     const links = this.getLinksWithAttr();
     links.forEach((item: HTMLElement) => {
       item?.addEventListener("click", this.handleLinks);
@@ -92,7 +96,7 @@ export class Stack extends Component {
     });
   }
 
-  protected removeEvents() {
+  private removeEvents() {
     const links = this.getLinksWithAttr();
     links.forEach((item: HTMLElement) => {
       item?.removeEventListener("click", this.handleLinks);
@@ -102,13 +106,13 @@ export class Stack extends Component {
     });
   }
 
-  // ------------------------------------------------------------------------------------- HANDLER
+  // ------------------------------------------------------------------------------------- HANDLERS
 
   /**
    * Handle links
    * @param event
    */
-  protected handleLinks = (event): void => {
+  private handleLinks = (event): void => {
     if (!event) return;
     event.preventDefault();
     // TODO ne pas bloquer la transition mais killer l'existante
@@ -120,7 +124,7 @@ export class Stack extends Component {
    * Handle history
    * @param event
    */
-  protected handleHistory = async (event) => {
+  private handleHistory = async (event) => {
     // TODO ne pas bloquer la transition mais killer l'existante
     if (this.pageIsAnimating) return;
 
@@ -193,11 +197,16 @@ export class Stack extends Component {
 
     // Start page transition manager who resolve newPage obj
     try {
+      // call callback start
+      this.onTransitionStart();
+
+      // get new Page from page transitions resolver
       const newPage = await this.pageTransitions({
         currentPage,
         mountNewPage,
       });
-      // end, set new page
+
+      //  set new pages
       this.prevPage = this.currentPage;
       this.currentPage = newPage;
 
@@ -205,6 +214,8 @@ export class Stack extends Component {
       Stack.pageIsAnimatingState.dispatch(false);
       this.pageIsAnimating = false;
 
+      // call callback complete
+      this.onTransitionComplete();
       debug("ended!");
     } catch (e) {
       debug("ERROR");
@@ -232,30 +243,30 @@ export class Stack extends Component {
 
   // ------------------------------------------------------------------------------------- PREPARE PAGE
 
-  protected getPageContainer($node: HTMLElement = document.body): HTMLElement {
+  private getPageContainer($node: HTMLElement = document.body): HTMLElement {
     return $node.querySelector(`*[${Stack.pageContainerAttr}]`);
   }
 
-  protected getPageWrapper($node: HTMLElement): HTMLElement {
+  private getPageWrapper($node: HTMLElement): HTMLElement {
     return $node.querySelector(`*[${Stack.pageWrapperAttr}]`);
   }
 
-  protected getPageRoot($wrapper: HTMLElement): HTMLElement {
+  private getPageRoot($wrapper: HTMLElement): HTMLElement {
     return $wrapper.children[$wrapper.children?.length - 1 || 0] as HTMLElement;
   }
 
-  protected getPageName($pageRoot: HTMLElement): string {
+  private getPageName($pageRoot: HTMLElement): string {
     for (const page of Object.keys(this._pages)) {
       if (page == $pageRoot.getAttribute(Component.componentAttr)) return page;
     }
   }
 
-  protected getPageInstance(pageName: string, $pageRoot?: HTMLElement): Component {
+  private getPageInstance(pageName: string, $pageRoot?: HTMLElement): Component {
     const classComponent = this._pages[pageName];
     return classComponent ? new classComponent($pageRoot, {}, pageName) : null;
   }
 
-  protected getFirstPage(): IPage {
+  private getFirstPage(): IPage {
     const $pageRoot = this.getPageRoot(this.$pageWrapper);
     const pageName = this.getPageName($pageRoot);
     const instance = this.getPageInstance(pageName, $pageRoot);
@@ -269,7 +280,7 @@ export class Stack extends Component {
   /**
    * Get link with with URL ATTR
    */
-  protected getLinksWithAttr(): HTMLElement[] {
+  private getLinksWithAttr(): HTMLElement[] {
     return [
       // @ts-ignore
       ...this.$pageContainer?.querySelectorAll(`*[${Stack.pageUrlAttr}]`),
@@ -281,7 +292,7 @@ export class Stack extends Component {
    * @param url
    * @protected
    */
-  protected async fetchNewDocument(url: string) {
+  private async fetchNewDocument(url: string) {
     try {
       const data = await fetch(url);
       const html = await data.text();
