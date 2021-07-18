@@ -93,7 +93,7 @@ export default class Component<Props = TProps> {
   /**
    * Callback of watch method execute each time children DOM nodes changed
    */
-  protected updated(mutation: MutationRecord): void {}
+  public updated(mutation: MutationRecord): void {}
 
   /**
    * Add is a register child component function
