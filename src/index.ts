@@ -1,1 +1,2 @@
-export { default as Component } from "./Component";
+export { Component } from "./Component";
+export { Stack } from "./Stack";

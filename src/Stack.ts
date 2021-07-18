@@ -1,4 +1,4 @@
-import Component from "./Component";
+import { Component } from "./";
 import { StateSignal } from "@solid-js/signal";
 const name = "Stack-";
 const debug = require("debug")(`front:${name}`);
@@ -20,7 +20,7 @@ export type TManagePageTransitionParams = {
 /**
  * AppComponent is a App class to extend
  */
-export default class Stack extends Component {
+export class Stack extends Component {
   // dispatch page is animating state
   public static pageIsAnimatingState = StateSignal<boolean>(false);
   public pageIsAnimating: boolean = false;
@@ -167,11 +167,9 @@ export default class Stack extends Component {
       const newPageInstance = this.getPageInstance(newPageName, newPageRoot);
       const playIn = () => {
         this.playInComplete = false;
-        return newPageInstance
-          .playIn(newPageInstance.$root, this.currentPage.pageName)
-          .then(() => {
-            this.playInComplete = true;
-          });
+        return newPageInstance.playIn(newPageInstance.$root, this.currentPage.pageName).then(() => {
+          this.playInComplete = true;
+        });
       };
 
       // update local stack events (history)

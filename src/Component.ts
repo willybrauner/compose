@@ -25,7 +25,7 @@ let COMPONENT_ID = 0;
 /**
  * Component
  */
-export default class Component<Props = TProps> {
+export class Component<Props = TProps> {
   public name: string;
   public $root: HTMLElement;
   public props: Props;
