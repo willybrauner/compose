@@ -11,11 +11,7 @@ export type TElements = {
 
 type TFlatArray<T> = T extends any[] ? T[number] : T;
 
-export type TAddComponent = new <P>(
-  $root?: HTMLElement,
-  props?: P,
-  attrName?: string
-) => Component;
+export type TAddComponent = new <P>($root?: HTMLElement, props?: P, attrName?: string) => Component;
 
 type TProps = { [x: string]: any } | void;
 
@@ -87,7 +83,7 @@ export class Component<Props = TProps> {
   public unmounted() {}
   private _unmounted(): void {
     this.isMounted = false;
-    debug("UNMOUNTED", this.name);
+    debug("_UN MOUNTED...", this.name);
     this.unmounted();
     this.onChildrenComponents((component: Component) => component?._unmounted?.());
   }
@@ -136,9 +132,7 @@ export class Component<Props = TProps> {
     }
 
     // return single instance or instances array
-    return localInstances.length === 1 && !returnArray
-      ? localInstances[0]
-      : localInstances;
+    return localInstances.length === 1 && !returnArray ? localInstances[0] : localInstances;
   }
 
   /**
@@ -202,10 +196,7 @@ export class Component<Props = TProps> {
    * @param $node
    */
   private getComponentId($node: HTMLElement): number {
-    return (
-      $node?.getAttribute(Component.idAttr) &&
-      parseInt($node.getAttribute(Component.idAttr))
-    );
+    return $node?.getAttribute(Component.idAttr) && parseInt($node.getAttribute(Component.idAttr));
   }
 
   /**

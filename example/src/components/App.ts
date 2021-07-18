@@ -1,12 +1,16 @@
-import { Component } from "../../../src";
-import Header from "./Header";
+import { Stack } from "../../../src";
 import debugModule from "debug";
+import HomePage from "../pages/HomePage";
+import AboutPage from "../pages/AboutPage";
+import { gsap } from "gsap";
+import { IPage, TManagePageTransitionParams } from "../../../src/Stack";
+
 const debug = debugModule(`front:App`);
 
 /**
  * @name App
  */
-export default class App extends Component {
+export default class App extends Stack {
   public static attrName = "App";
 
   constructor($root, props) {
@@ -14,24 +18,30 @@ export default class App extends Component {
     this.init();
   }
 
-  public components = {
-    Header: this.add(Header),
-  };
-
-  public mounted() {
-    debug("COUCOU start mount from App");
-    window.addEventListener("resize", this.resizeHandler);
-
-    // setTimeout(() => {
-    //   this.components.Header.$root.remove();
-    // }, 2000);
-  }
-  public unmounted() {
-    debug("UN mount from App");
-    window.removeEventListener("resize", this.resizeHandler);
+  protected pages(): { [p: string]: any } {
+    return {
+      HomePage,
+      AboutPage,
+    };
   }
 
-  protected resizeHandler = () => {
-    debug("window.innerWidth", window.innerWidth);
-  };
+  /**
+   * Page transitions
+   * Default transition to override from parent component
+   * @param currentPage
+   * @param mountNewPage
+   * @protected
+   */
+  protected pageTransitions({
+    currentPage,
+    mountNewPage,
+  }: TManagePageTransitionParams): Promise<IPage> {
+    return new Promise(async (resolve) => {
+      const newPage = await mountNewPage();
+      newPage.$pageRoot.style.visibility = "hidden"
+      currentPage.playOut(newPage.pageName);
+      await newPage.playIn();
+      resolve(newPage);
+    });
+  }
 }

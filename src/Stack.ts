@@ -1,7 +1,7 @@
 import { Component } from "./";
 import { StateSignal } from "@solid-js/signal";
-const name = "Stack-";
-const debug = require("debug")(`front:${name}`);
+import debugModule from "debug";
+const debug = debugModule(`front:Stack-`);
 
 export interface IPage {
   $pageRoot: HTMLElement;
@@ -21,20 +21,23 @@ export type TManagePageTransitionParams = {
  * AppComponent is a App class to extend
  */
 export class Stack extends Component {
-  // dispatch page is animating state
+  public static pageContainerAttr = "data-page-transition-container";
+  public static pageWrapperAttr = "data-page-transition-wrapper";
+  public static pageUrlAttr = "data-page-transition-url";
+
+  public $pageContainer: HTMLElement;
+  public $pageWrapper: HTMLElement;
+
   public static pageIsAnimatingState = StateSignal<boolean>(false);
   public pageIsAnimating: boolean = false;
 
-  public static pageContainerAttr = "data-page-transition-container";
-  public static pageUrlAttr = "data-page-transition-url";
-
-  public $root: HTMLElement;
   protected currentUrl: string = window.location.href;
-  protected $pageContainer: HTMLElement;
   protected currentPage: IPage;
   protected prevPage: IPage;
   protected playOutComplete: boolean = true;
   protected playInComplete: boolean = true;
+
+  private historyEvents = ["pushState", "replaceState", "popstate"];
 
   // Register pages from parent class
   protected _pages: { [x: string]: any };
@@ -44,9 +47,9 @@ export class Stack extends Component {
 
   constructor($root, props) {
     super($root, props);
-    this.$root = document.querySelector(".App") || $root;
+    this.$pageContainer = this.getPageContainer() || $root;
+    this.$pageWrapper = this.getPageWrapper(this.$pageContainer);
     this._pages = this.pages();
-    this.$pageContainer = this.getPageContainer(this.$root);
     this.currentPage = this.getFirstPage();
 
     // start patch history
@@ -83,9 +86,9 @@ export class Stack extends Component {
     links.forEach((item: HTMLElement) => {
       item?.addEventListener("click", this.handleLinks);
     });
-    window.addEventListener("pushState", this.handleHistory);
-    window.addEventListener("replaceState", this.handleHistory);
-    window.addEventListener("popstate", this.handleHistory);
+    this.historyEvents.forEach((event) => {
+      window.addEventListener(event, this.handleHistory);
+    });
   }
 
   protected removeEvents() {
@@ -93,9 +96,9 @@ export class Stack extends Component {
     links.forEach((item: HTMLElement) => {
       item?.removeEventListener("click", this.handleLinks);
     });
-    window.removeEventListener("pushState", this.handleHistory);
-    window.removeEventListener("replaceState", this.handleHistory);
-    window.removeEventListener("popstate", this.handleHistory);
+    this.historyEvents.forEach((event) => {
+      window.removeEventListener(event, this.handleHistory);
+    });
   }
 
   // ------------------------------------------------------------------------------------- HANDLER
@@ -119,11 +122,10 @@ export class Stack extends Component {
   protected handleHistory = async (event) => {
     // TODO ne pas bloquer la transition mais killer l'existante
     if (this.pageIsAnimating) return;
-
-    const selectedUrl = event?.["arguments"]?.[2] || window.location.href;
-    debug("selectedUrl", selectedUrl);
-    if (!selectedUrl || selectedUrl === this.currentUrl) return;
-    this.currentUrl = selectedUrl;
+    const requestUrl = event?.["arguments"]?.[2] || window.location.href;
+    debug("url", requestUrl);
+    if (!requestUrl || requestUrl === this.currentUrl) return;
+    this.currentUrl = requestUrl;
 
     // dispatch is animating
     Stack.pageIsAnimatingState.dispatch(true);
@@ -135,7 +137,7 @@ export class Stack extends Component {
     const page = this.currentPage;
     const playOut = (goFrom: string, autoUnmountOnComplete = true) => {
       this.playOutComplete = false;
-      page.instance.unmounted();
+      page.instance._unmounted();
       return page.instance.playOut(page.$pageRoot, goFrom).then(() => {
         this.playOutComplete = true;
         autoUnmountOnComplete && unmount();
@@ -155,16 +157,22 @@ export class Stack extends Component {
      * Prepare mount new page to be playIn
      */
     const mountNewPage = async (): Promise<IPage> => {
-      const newDocument = await this.fetchNewDocument(selectedUrl);
+      // fetch new page document
+      const newDocument = await this.fetchNewDocument(requestUrl);
+
+      // change page title
       document.title = newDocument.title;
 
-      const newPageContainer = this.getPageContainer(newDocument.body);
-      const newPageRoot = this.getPageRoot(newPageContainer);
-      this.$pageContainer.appendChild(newPageRoot);
+      // inject new page content in pages Container
+      const newPageWrapper = this.getPageWrapper(newDocument.body);
+      const newPageRoot = this.getPageRoot(newPageWrapper);
+      this.$pageWrapper.appendChild(newPageRoot);
 
-      // important to instance the page after append it in DOM
+      //  instance the page after append it in DOM
       const newPageName = this.getPageName(newPageRoot);
       const newPageInstance = this.getPageInstance(newPageName, newPageRoot);
+
+      // prepare playIn transition for new Page
       const playIn = () => {
         this.playInComplete = false;
         return newPageInstance.playIn(newPageInstance.$root, this.currentPage.pageName).then(() => {
@@ -227,12 +235,16 @@ export class Stack extends Component {
 
   // ------------------------------------------------------------------------------------- PREPARE PAGE
 
-  protected getPageContainer($root): HTMLElement {
-    return $root.querySelector(`*[${Stack.pageContainerAttr}]`);
+  protected getPageContainer($node: HTMLElement = document.body): HTMLElement {
+    return $node.querySelector(`*[${Stack.pageContainerAttr}]`);
   }
 
-  protected getPageRoot($container: HTMLElement): HTMLElement {
-    return $container.children[$container.children?.length - 1 || 0] as HTMLElement;
+  protected getPageWrapper($node: HTMLElement): HTMLElement {
+    return $node.querySelector(`*[${Stack.pageWrapperAttr}]`);
+  }
+
+  protected getPageRoot($wrapper: HTMLElement): HTMLElement {
+    return $wrapper.children[$wrapper.children?.length - 1 || 0] as HTMLElement;
   }
 
   protected getPageName($pageRoot: HTMLElement): string {
@@ -247,7 +259,7 @@ export class Stack extends Component {
   }
 
   protected getFirstPage(): IPage {
-    const $pageRoot = this.getPageRoot(this.$pageContainer);
+    const $pageRoot = this.getPageRoot(this.$pageWrapper);
     const pageName = this.getPageName($pageRoot);
     const instance = this.getPageInstance(pageName, $pageRoot);
     const playIn = () => instance.playIn($pageRoot);
@@ -263,7 +275,7 @@ export class Stack extends Component {
   protected getLinksWithAttr(): HTMLElement[] {
     return [
       // @ts-ignore
-      ...this.$root?.querySelectorAll(`*[${Stack.pageUrlAttr}]`),
+      ...this.$pageContainer?.querySelectorAll(`*[${Stack.pageUrlAttr}]`),
     ];
   }
 

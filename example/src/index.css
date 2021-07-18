@@ -5,6 +5,13 @@ body {
   color: #eee;
 }
 
+.Page {
+  margin-top: 2rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 button {
   margin-top: 1rem;
   cursor: pointer;
@@ -24,11 +31,6 @@ button:hover {
 .link {
   color: red;
 }
-
-.Page {
-  margin-top: 2rem;
-}
-
 code {
   display: block;
   margin-top: 3rem;

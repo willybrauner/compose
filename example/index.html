@@ -7,14 +7,14 @@
 
   <body>
     <div id="root">
-      <main class="App" data-component="App">
+      <main class="App" data-component="App" data-page-transition-container>
         <nav>
           <a class="link" href="index.html" data-page-transition-url="index.html">home</a>
           <a class="link" href="about.html" data-page-transition-url="about.html">about</a>
         </nav>
 
-        <div class="App_stack" data-page-transition-container>
-          <div class="HomePage Page">
+        <div class="App_stack" data-page-transition-wrapper>
+          <div class="HomePage Page" data-component="HomePage">
             <code>Header</code>
             <header class="Header HomePage_header" data-component="Header">
               <h1 class="Header_title">Home</h1>
