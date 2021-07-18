@@ -1,6 +1,7 @@
 import { Component } from "./";
 import { StateSignal } from "@solid-js/signal";
 import debugModule from "debug";
+import {TAddComponent} from "./Component"
 const debug = debugModule(`front:Stack-`);
 
 export interface IPage {
@@ -18,7 +19,7 @@ export type TManagePageTransitionParams = {
 };
 
 /**
- * AppComponent is a App class to extend
+ * Stack is an extended class who manage page transitions
  */
 export class Stack extends Component {
   public static pageContainerAttr = "data-page-transition-container";
@@ -40,8 +41,8 @@ export class Stack extends Component {
   private historyEvents = ["pushState", "replaceState", "popstate"];
 
   // Register pages from parent class
-  protected _pages: { [x: string]: any };
-  protected pages(): { [x: string]: any } {
+  protected _pages: { [x: string]: TAddComponent };
+  protected pages(): { [x: string]: TAddComponent } {
     return {};
   }
 
@@ -253,7 +254,7 @@ export class Stack extends Component {
     }
   }
 
-  protected getPageInstance(pageName: string, $pageRoot?: HTMLElement) {
+  protected getPageInstance(pageName: string, $pageRoot?: HTMLElement): Component {
     const classComponent = this._pages[pageName];
     return classComponent ? new classComponent($pageRoot, {}, pageName) : null;
   }

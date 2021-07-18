@@ -94,6 +94,16 @@ export class Component<Props = TProps> {
   public updated(mutation: MutationRecord): void {}
 
   /**
+   * Page transitions
+   */
+  public playIn($root?: HTMLElement, goFrom?: string): Promise<void | any> {
+    return Promise.resolve();
+  }
+  public playOut($root?: HTMLElement, goTo?: string): Promise<void | any> {
+    return Promise.resolve();
+  }
+
+  /**
    * Add is a register child component function
    * It create new children instance
    */

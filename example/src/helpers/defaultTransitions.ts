@@ -1,9 +1,12 @@
 import { gsap } from "gsap";
+import debugModule from "debug";
+const debug = debugModule(`front:defaultTransitions`);
 
 const xValue = 100;
 const duration = 1;
 
 export const defaultPlayIn = (el?: HTMLElement, goFrom?: string): Promise<void> => {
+  debug("goFrom:", goFrom)
   return new Promise((resolve) => {
     gsap.fromTo(
       el,
@@ -23,6 +26,7 @@ export const defaultPlayIn = (el?: HTMLElement, goFrom?: string): Promise<void> 
 };
 
 export const defaultPlayOut = (el?: HTMLElement, goTo?: string): Promise<void> => {
+  debug("goTo: ", goTo)
   return new Promise((resolve) => {
     gsap.fromTo(
       el,
