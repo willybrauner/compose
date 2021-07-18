@@ -1,6 +1,5 @@
 import { Component } from "../../src";
 import Header from "./Header";
-import Stack from "../../src/Stack";
 
 const componentName = "App";
 const debug = require("debug")(`front:${componentName}`);
@@ -17,11 +16,12 @@ export default class App extends Component {
   }
 
   public components = {
-    Header: this.add<Header>(Header),
+    Header: this.add(Header),
   };
 
   mounted() {
     debug("start mount from App");
+    debug(">>ww>>", this.components.Header);
     window.addEventListener("resize", this.resizeHandler);
   }
   unmounted() {

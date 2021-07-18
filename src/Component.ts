@@ -1,21 +1,24 @@
 export type TComponents = {
   [name: string]: Component | Component[];
 };
+
 export type TElements = {
   [x: string]: HTMLElement | HTMLElement[];
 };
+
 type TFlatArray<T> = T extends any[] ? T[number] : T;
-export type TClassComponent = new <P>(
+
+export type TAddComponent = new <P>(
   $root?: HTMLElement,
   props?: P,
   attrName?: string
 ) => Component;
+
 type TProps = { [x: string]: any } | void;
 
 // globals
 let COMPONENT_ID = 0;
-const COMPONENT_NAME = "Component";
-const debug = require("debug")(`front:${COMPONENT_NAME}`);
+const debug = require("debug")(`front:Component`);
 
 /**
  * Component
@@ -24,11 +27,11 @@ export default class Component<Props = TProps> {
   public name: string;
   public $root: HTMLElement;
   public props: Props;
-  protected components: TComponents;
-  protected elements: TElements;
-  protected observer: MutationObserver;
-  protected id: number;
-  protected isMounted: boolean;
+  public components: TComponents;
+  public elements: TElements;
+  public id: number;
+  public isMounted: boolean;
+  private observer: MutationObserver;
   public static componentAttr: string = "data-component";
   public static idAttr: string = "data-component-id";
 
@@ -40,8 +43,8 @@ export default class Component<Props = TProps> {
   constructor($root?: HTMLElement, props?: Props, attrName?: string) {
     this.props = props;
     this.$root = $root;
-    this.name = attrName || this.getComponentName();
-    debug("this.name construct", this.name);
+    this.name = attrName || this.getComponentName(this.$root);
+
     // set ID on DOM element
     this.$root.setAttribute(Component.idAttr, `${COMPONENT_ID}`);
     this.id = COMPONENT_ID;
@@ -57,12 +60,12 @@ export default class Component<Props = TProps> {
     this.watchChildren();
   }
 
-  protected beforeMount(): void {}
+  public beforeMount(): void {}
 
   /**
    * When component is mounted
    */
-  protected mounted(): void {
+  public mounted(): void {
     this.isMounted = true;
     debug("MOUNTED!", this.name);
   }
@@ -71,7 +74,7 @@ export default class Component<Props = TProps> {
    * When component is unmounted
    * - execute unmounted() method of components
    */
-  protected unmounted(): void {
+  public unmounted(): void {
     this.isMounted = false;
     debug("UNMOUNTED", this.name);
     this.onChildrenComponents((component: Component) => component?.unmounted?.());
@@ -86,21 +89,22 @@ export default class Component<Props = TProps> {
    * Add is a register child component function
    * It create new children instance
    */
-  protected add<T, P = Props>(
-    classComponent: TClassComponent,
+  protected add<T = Component, P = TProps>(
+    classComponent: TAddComponent,
     props?: P,
-    attrName?: string
+    attrName?: string,
+    returnArray: boolean = false
   ): T {
     // prepare instances array
     const localInstances = [];
 
-    // get string name instance
-    const name: string = classComponent?.["attrName"] || attrName;
+    // get string name instance from from param or static attrName property
+    const name: string = attrName || classComponent?.["attrName"];
     debug("add name", name);
 
     // get DOM elements
     const elements = this.getDomElement(this.$root, name);
-    debug("elements: ", elements);
+    debug("add elements: ", elements, this.$root, name);
 
     // if no elements, exit
     if (!elements.length) return;
@@ -120,8 +124,11 @@ export default class Component<Props = TProps> {
       // push it store and local list
       localInstances.push(classInstance);
     }
+
     // return single instance or instances array
-    return localInstances.length === 1 ? localInstances[0] : localInstances;
+    return localInstances.length === 1 && !returnArray
+      ? localInstances[0]
+      : localInstances;
   }
 
   /**
@@ -154,7 +161,7 @@ export default class Component<Props = TProps> {
   private getDomElement($root: HTMLElement, name: string): HTMLElement[] {
     return [
       // @ts-ignore
-      ...($root?.querySelectorAll(`*[${this.componentAttr}=${name}]`) || []),
+      ...($root?.querySelectorAll(`*[${Component.componentAttr}=${name}]`) || []),
     ];
   }
 
@@ -176,16 +183,20 @@ export default class Component<Props = TProps> {
    * This string name need to be de same than the Class component name
    * @param $node
    */
-  protected getComponentName = ($node: HTMLElement = this.$root): string =>
-    $node?.getAttribute(Component.componentAttr);
+  private getComponentName($node: HTMLElement = this.$root): string {
+    return $node?.getAttribute(Component.componentAttr);
+  }
 
   /**
    * Get component ID
    * @param $node
    */
-  protected getComponentId = ($node: HTMLElement): number =>
-    $node?.getAttribute(Component.idAttr) &&
-    parseInt($node.getAttribute(Component.idAttr));
+  private getComponentId($node: HTMLElement): number {
+    return (
+      $node?.getAttribute(Component.idAttr) &&
+      parseInt($node.getAttribute(Component.idAttr))
+    );
+  }
 
   /**
    *  Watch component changes

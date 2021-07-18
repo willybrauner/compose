@@ -7,14 +7,13 @@ const debug = require("debug")(`front:${componentName}`);
  * @name MainButton
  */
 export default class MainButton extends Component {
+  public static attrName = "MainButton";
+
   constructor($root, props) {
     super($root, props);
     this.init();
   }
 
-  protected resizeHandler = () => {
-    debug("window.innerWidth", window.innerWidth);
-  };
 
   public mounted() {
     debug("start mount from MainButton");
@@ -26,4 +25,8 @@ export default class MainButton extends Component {
     debug("UN mount from MainButton");
     window.removeEventListener("resize", this.resizeHandler);
   }
+
+  protected resizeHandler = () => {
+    debug("window.innerWidth", window.innerWidth);
+  };
 }
