@@ -1,28 +1,24 @@
 import { Component } from "../../src";
 import Header from "./Header";
+import Stack from "../../src/Stack";
 
 const componentName = "App";
-const debug = require("debug")(`composition:${componentName}`);
+const debug = require("debug")(`front:${componentName}`);
 
 /**
  * @name App
  */
 export default class App extends Component {
-  public children = {
-    header: this.register<Header>(Header, "Header"),
-  };
+  public static attrName = "App";
 
-  constructor(e) {
-    super(e);
+  constructor($root, props) {
+    super($root, props);
     this.init();
-
-    const title = this.find<HTMLElement>("title");
-    debug("title", title);
-    // test
-    setTimeout(() => {
-      this.children.header.$root.remove();
-    }, 2400);
   }
+
+  public components = {
+    Header: this.add<Header>(Header),
+  };
 
   mounted() {
     debug("start mount from App");
@@ -33,8 +29,6 @@ export default class App extends Component {
     debug("UN mount from App");
     window.removeEventListener("resize", this.resizeHandler);
   }
-
-  updated(mutation) {}
 
   protected resizeHandler = () => {
     debug("window.innerWidth", window.innerWidth);

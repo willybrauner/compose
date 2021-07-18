@@ -1,5 +1,5 @@
 const componentName = "Component";
-const debug = require("debug")(`composition:${componentName}`);
+const debug = require("debug")(`front:${componentName}`);
 
 type TRegister = {
   name: string;

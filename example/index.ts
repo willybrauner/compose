@@ -1,8 +1,8 @@
 import "./index.css";
 import App from "./components/App";
 const componentName = "index";
-const debug = require("debug")(`composition:${componentName}`);
+const debug = require("debug")(`front:${componentName}`);
 
 // ------------------------------------------------
 
-new App("App");
+new App(document.querySelector(".App"), {});

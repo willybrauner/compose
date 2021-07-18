@@ -14,7 +14,7 @@ let noop = () => { };
 
 
 const componentName = "component";
-const debug = require("debug")(`composition:${componentName}`);
+const debug = require("debug")(`front:${componentName}`);
 
 /**
  * register

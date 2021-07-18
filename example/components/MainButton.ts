@@ -1,14 +1,14 @@
 import { Component } from "../../src";
 
 const componentName = "MainButton";
-const debug = require("debug")(`composition:${componentName}`);
+const debug = require("debug")(`front:${componentName}`);
 
 /**
  * @name MainButton
  */
 export default class MainButton extends Component {
-  constructor(e) {
-    super(e);
+  constructor($root, props) {
+    super($root, props);
     this.init();
   }
 
