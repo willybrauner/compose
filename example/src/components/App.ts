@@ -9,7 +9,7 @@ const debug = debugModule(`front:App`);
 /**
  * @name App
  */
-export default class App extends Stack implements IDefaultPageTransitions {
+export default class App extends Stack {
   public static attrName = "App";
 
   constructor($root, props) {
@@ -23,28 +23,19 @@ export default class App extends Stack implements IDefaultPageTransitions {
     };
   }
 
-  /**
-   * Page transitions
-   * Default transition to override from parent component
-   * @param currentPage
-   * @param mountNewPage
-   * @protected
-   */
-  protected pageTransitions({
-    currentPage,
-    mountNewPage,
-  }: TManagePageTransitionParams): Promise<IPage> {
-    return new Promise(async (resolve) => {
-      const newPage = await mountNewPage();
-      // newPage.$pageRoot.style.visibility = "hidden";
-      currentPage.playOut(newPage.pageName);
-      await newPage.playIn();
-      resolve(newPage);
-    });
+  protected async pageTransitions(
+    currentPage: IPage,
+    newPage: IPage,
+    complete: () => void
+  ): Promise<any> {
+    await currentPage.playOut(newPage.pageName);
+    await newPage.playIn();
+    complete();
   }
 
-  public defaultPlayOut($root: HTMLElement, goTo?: string): Promise<any> | undefined {
+  public defaultPlayOut($root: HTMLElement, goTo?: string): Promise<void> {
     debug("goTo", goTo);
+    gsap.killTweensOf($root);
     return new Promise((resolve) => {
       gsap.fromTo(
         $root,
@@ -62,8 +53,9 @@ export default class App extends Stack implements IDefaultPageTransitions {
     });
   }
 
-  public defaultPlayIn($root: HTMLElement, goFrom?: string): Promise<any> | undefined {
+  public defaultPlayIn($root: HTMLElement, goFrom?: string): Promise<void> {
     debug("goFrom: ", goFrom);
+    gsap.killTweensOf($root);
     return new Promise((resolve) => {
       gsap.fromTo(
         $root,
