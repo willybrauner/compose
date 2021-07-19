@@ -33,10 +33,10 @@ export default class AboutPage extends Component {
 
   // ------------------------------------------------------------------------------------- PAGE TRANSITION
 
-  playIn($root?: HTMLElement, goFrom?: string): Promise<any> {
-    return defaultPlayIn($root, goFrom);
-  }
-  playOut($root?: HTMLElement, goTo?: string): Promise<any> {
-    return defaultPlayOut($root, goTo);
-  }
+  // playIn($root?: HTMLElement, goFrom?: string): Promise<any> {
+  //   return defaultPlayIn($root, goFrom);
+  // }
+  // playOut($root?: HTMLElement, goTo?: string): Promise<any> {
+  //   return defaultPlayOut($root, goTo);
+  // }
 }

@@ -4,6 +4,15 @@ import debugModule from "debug";
 import { TAddComponent } from "./Component";
 const debug = debugModule(`front:Stack-`);
 
+/**
+ * default transitions used instead specific page transitions methods
+ * They can be implemented on parent Class
+ */
+export interface IDefaultPageTransitions {
+  defaultPlayIn($root: HTMLElement, goFrom?: string): Promise<any | void>;
+  defaultPlayOut($root: HTMLElement, goTo?: string): Promise<any | void>;
+}
+
 export interface IPage {
   $pageRoot: HTMLElement;
   pageName: string;
@@ -66,16 +75,16 @@ export class Stack extends Component {
   /**
    * Life cycle
    */
-  protected start() {
+  protected start(): void {
     this.initEvents();
   }
 
-  protected update() {
+  protected update(): void {
     this.removeEvents();
     this.initEvents();
   }
 
-  protected stop() {
+  protected stop(): void {
     this.removeEvents();
   }
 
@@ -130,7 +139,7 @@ export class Stack extends Component {
 
     // get URL to request
     const requestUrl = event?.["arguments"]?.[2] || window.location.href;
-    debug("url", requestUrl);
+    debug("request url", requestUrl);
 
     if (!requestUrl || requestUrl === this.currentUrl) return;
     this.currentUrl = requestUrl;
@@ -144,7 +153,18 @@ export class Stack extends Component {
     const playOut = (goFrom: string, autoUnmountOnComplete = true) => {
       this.playOutComplete = false;
       page.instance._unmounted();
-      return page.instance.playOut(page.$pageRoot, goFrom).then(() => {
+
+      const playOut = this.constructor.prototype?.defaultPlayOut || page.instance.playOut;
+
+      // cas there is no available playOut method
+      if (!playOut) {
+        return Promise.resolve().then(() => {
+          this.playOutComplete = true;
+          unmount();
+        });
+      }
+
+      return playOut(page.$pageRoot, goFrom).then(() => {
         this.playOutComplete = true;
         autoUnmountOnComplete && unmount();
       });
@@ -179,7 +199,16 @@ export class Stack extends Component {
       // prepare playIn transition for new Page
       const playIn = () => {
         this.playInComplete = false;
-        return newPageInstance.playIn(newPageInstance.$root, this.currentPage.pageName).then(() => {
+        const playIn = this.constructor.prototype?.defaultPlayIn || newPageInstance.playIn;
+
+        // cas there is no available playOut method
+        if (!playIn) {
+          return Promise.resolve().then(() => {
+            this.playInComplete = true;
+            unmount();
+          });
+        }
+        return playIn(newPageInstance.$root, this.currentPage.pageName).then(() => {
           this.playInComplete = true;
         });
       };
