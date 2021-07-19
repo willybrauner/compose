@@ -28,7 +28,7 @@ export default class App extends Stack {
     newPage: IPage,
     complete: () => void
   ): Promise<any> {
-    await currentPage.playOut(newPage.pageName);
+    await currentPage.playOut();
     await newPage.playIn();
     complete();
   }

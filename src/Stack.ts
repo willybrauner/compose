@@ -266,15 +266,23 @@ export class Stack extends Component {
     mountNewPage,
   }: TManagePageTransitionParams): Promise<IPage> {
     return new Promise(async (resolve) => {
-      // get new page
+      // inject new page in DOM + create page class instance
       const newPage = await mountNewPage();
 
+      // allow to prepare playOut and pass automatically newPage name
+      const preparedCurrentPage = {
+        ...currentPage,
+        playOut: (goFrom: string, autoUnmountOnComplete = true) =>
+          currentPage.playOut(newPage.pageName, autoUnmountOnComplete),
+      };
+
+      // called when transition is completed
       const resolver = () => {
         newPage.$pageRoot.style.visibility = "visible";
         resolve(newPage);
       };
 
-      return this.pageTransitions(currentPage, newPage, resolver);
+      return this.pageTransitions(preparedCurrentPage, newPage, resolver);
     });
   }
 
@@ -290,7 +298,7 @@ export class Stack extends Component {
     newPage: IPage,
     complete: () => void
   ): Promise<any> {
-    await currentPage.playOut(newPage.pageName);
+    await currentPage.playOut();
     await newPage.playIn();
     complete();
   }
