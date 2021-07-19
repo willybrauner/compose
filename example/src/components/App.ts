@@ -36,7 +36,7 @@ export default class App extends Stack implements IDefaultPageTransitions {
   }: TManagePageTransitionParams): Promise<IPage> {
     return new Promise(async (resolve) => {
       const newPage = await mountNewPage();
-      //newPage.$pageRoot.style.visibility = "hidden";
+      // newPage.$pageRoot.style.visibility = "hidden";
       currentPage.playOut(newPage.pageName);
       await newPage.playIn();
       resolve(newPage);
