@@ -85,7 +85,10 @@ export class Component<Props = TProps> {
     this.isMounted = false;
     debug("_UN MOUNTED...", this.name);
     this.unmounted();
-    this.onChildrenComponents((component: Component) => component?._unmounted?.());
+    this.onChildrenComponents((component: Component) => {
+      COMPONENT_ID--;
+      component?._unmounted?.();
+    });
   }
 
   /**
