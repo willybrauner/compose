@@ -1,25 +1,27 @@
-import { Stack } from "../../../src";
+import { IPage, Stack } from "../../../src";
 import debugModule from "debug";
 import HomePage from "../pages/HomePage";
 import AboutPage from "../pages/AboutPage";
-import { IDefaultPageTransitions, IPage, TManagePageTransitionParams } from "../../../src/Stack";
 import { gsap } from "gsap";
+import WorkPage from "../pages/WorkPage";
+import { IDefaultPageTransitions } from "../../../src";
+
 const debug = debugModule(`front:App`);
 
 /**
  * @name App
  */
-export default class App extends Stack {
+export default class App extends Stack implements IDefaultPageTransitions {
   public static attrName = "App";
 
   constructor($root, props) {
     super($root, props);
   }
-
   protected pages() {
     return {
       HomePage,
       AboutPage,
+      WorkPage,
     };
   }
 
@@ -34,7 +36,7 @@ export default class App extends Stack {
   }
 
   public defaultPlayOut($root: HTMLElement, goTo?: string): Promise<void> {
-    debug("goTo", goTo);
+    debug("default goTo", goTo);
     gsap.killTweensOf($root);
     return new Promise((resolve) => {
       gsap.fromTo(
@@ -46,6 +48,7 @@ export default class App extends Stack {
         {
           autoAlpha: 0,
           y: 100,
+          duration: 0.4,
           ease: "power3.inOut",
           onComplete: resolve,
         }
@@ -54,7 +57,7 @@ export default class App extends Stack {
   }
 
   public defaultPlayIn($root: HTMLElement, goFrom?: string): Promise<void> {
-    debug("goFrom: ", goFrom);
+    debug("default goFrom: ", goFrom);
     gsap.killTweensOf($root);
     return new Promise((resolve) => {
       gsap.fromTo(
@@ -66,6 +69,7 @@ export default class App extends Stack {
         {
           y: 0,
           autoAlpha: 1,
+          duration: 0.4,
           ease: "power3.inOut",
           onComplete: resolve,
         }

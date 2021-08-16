@@ -1,37 +1,45 @@
-import debugModule from "debug";
-const debug = debugModule(`front:Component`);
+type TFlatArray<T> = T extends any[] ? T[number] : T
+
+export type TNewComponent<C, P> = new <P = TProps>(...rest: any[]) => TFlatArray<C>
+
+export type TProps = { [x: string]: any } | void
 
 export type TComponents = {
-  [name: string]: Component | Component[];
-};
+  [name: string]: any | any[]
+}
 
 export type TElements = {
-  [x: string]: HTMLElement | HTMLElement[];
-};
+  [x: string]: HTMLElement | HTMLElement[]
+}
 
-type TFlatArray<T> = T extends any[] ? T[number] : T;
+/**
+ * Glob scope
+ */
+let COMPONENT_ID = 0
 
-export type TAddComponent = new <P>($root?: HTMLElement, props?: P, attrName?: string) => Component;
-
-type TProps = { [x: string]: any } | void;
-
-// globals
-let COMPONENT_ID = 0;
+/**
+ * default transitions used as specific page transitions methods
+ * on each page used by stack
+ */
+export interface IPageTransitions {
+  playIn?($root: HTMLElement, goFrom?: string): Promise<void>
+  playOut?($root: HTMLElement, goTo?: string): Promise<void>
+}
 
 /**
  * Component
  */
 export class Component<Props = TProps> {
-  public name: string;
-  public $root: HTMLElement;
-  public props: Props;
-  public components: TComponents;
-  public elements: TElements;
-  public id: number;
-  public isMounted: boolean;
-  private observer: MutationObserver;
-  public static componentAttr: string = "data-component";
-  public static idAttr: string = "data-component-id";
+  public name: string
+  public $root: HTMLElement
+  public props: Props
+  public components: TComponents
+  public elements: TElements
+  public id: number
+  public isMounted: boolean
+  private observer: MutationObserver
+  public static componentAttr: string = "data-component"
+  public static idAttr: string = "data-component-id"
 
   /**
    * @param $root Dom element link with the instance
@@ -39,23 +47,23 @@ export class Component<Props = TProps> {
    * @param attrName is value from data-component="{name}"
    */
   constructor($root?: HTMLElement, props?: Props, attrName?: string) {
-    this.props = props;
-    this.$root = $root;
-    this.name = attrName || this.getComponentName(this.$root);
+    this.props = props
+    this.$root = $root
+    this.name = attrName || this.getComponentName(this.$root)
 
     // set ID on DOM element
-    this.$root.setAttribute(Component.idAttr, `${COMPONENT_ID}`);
-    this.id = COMPONENT_ID;
-    COMPONENT_ID++;
+    this.$root.setAttribute(Component.idAttr, `${COMPONENT_ID}`)
+    this.id = COMPONENT_ID
+    COMPONENT_ID++
   }
 
   /**
    * Init to call in contructor (to keep context)
    */
   protected init() {
-    this._beforeMount();
-    this._mounted();
-    this._watchChildren();
+    this._beforeMount()
+    this._mounted()
+    this._watchChildren()
   }
 
   /**
@@ -63,7 +71,7 @@ export class Component<Props = TProps> {
    */
   public beforeMount(): void {}
   private _beforeMount(): void {
-    this.beforeMount();
+    this.beforeMount()
   }
 
   /**
@@ -71,9 +79,8 @@ export class Component<Props = TProps> {
    */
   public mounted(): void {}
   private _mounted(): void {
-    this.isMounted = true;
-    debug("MOUNTED!", this.name);
-    this.mounted();
+    this.isMounted = true
+    this.mounted()
   }
 
   /**
@@ -82,13 +89,12 @@ export class Component<Props = TProps> {
    */
   public unmounted() {}
   private _unmounted(): void {
-    this.isMounted = false;
-    debug("_UN MOUNTED...", this.name);
-    this.unmounted();
+    this.isMounted = false
+    this.unmounted()
     this.onChildrenComponents((component: Component) => {
-      COMPONENT_ID--;
-      component?._unmounted?.();
-    });
+      COMPONENT_ID--
+      component?._unmounted?.()
+    })
   }
 
   /**
@@ -97,41 +103,27 @@ export class Component<Props = TProps> {
   public updated(mutation: MutationRecord): void {}
 
   /**
-   * Page transitions
-   */
-  public playIn($root?: HTMLElement, goFrom?: string): Promise<void | any> {
-    return Promise.resolve();
-  }
-  public playOut($root?: HTMLElement, goTo?: string): Promise<void | any> {
-    return Promise.resolve();
-  }
-
-  /**
    * Add is a register child component function
    * It create new children instance
    */
-  protected add<T = Component, P = TProps>(
-    classComponent: TAddComponent,
+  protected add<T = any, P = TProps>(
+    classComponent: TNewComponent<T, P>,
     props?: P,
     attrName?: string,
     returnArray: boolean = false
   ): T {
     // prepare instances array
-    const localInstances = [];
-
+    const localInstances = []
     // get string name instance from from param or static attrName property
-    const name: string = attrName || classComponent?.["attrName"];
-
+    const name: string = attrName || classComponent?.["attrName"]
     // get DOM elements
-    const elements = this.getDomElement(this.$root, name);
-
+    const elements = this.getDomElement(this.$root, name)
     // if no elements, exit
-    if (!elements.length) return;
-
+    if (!elements.length) return
     // map on each elements (because elements return an array)
     for (let i = 0; i < elements.length; i++) {
       // create child instance
-      let classInstance: TFlatArray<Component> = new classComponent<P>(
+      const classInstance: T = new classComponent<P>(
         elements[i],
         {
           ...props,
@@ -139,13 +131,14 @@ export class Component<Props = TProps> {
           parentId: this.id,
         },
         name
-      );
+      )
       // push it store and local list
-      localInstances.push(classInstance);
+      localInstances.push(classInstance)
     }
-
     // return single instance or instances array
-    return localInstances.length === 1 && !returnArray ? localInstances[0] : localInstances;
+    return localInstances.length === 1 && !returnArray
+      ? localInstances[0]
+      : localInstances
   }
 
   /**
@@ -156,18 +149,21 @@ export class Component<Props = TProps> {
    */
   protected find<T extends HTMLElement | HTMLElement[]>(
     bemElementName: string,
+    returnArray: boolean = false,
     className = this.$root?.classList?.[0]
   ): T {
     // check and exit
-    if (!className || !bemElementName || !this.$root) return;
+    if (!className || !bemElementName || !this.$root) return
     // query elements
-    const elements = this.$root.querySelectorAll(`.${className}_${bemElementName}`);
-    // check
-    if (!elements.length) return;
+    const elements = this.$root.querySelectorAll(`.${className}_${bemElementName}`)
+
+    if (!elements.length) return
     // transform to array
-    const formatElements: T = Array.from(elements) as T;
+    const formatElements: T = Array.from(elements) as T
     // return 1 element or array of elements
-    return (formatElements as any).length === 1 ? formatElements[0] : formatElements;
+    return (formatElements as any).length === 1 && !returnArray
+      ? formatElements[0]
+      : formatElements
   }
 
   // ------------------------------------------------------------------------------------- CORE
@@ -179,7 +175,7 @@ export class Component<Props = TProps> {
     return [
       // @ts-ignore
       ...($root?.querySelectorAll(`*[${Component.componentAttr}=${name}]`) || []),
-    ];
+    ]
   }
 
   /**
@@ -187,12 +183,12 @@ export class Component<Props = TProps> {
    * @param callback
    * @protected
    */
-  private onChildrenComponents(callback: (component: Component) => void): void {
+  private onChildrenComponents(callback: (component) => void): void {
     this.components &&
-      Object.keys(this.components).forEach((component) => {
-        const child = this.components?.[component];
-        Array.isArray(child) ? child?.forEach((c) => callback(c)) : callback(child);
-      });
+    Object.keys(this.components).forEach((component) => {
+      const child = this.components?.[component]
+      Array.isArray(child) ? child?.forEach((c) => callback(c)) : callback(child)
+    })
   }
 
   /**
@@ -201,7 +197,7 @@ export class Component<Props = TProps> {
    * @param $node
    */
   private getComponentName($node: HTMLElement = this.$root): string {
-    return $node?.getAttribute(Component.componentAttr);
+    return $node?.getAttribute(Component.componentAttr)
   }
 
   /**
@@ -209,7 +205,10 @@ export class Component<Props = TProps> {
    * @param $node
    */
   private getComponentId($node: HTMLElement): number {
-    return $node?.getAttribute(Component.idAttr) && parseInt($node.getAttribute(Component.idAttr));
+    return (
+      $node?.getAttribute(Component.idAttr) &&
+      parseInt($node.getAttribute(Component.idAttr))
+    )
   }
 
   /**
@@ -220,45 +219,40 @@ export class Component<Props = TProps> {
       for (const mutation of mutationsList) {
         // add node actions
         for (const node of mutation.addedNodes) {
-          const nodeAddedId = this.getComponentId(node);
-          if (!nodeAddedId) return;
+          const nodeAddedId = this.getComponentId(node)
+          if (!nodeAddedId) return
 
-          this.onChildrenComponents((component: Component) => {
-            // prettier-ignore
+          this.onChildrenComponents((component) => {
             if (!component.isMounted) {
               // TODO voir si on devrait pas le register plutot ?
-              debug("!!! has been addded", { name: component, isMounted: component.isMounted, node })
               component.mounted()
             }
-          });
+          })
         }
-
         // remove nodes actions
         for (const node of mutation.removedNodes) {
-          const nodeRemovedId = this.getComponentId(node);
-          if (!nodeRemovedId) return;
+          const nodeRemovedId = this.getComponentId(node)
+          if (!nodeRemovedId) return
 
-          this.onChildrenComponents((component: Component) => {
+          this.onChildrenComponents((component) => {
             if (nodeRemovedId === component.id && component.isMounted) {
-              // prettier-ignore
-              debug("!!! has been removed", { name: component, isMounted: component.isMounted, node })
-              component._unmounted();
-              component.observer.disconnect();
+              component._unmounted()
+              component.observer.disconnect()
             }
-          });
+          })
         }
 
-        this.updated(mutation);
+        this.updated(mutation)
       }
-    };
+    }
 
-    this.observer = new MutationObserver(onChange);
+    this.observer = new MutationObserver(onChange)
 
     if (this.$root) {
       this.observer.observe(this.$root, {
         subtree: true,
         childList: true,
-      });
+      })
     }
   }
 }

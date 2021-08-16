@@ -1,14 +1,14 @@
 import { Component } from "../../../src";
 import debugModule from "debug";
 import Header from "../components/Header";
-import { gsap } from "gsap";
-const debug = debugModule(`front:HomePage`);
+import { defaultPlayIn, defaultPlayOut } from "../helpers/defaultTransitions";
+const debug = debugModule(`front:WorkPage`);
 
 /**
- * @name HomePage
+ * @name WorkPage
  */
-export default class HomePage extends Component  {
-  public static attrName = "HomePage";
+export default class WorkPage extends Component {
+  public static attrName = "WorkPage";
 
   constructor($root, props) {
     super($root, props);
@@ -33,23 +33,10 @@ export default class HomePage extends Component  {
 
   // ------------------------------------------------------------------------------------- PAGE TRANSITION
 
-  public playIn($root?: HTMLElement, goFrom?: string): Promise<any> {
-    debug("goTo", goFrom, this);
-    return new Promise((resolve) => {
-      gsap.fromTo(
-        this.$root,
-        {
-          autoAlpha: 0,
-          x: -100,
-        },
-        {
-          x: 0,
-          autoAlpha: 1,
-          duration: 0.4,
-          ease: "power3.inOut",
-          onComplete: resolve,
-        }
-      );
-    });
-  }
+  // playIn($root?: HTMLElement, goFrom?: string): Promise<any> {
+  //   return defaultPlayIn($root, goFrom);
+  // }
+  // playOut($root?: HTMLElement, goTo?: string): Promise<any> {
+  //   return defaultPlayOut($root, goTo);
+  // }
 }

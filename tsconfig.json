@@ -1,20 +1,20 @@
 {
   "compilerOptions": {
+    "module": "commonjs",
+    "target": "esnext",
     "outDir": "./dist",
     "rootDir": "./src",
-    "module": "commonjs",
-    "target": "ES6",
-    "lib": ["es2015.promise", "es6", "dom", "esnext"],
-    "jsx": "react",
+    "composite": false,
+    "lib": ["dom", "es2015"],
     "moduleResolution": "node",
     "types": ["node", "jest"],
+    "jsx": "react",
     "declaration": true,
-    "isolatedModules": false,
     "noImplicitAny": false,
     "esModuleInterop": true,
     "preserveConstEnums": true,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "skipLibCheck": false,
   },
-  "include": ["./src/**/*"],
-  "exclude": ["node_modules", "dist", "test"]
+  "exclude": ["node_modules", "dist", "example", "test", "vite.config.ts"]
 }

@@ -1,7 +1,6 @@
 import { Component } from "../../../src";
 import debugModule from "debug";
 import Header from "../components/Header";
-import { defaultPlayIn, defaultPlayOut } from "../helpers/defaultTransitions";
 const debug = debugModule(`front:AboutPage`);
 
 /**

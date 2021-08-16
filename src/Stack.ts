@@ -1,9 +1,6 @@
-import { Component } from "./";
-import { StateSignal } from "@solid-js/signal";
-import debugModule from "debug";
-import { TAddComponent } from "./Component";
-import { rejects } from "assert";
-const debug = debugModule(`front:Stack-`);
+import { Component, TNewComponent } from "./Component";
+
+export type TPageList = { [x: string]: TNewComponent<any, any> };
 
 /**
  * default transitions used instead specific page transitions methods
@@ -31,7 +28,10 @@ export type TManagePageTransitionParams = {
 };
 
 /**
- * Stack is an extended class who manage page transitions
+ * Stack
+ * In order to get dynamic page fetching and refreshing without reload,
+ * `Stack` extended class is a middleware class between our App root component
+ * and `Component` extended class.
  */
 export class Stack extends Component {
   public static pageContainerAttr = "data-page-transition-container";
@@ -40,21 +40,16 @@ export class Stack extends Component {
 
   public $pageContainer: HTMLElement;
   public $pageWrapper: HTMLElement;
-
-  public static pageIsAnimatingState = StateSignal<boolean>(false);
   public pageIsAnimating: boolean = false;
 
-  protected currentUrl: string = window.location.href;
+  protected currentUrl: string = null;
   protected currentPage: IPage;
   protected prevPage: IPage;
-  protected playOutComplete: boolean = true;
-  protected playInComplete: boolean = true;
-
-  private historyEvents = ["pushState", "replaceState", "popstate"];
+  protected isFirstPage = true;
 
   // Register pages from parent class
-  protected _pages: { [x: string]: TAddComponent };
-  protected pages(): { [x: string]: TAddComponent } {
+  protected _pageList: TPageList;
+  protected pages(): TPageList {
     return {};
   }
 
@@ -62,24 +57,19 @@ export class Stack extends Component {
     super($root, props);
     this.$pageContainer = this.getPageContainer() || $root;
     this.$pageWrapper = this.getPageWrapper(this.$pageContainer);
-    this._pages = this.pages();
-    this.currentPage = this.getFirstPage();
-
+    this._pageList = this.pages();
+    this.currentPage = this.getFirstCurrentPage();
     // start patch history
     this.patchHistoryStates();
-
-    // init children components
-    this.init();
-
     // start page events
     this.start();
   }
 
-  /**
-   * Life cycle
-   */
+  // --------------------------------------------------------------------------- LIFE CICLE
+
   protected start(): void {
     this.initEvents();
+    this.handleHistory();
   }
 
   protected update(): void {
@@ -91,20 +81,16 @@ export class Stack extends Component {
     this.removeEvents();
   }
 
-  protected onTransitionStart(): void {}
-
-  protected onTransitionComplete(): void {}
-
   /**
    * EVENTS
    */
   private initEvents() {
     const links = this.getLinksWithAttr();
     links.forEach((item: HTMLElement) => {
-      item?.addEventListener("click", this.handleLinks);
+      item?.addEventListener("click", this.handleLinks.bind(this));
     });
-    this.historyEvents.forEach((event) => {
-      window.addEventListener(event, this.handleHistory);
+    ["pushState", "replaceState", "popstate"].forEach((event) => {
+      window.addEventListener(event, this.handleHistory.bind(this));
     });
   }
 
@@ -113,149 +99,161 @@ export class Stack extends Component {
     links.forEach((item: HTMLElement) => {
       item?.removeEventListener("click", this.handleLinks);
     });
-    this.historyEvents.forEach((event) => {
+    ["pushState", "replaceState", "popstate"].forEach((event) => {
       window.removeEventListener(event, this.handleHistory);
     });
   }
 
-  // ------------------------------------------------------------------------------------- HANDLERS
+  // --------------------------------------------------------------------------- HANDLERS
 
   /**
    * Handle links
    * @param event
    */
-  private handleLinks = (event): void => {
+  private handleLinks(event): void {
     if (!event) return;
     event.preventDefault();
 
     if (this.pageIsAnimating) return;
     const url = event?.currentTarget?.getAttribute(Stack.pageUrlAttr);
     window.history.pushState({}, null, url);
-  };
+  }
 
   /**
    * Handle history
    * @param event
    */
-  private handleHistory = async (event) => {
+  private async handleHistory(event?): Promise<void> {
     if (this.pageIsAnimating) return;
 
     // get URL to request
-    const requestUrl = event?.["arguments"]?.[2] || window.location.href;
-    debug("request url", requestUrl);
+    const pathname = window.location.pathname;
+    const firstUrl =
+      pathname[0] === "/" && pathname !== "/"
+        ? pathname.slice(1, pathname.length)
+        : pathname;
 
+    const requestUrl = event?.["arguments"]?.[2] || firstUrl;
     if (!requestUrl || requestUrl === this.currentUrl) return;
     this.currentUrl = requestUrl;
-
-    // dispatch is animating
-    Stack.pageIsAnimatingState.dispatch(true);
     this.pageIsAnimating = true;
 
+    // Start page transition manager who resolve newPage obj
+    try {
+      const newPage = await this.pageTransitionsMiddleware({
+        currentPage: this.prepareCurrentPage(),
+        mountNewPage: () => this.mountNewPage(requestUrl),
+      });
+      this.prevPage = this.currentPage;
+      this.currentPage = newPage;
+      this.pageIsAnimating = false;
+      this.isFirstPage = false;
+    } catch (e) {
+      console.warn("error on page transition...", e);
+    }
+  }
+
+  /**
+   * Prepare current page
+   */
+  private prepareCurrentPage(): IPage | null {
     // Prepare current page to be playOut
     const page = this.currentPage;
-    const playOut = (goFrom: string, autoUnmountOnComplete = true) => {
-      this.playOutComplete = false;
-      page.instance._unmounted();
 
-      const playOut = this.constructor.prototype?.defaultPlayOut || page.instance.playOut;
-
-      // cas there is no available playOut method
-      if (!playOut) {
-        return Promise.resolve().then(() => {
-          this.playOutComplete = true;
-          unmount();
-        });
-      }
-
-      return playOut(page.$pageRoot, goFrom).then(() => {
-        this.playOutComplete = true;
-        autoUnmountOnComplete && unmount();
-      });
-    };
     const unmount = () => {
       page.$pageRoot.remove();
     };
 
-    const currentPage = {
+    const playOut = (goFrom: string, autoUnmountOnComplete = true) => {
+      page.instance._unmounted();
+      const playOut =
+        page.instance?.playOut?.bind(page.instance) ||
+        this.constructor.prototype?.defaultPlayOut;
+      // cas there is no available playOut method
+      if (!playOut) {
+        return Promise.resolve().then(() => unmount());
+      }
+      return playOut(page.$pageRoot, goFrom).then(() => {
+        autoUnmountOnComplete && unmount();
+      });
+    };
+
+    if (this.isFirstPage) {
+      return null;
+    }
+
+    return {
       ...page,
       playOut,
       unmount,
     };
-
-    // Prepare mount new page to be playIn
-    const mountNewPage = async (): Promise<IPage> => {
-      // fetch new page document
-      const newDocument = await this.fetchNewDocument(requestUrl);
-
-      // change page title
-      document.title = newDocument.title;
-
-      // inject new page content in pages Container
-      const newPageWrapper = this.getPageWrapper(newDocument.body);
-      const newPageRoot = this.getPageRoot(newPageWrapper);
-      //  hide new page by default before inject in dom
-      newPageRoot.style.visibility = "hidden";
-      this.$pageWrapper.appendChild(newPageRoot);
-
-      //  instance the page after append it in DOM
-      const newPageName = this.getPageName(newPageRoot);
-      const newPageInstance = this.getPageInstance(newPageName, newPageRoot);
-
-      // prepare playIn transition for new Page
-      const playIn = () => {
-        this.playInComplete = false;
-        const playIn = this.constructor.prototype?.defaultPlayIn || newPageInstance.playIn;
-
-        // cas there is no available playOut method
-        if (!playIn) {
-          debug("pass ici");
-          newPageRoot.style.visibility = "visible";
-          return Promise.resolve().then(() => {
-            this.playInComplete = true;
-          });
-        }
-
-        return playIn(newPageInstance.$root, this.currentPage.pageName).then(() => {
-          this.playInComplete = true;
-        });
-      };
-
-      // update local stack events (history)
-      this.update();
-
-      return {
-        $pageRoot: newPageRoot,
-        pageName: newPageName,
-        instance: newPageInstance,
-        playIn,
-      };
-    };
-
-    // Start page transition manager who resolve newPage obj
-    try {
-      // call callback start
-      this.onTransitionStart();
-      // get new Page from page transitions resolver
-      const newPage = await this.pageTransitionsMiddleware({
-        currentPage,
-        mountNewPage,
-      });
-      //  set new pages
-      this.prevPage = this.currentPage;
-      this.currentPage = newPage;
-      // dispatch is animating
-      Stack.pageIsAnimatingState.dispatch(false);
-      this.pageIsAnimating = false;
-      // call callback complete
-      this.onTransitionComplete();
-      debug("ended!");
-    } catch (e) {
-      debug("error");
-    }
-  };
+  }
 
   /**
-   * Page transitions
+   *  Prepare mount new page
+   *  - request new page
+   *  - change title
+   *  - inject new DOM in current DOM container
+   *  - prepare playIn
+   * @param requestUrl
+   */
+  private async mountNewPage(requestUrl: string): Promise<IPage> {
+    // prepare playIn transition for new Page
+    const preparePlayIn = (pageInstance, $pageRoot): Promise<any> => {
+      const playIn =
+        pageInstance.playIn?.bind(pageInstance) ||
+        this.constructor.prototype?.defaultPlayIn;
+
+      // in case there is no available playOut method
+      if (!playIn) {
+        $pageRoot.style.visibility = "visible";
+        return Promise.resolve();
+      }
+      return playIn(pageInstance.$root, this.currentPage.pageName);
+    };
+
+    // case of is first page
+    if (this.isFirstPage) {
+      const page = this.currentPage;
+      page.$pageRoot.style.visibility = "hidden";
+
+      return {
+        $pageRoot: page.$pageRoot,
+        pageName: page.pageName,
+        instance: page.instance,
+        playIn: () => preparePlayIn(page.instance, page.$pageRoot),
+      };
+    }
+
+    // fetch new page document
+    const newDocument = await this.fetchNewDocument(requestUrl);
+    // change page title
+    document.title = newDocument.title;
+
+    // inject new page content in pages Container
+    // hide new page by default before inject in dom
+    const newPageWrapper = this.getPageWrapper(newDocument.body);
+    const newPageRoot = this.getPageRoot(newPageWrapper);
+    newPageRoot.style.visibility = "hidden";
+    this.$pageWrapper.appendChild(newPageRoot);
+
+    //  instance the page after append it in DOM
+    const newPageName = this.getPageName(newPageRoot);
+    const newPageInstance = this.getPageInstance(newPageName, newPageRoot);
+
+    // update local stack events (history)
+    this.update();
+
+    return {
+      $pageRoot: newPageRoot,
+      pageName: newPageName,
+      instance: newPageInstance,
+      playIn: () => preparePlayIn(newPageInstance, newPageRoot),
+    };
+  }
+
+  /**
+   * Page transitions middleware
    * Default transition to override from parent component
    * @param currentPage
    * @param mountNewPage
@@ -273,7 +271,7 @@ export class Stack extends Component {
       const preparedCurrentPage = {
         ...currentPage,
         playOut: (goFrom: string, autoUnmountOnComplete = true) =>
-          currentPage.playOut(newPage.pageName, autoUnmountOnComplete),
+          currentPage?.playOut(newPage.pageName, autoUnmountOnComplete),
       };
 
       // called when transition is completed
@@ -302,7 +300,7 @@ export class Stack extends Component {
     await newPage.playIn();
     complete();
   }
-  // ------------------------------------------------------------------------------------- PREPARE PAGE
+  // --------------------------------------------------------------------------- PREPARE PAGE
 
   private getPageContainer($node: HTMLElement = document.body): HTMLElement {
     return $node.querySelector(`*[${Stack.pageContainerAttr}]`);
@@ -317,26 +315,29 @@ export class Stack extends Component {
   }
 
   private getPageName($pageRoot: HTMLElement): string {
-    for (const page of Object.keys(this._pages)) {
+    for (const page of Object.keys(this._pageList)) {
       if (page == $pageRoot.getAttribute(Component.componentAttr)) return page;
     }
   }
 
-  private getPageInstance(pageName: string, $pageRoot?: HTMLElement): Component {
-    const classComponent = this._pages[pageName];
+  private getPageInstance(
+    pageName: string,
+    $pageRoot?: HTMLElement
+  ): Component {
+    const classComponent = this._pageList[pageName];
     return classComponent ? new classComponent($pageRoot, {}, pageName) : null;
   }
 
-  private getFirstPage(): IPage {
+  private getFirstCurrentPage(): IPage {
     const $pageRoot = this.getPageRoot(this.$pageWrapper);
     const pageName = this.getPageName($pageRoot);
     const instance = this.getPageInstance(pageName, $pageRoot);
-    const playIn = () => instance.playIn($pageRoot);
-    const playOut = () => instance.playIn($pageRoot);
+    const playIn = () => instance?.["playIn"]($pageRoot);
+    const playOut = () => instance?.["playOut"]($pageRoot);
     return { $pageRoot, pageName, instance, playIn, playOut };
   }
 
-  // ------------------------------------------------------------------------------------- HELPERS
+  // --------------------------------------------------------------------------- HELPERS
 
   /**
    * Get link with with URL ATTR

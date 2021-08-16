@@ -1,51 +1,35 @@
 {
   "name": "@wbe/composition",
-  "version": "0.1.0",
-  "description": "A DOM composition API",
+  "version": "2.3.1",
+  "description": "Composition is a tiny zero dependency library for vanilla javascript component approach and page transitions management.",
   "author": "Willy Brauner",
   "license": "MIT",
-  "main": "dist/index.js",
+  "types": "dist/index",
+  "source": "src/index.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.module.js",
+  "unpkg": "./dist/index.umd.js",
   "private": false,
-  "keywords": [
-    "router",
-    "react",
-    "typescript"
-  ],
+  "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "git://github.com/willybrauner/composition.git"
-  },
-  "publishConfig": {
-    "access": "public"
+    "url": "https://github.com/willybrauner/libraries.git"
   },
   "scripts": {
     "dev": "vite",
-    "build": "parcel build example/*.html --out-dir example/dist",
-    "compile": "tsc -p tsconfig.json",
-    "test": "jest"
+    "build": "npm run clean && npm run compile",
+    "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
+    "compile": "microbundle"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.20",
-    "@types/node": "^14.14.19",
+    "debug": "^4.3.2",
     "gsap": "^3.3.4",
-    "jest": "^26.6.3",
-    "prettier": "^2.2.1",
-    "ts-jest": "^26.4.4",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.1.3",
     "vite": "^2.4.0"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{tsx,ts,jsx,js,less,css,json,md}": [
-      "prettier --write"
-    ]
-  },
-  "dependencies": {
-    "@solid-js/signal": "^1.0.0-beta.1"
+  "keywords": [
+    "composition"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }
