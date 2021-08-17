@@ -5,7 +5,6 @@ import AboutPage from "../pages/AboutPage";
 import { gsap } from "gsap";
 import WorkPage from "../pages/WorkPage";
 import { IDefaultPageTransitions } from "../../../src";
-
 const debug = debugModule(`front:App`);
 
 /**

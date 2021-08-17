@@ -67,22 +67,35 @@ export class Stack extends Component {
 
   // --------------------------------------------------------------------------- LIFE CICLE
 
+  /**
+   * Start
+   * @protected
+   */
   protected start(): void {
     this.initEvents();
     this.handleHistory();
   }
 
+  /**
+   * Update
+   * @protected
+   */
   protected update(): void {
     this.removeEvents();
     this.initEvents();
   }
 
+  /**
+   * Stop
+   * @protected
+   */
   protected stop(): void {
     this.removeEvents();
   }
 
   /**
-   * EVENTS
+   * Initialize events
+   * @private
    */
   private initEvents() {
     const links = this.getLinksWithAttr();
@@ -94,6 +107,10 @@ export class Stack extends Component {
     });
   }
 
+  /**
+   * Remove events
+   * @private
+   */
   private removeEvents() {
     const links = this.getLinksWithAttr();
     links.forEach((item: HTMLElement) => {
@@ -125,6 +142,14 @@ export class Stack extends Component {
    */
   private async handleHistory(event?): Promise<void> {
     if (this.pageIsAnimating) return;
+
+    // get URL to request
+    // const pathname = window.location.pathname;
+    // const firstUrl =
+    //   pathname[0] === "/" && pathname !== "/"
+    //     ? pathname.slice(1, pathname.length)
+    //     : pathname;
+
     const requestUrl = event?.["arguments"]?.[2] || window.location.href
 
     if (!requestUrl || requestUrl === this.currentUrl) return;
@@ -150,22 +175,25 @@ export class Stack extends Component {
    * Prepare current page
    */
   private prepareCurrentPage(): IPage | null {
-    // Prepare current page to be playOut
     const page = this.currentPage;
 
+    // prepare unmount
     const unmount = () => {
       page.$pageRoot.remove();
     };
 
+    // prepare playout
     const playOut = (goFrom: string, autoUnmountOnComplete = true) => {
       page.instance._unmounted();
       const playOut =
         page.instance?.playOut?.bind(page.instance) ||
         this.constructor.prototype?.defaultPlayOut;
-      // cas there is no available playOut method
+
+      // case there is no available playOut method
       if (!playOut) {
         return Promise.resolve().then(() => unmount());
       }
+
       return playOut(page.$pageRoot, goFrom).then(() => {
         autoUnmountOnComplete && unmount();
       });
@@ -197,18 +225,17 @@ export class Stack extends Component {
         pageInstance.playIn?.bind(pageInstance) ||
         this.constructor.prototype?.defaultPlayIn;
 
-      // in case there is no available playOut method
+      // case there is no available playIn method
       if (!playIn) {
-        $pageRoot.style.visibility = "visible";
         return Promise.resolve();
       }
+
       return playIn(pageInstance.$root, this.currentPage.pageName);
     };
 
     // case of is first page
     if (this.isFirstPage) {
       const page = this.currentPage;
-      page.$pageRoot.style.visibility = "hidden";
 
       return {
         $pageRoot: page.$pageRoot,
@@ -220,14 +247,13 @@ export class Stack extends Component {
 
     // fetch new page document
     const newDocument = await this.fetchNewDocument(requestUrl);
+
     // change page title
     document.title = newDocument.title;
 
     // inject new page content in pages Container
-    // hide new page by default before inject in dom
     const newPageWrapper = this.getPageWrapper(newDocument.body);
     const newPageRoot = this.getPageRoot(newPageWrapper);
-    newPageRoot.style.visibility = "hidden";
     this.$pageWrapper.appendChild(newPageRoot);
 
     //  instance the page after append it in DOM
@@ -259,6 +285,7 @@ export class Stack extends Component {
     return new Promise(async (resolve) => {
       // inject new page in DOM + create page class instance
       const newPage = await mountNewPage();
+      newPage.$pageRoot.style.visibility = "hidden";
 
       // allow to prepare playOut and pass automatically newPage name
       const preparedCurrentPage = {
@@ -295,24 +322,50 @@ export class Stack extends Component {
   }
   // --------------------------------------------------------------------------- PREPARE PAGE
 
+  /**
+   * Get page container HTMLElement
+   * @param $node
+   * @private
+   */
   private getPageContainer($node: HTMLElement = document.body): HTMLElement {
     return $node.querySelector(`*[${Stack.pageContainerAttr}]`);
   }
 
+  /**
+   * Get page wrapper HTMLElement
+   * @param $node
+   * @private
+   */
   private getPageWrapper($node: HTMLElement): HTMLElement {
     return $node.querySelector(`*[${Stack.pageWrapperAttr}]`);
   }
 
+  /**
+   * Get page root HTMLElement
+   * @param $wrapper
+   * @private
+   */
   private getPageRoot($wrapper: HTMLElement): HTMLElement {
     return $wrapper.children[$wrapper.children?.length - 1 || 0] as HTMLElement;
   }
 
+  /**
+   * Get page name
+   * @param $pageRoot
+   * @private
+   */
   private getPageName($pageRoot: HTMLElement): string {
     for (const page of Object.keys(this._pageList)) {
       if (page == $pageRoot.getAttribute(Component.componentAttr)) return page;
     }
   }
 
+  /**
+   * Get page instance
+   * @param pageName
+   * @param $pageRoot
+   * @private
+   */
   private getPageInstance(
     pageName: string,
     $pageRoot?: HTMLElement
@@ -321,6 +374,10 @@ export class Stack extends Component {
     return classComponent ? new classComponent($pageRoot, {}, pageName) : null;
   }
 
+  /**
+   * Get First current page
+   * @private
+   */
   private getFirstCurrentPage(): IPage {
     const $pageRoot = this.getPageRoot(this.$pageWrapper);
     const pageName = this.getPageName($pageRoot);
@@ -343,7 +400,7 @@ export class Stack extends Component {
   }
 
   /**
-   * Fetch URL
+   * Fetch new document from specific URL
    * @param url
    * @protected
    */
