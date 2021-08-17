@@ -125,15 +125,8 @@ export class Stack extends Component {
    */
   private async handleHistory(event?): Promise<void> {
     if (this.pageIsAnimating) return;
+    const requestUrl = event?.["arguments"]?.[2] || window.location.href
 
-    // get URL to request
-    const pathname = window.location.pathname;
-    const firstUrl =
-      pathname[0] === "/" && pathname !== "/"
-        ? pathname.slice(1, pathname.length)
-        : pathname;
-
-    const requestUrl = event?.["arguments"]?.[2] || firstUrl;
     if (!requestUrl || requestUrl === this.currentUrl) return;
     this.currentUrl = requestUrl;
     this.pageIsAnimating = true;
