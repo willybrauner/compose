@@ -41,6 +41,7 @@ export class Stack extends Component {
   public $pageContainer: HTMLElement;
   public $pageWrapper: HTMLElement;
   public pageIsAnimating: boolean = false;
+  public disableTranstitions:boolean = false;
 
   protected currentUrl: string = null;
   protected currentPage: IPage;
@@ -128,7 +129,8 @@ export class Stack extends Component {
    * @param event
    */
   private handleLinks(event): void {
-    if (!event) return;
+
+    if (!event || this.disableTranstitions) return;
     event.preventDefault();
 
     if (this.pageIsAnimating) return;
@@ -283,7 +285,7 @@ export class Stack extends Component {
     return new Promise(async (resolve) => {
       // inject new page in DOM + create page class instance
       const newPage = await mountNewPage();
-      newPage.$pageRoot.style.visibility = "hidden";
+       newPage.$pageRoot.style.visibility = "hidden";
 
       // allow to prepare playOut and pass automatically newPage name
       const preparedCurrentPage = {
