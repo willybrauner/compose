@@ -34,7 +34,7 @@ export default class App extends Stack implements IDefaultPageTransitions {
     complete();
   }
 
-  public defaultPlayOut($root: HTMLElement, goTo?: string): Promise<void> {
+  public defaultPlayOut({ $root, goTo }): Promise<void> {
     debug("default goTo", goTo);
     gsap.killTweensOf($root);
     return new Promise((resolve) => {
@@ -55,7 +55,7 @@ export default class App extends Stack implements IDefaultPageTransitions {
     });
   }
 
-  public defaultPlayIn($root: HTMLElement, goFrom?: string): Promise<void> {
+  public defaultPlayIn({ $root, goFrom }): Promise<void> {
     debug("default goFrom: ", goFrom);
     gsap.killTweensOf($root);
     return new Promise((resolve) => {

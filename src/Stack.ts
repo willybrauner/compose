@@ -7,8 +7,8 @@ export type TPageList = { [x: string]: TNewComponent<any, any> };
  * They can be implemented on parent Class
  */
 export interface IDefaultPageTransitions {
-  defaultPlayIn($root: HTMLElement, goFrom?: string): Promise<void>;
-  defaultPlayOut($root: HTMLElement, goTo?: string): Promise<void>;
+  defaultPlayIn({ $root, goFrom }: { $root: HTMLElement; goFrom?: string }): Promise<void>;
+  defaultPlayOut({ $root, goTo }: { $root: HTMLElement; goTo?: string }): Promise<void>;
 }
 
 export interface IPage {
@@ -150,7 +150,7 @@ export class Stack extends Component {
     //     ? pathname.slice(1, pathname.length)
     //     : pathname;
 
-    const requestUrl = event?.["arguments"]?.[2] || window.location.href
+    const requestUrl = event?.["arguments"]?.[2] || window.location.href;
 
     if (!requestUrl || requestUrl === this.currentUrl) return;
     this.currentUrl = requestUrl;
@@ -183,18 +183,17 @@ export class Stack extends Component {
     };
 
     // prepare playout
-    const playOut = (goFrom: string, autoUnmountOnComplete = true) => {
+    const playOut = (goTo: string, autoUnmountOnComplete = true) => {
       page.instance._unmounted();
       const playOut =
-        page.instance?.playOut?.bind(page.instance) ||
-        this.constructor.prototype?.defaultPlayOut;
+        page.instance?.playOut?.bind(page.instance) || this.constructor.prototype?.defaultPlayOut;
 
       // case there is no available playOut method
       if (!playOut) {
         return Promise.resolve().then(() => unmount());
       }
 
-      return playOut(page.$pageRoot, goFrom).then(() => {
+      return playOut({ $root: page.$pageRoot, goTo }).then(() => {
         autoUnmountOnComplete && unmount();
       });
     };
@@ -220,17 +219,16 @@ export class Stack extends Component {
    */
   private async mountNewPage(requestUrl: string): Promise<IPage> {
     // prepare playIn transition for new Page
-    const preparePlayIn = (pageInstance, $pageRoot): Promise<any> => {
+    const preparePlayIn = (pageInstance): Promise<any> => {
       const playIn =
-        pageInstance.playIn?.bind(pageInstance) ||
-        this.constructor.prototype?.defaultPlayIn;
+        pageInstance.playIn?.bind(pageInstance) || this.constructor.prototype?.defaultPlayIn;
 
       // case there is no available playIn method
       if (!playIn) {
         return Promise.resolve();
       }
 
-      return playIn(pageInstance.$root, this.currentPage.pageName);
+      return playIn({ $root: pageInstance.$root, goFrom: this.currentPage.pageName });
     };
 
     // case of is first page
@@ -241,7 +239,7 @@ export class Stack extends Component {
         $pageRoot: page.$pageRoot,
         pageName: page.pageName,
         instance: page.instance,
-        playIn: () => preparePlayIn(page.instance, page.$pageRoot),
+        playIn: () => preparePlayIn(page.instance),
       };
     }
 
@@ -267,7 +265,7 @@ export class Stack extends Component {
       $pageRoot: newPageRoot,
       pageName: newPageName,
       instance: newPageInstance,
-      playIn: () => preparePlayIn(newPageInstance, newPageRoot),
+      playIn: () => preparePlayIn(newPageInstance),
     };
   }
 
@@ -290,7 +288,7 @@ export class Stack extends Component {
       // allow to prepare playOut and pass automatically newPage name
       const preparedCurrentPage = {
         ...currentPage,
-        playOut: (goFrom: string, autoUnmountOnComplete = true) =>
+        playOut: (goTo: string, autoUnmountOnComplete = true) =>
           currentPage?.playOut(newPage.pageName, autoUnmountOnComplete),
       };
 
@@ -366,10 +364,7 @@ export class Stack extends Component {
    * @param $pageRoot
    * @private
    */
-  private getPageInstance(
-    pageName: string,
-    $pageRoot?: HTMLElement
-  ): Component {
+  private getPageInstance(pageName: string, $pageRoot?: HTMLElement): Component {
     const classComponent = this._pageList[pageName];
     return classComponent ? new classComponent($pageRoot, {}, pageName) : null;
   }
