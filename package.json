@@ -22,10 +22,12 @@
     "compile": "microbundle"
   },
   "devDependencies": {
+    "@babel/preset-typescript": "^7.15.0",
     "debug": "^4.3.2",
-    "gsap": "^3.3.4",
+    "gsap": "^3.7.1",
+    "microbundle": "^0.13.3",
     "prettier": "^2.3.2",
-    "vite": "^2.4.0"
+    "vite": "^2.5.0"
   },
   "keywords": [
     "composition"
