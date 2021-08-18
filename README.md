@@ -185,7 +185,7 @@ If we don't know how many instance of our component `Bar` exist,
 it's possible to force `add()` to return an array via `returnArray` parameter.
 
 ```js
-this.components = {
+components = {
   Bar: this.add(Bar, {}, true),
 };
 ```
@@ -193,7 +193,7 @@ this.components = {
 With typescript, we can explicitly state that we are expecting an array.
 
 ```ts
-this.components = {
+components = {
   Bar: this.add<Bar[]>(Bar),
 };
 ```
@@ -201,7 +201,7 @@ this.components = {
 The method accepts a static props parameter which we can access from the new Bar component via `this.props`.
 
 ```js
-this.components = {
+components = {
   Bar: this.add(Bar, { myProp: "foo" }),
 };
 ```
@@ -209,7 +209,7 @@ this.components = {
 With typescript, we can type the `props` object:
 
 ```ts
-this.components = {
+components = {
   Bar: this.add<Bar, { myProp: string }>(Bar, { myProp: "foo" }, false),
 };
 ```
@@ -338,10 +338,10 @@ class HomePage extends Component {
   }
 
   // Prepare playIn and playOut page transitions used by Stack
-  playIn($root, goFrom) {
+  playIn({ $root, goFrom }) {
     return Promise.resove();
   }
-  playOut($root, goTo) {
+  playOut({ $root, goTo }) {
     return Promise.resove();
   }
 }
@@ -356,10 +356,10 @@ no specific methods exist in current page witch is in transition.
 ```js
 class App extends Stack {
   // ...
-  defaultPlayIn($root, goTo) {
+  defaultPlayIn({ $root, goTo }) {
     return Promise.resove();
   }
-  defaultPlayOut($root, goTo) {
+  defaultPlayOut({ $root, goTo }) {
     return Promise.resove();
   }
 }

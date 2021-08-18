@@ -1,3 +1,7 @@
 .idea
-.cache
 node_modules
+dist
+tsconfig.tsbuildinfo
+tsconfig-build.tsbuildinfo
+.husky
+.DS_Store
