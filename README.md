@@ -345,7 +345,6 @@ class HomePage extends Component {
     return Promise.resove();
   }
 }
-
 ```
 
 ### `defaultPlayIn()` & `defaultPlayOut()`
@@ -356,11 +355,22 @@ no specific methods exist in current page witch is in transition.
 ```js
 class App extends Stack {
   // ...
-  defaultPlayIn({ $root, goTo }) {
+  defaultPlayIn({ $root, goFrom }) {
     return Promise.resove();
   }
   defaultPlayOut({ $root, goTo }) {
     return Promise.resove();
   }
+}
+```
+
+### disableTranstitions
+
+For disable page transitions in some case, use `disableTranstitions` property:
+
+```js
+class App extends Stack {
+  // ...
+  disableTransitions = true;
 }
 ```
