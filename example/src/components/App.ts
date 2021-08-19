@@ -67,9 +67,10 @@ export default class App extends Stack implements IDefaultPageTransitions {
         },
         {
           y: 0,
+          delay:0.2,
           autoAlpha: 1,
           duration: 0.4,
-          ease: "power3.inOut",
+          ease: "power3.out",
           onComplete: resolve,
         }
       );

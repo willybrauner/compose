@@ -1,5 +1,56 @@
 import { Component, TNewComponent } from "./Component";
 
+export type TDeferredPromise<T> = {
+  promise: Promise<T>;
+  resolve: (resolve?: T) => void;
+  reject: (error?: Error | any) => void;
+};
+
+
+function MakeQuerablePromise(promise) {
+  // Don't modify any promise that has been already modified.
+  if (promise.isFulfilled) return promise;
+
+  // Set initial state
+  var isPending = true;
+  var isRejected = false;
+  var isFulfilled = false;
+
+  // Observe the promise, saving the fulfillment in a closure scope.
+  var result = promise.then(
+    function(v) {
+      isFulfilled = true;
+      isPending = false;
+      return v;
+    },
+    function(e) {
+      isRejected = true;
+      isPending = false;
+      throw e;
+    }
+  );
+
+  result.isFulfilled = function() { return isFulfilled; };
+  result.isPending = function() { return isPending; };
+  result.isRejected = function() { return isRejected; };
+  return result;
+}
+
+/**
+ * @name deferredPromise
+ * @return TDeferredPromise
+ */
+function deferredPromise<T>(): TDeferredPromise<T> {
+  const deferred: TDeferredPromise<T> | any = {};
+
+  deferred.promise = MakeQuerablePromise(new Promise((resolve, reject) => {
+    deferred.resolve = resolve;
+    deferred.reject = reject;
+  }));
+
+  return deferred;
+}
+
 export type TPageList = { [x: string]: TNewComponent<any, any> };
 
 /**
@@ -41,7 +92,7 @@ export class Stack extends Component {
   public $pageContainer: HTMLElement;
   public $pageWrapper: HTMLElement;
   public pageIsAnimating: boolean = false;
-  public disableTranstitions:boolean = false;
+  public disableTranstitions: boolean = false;
 
   protected currentUrl: string = null;
   protected currentPage: IPage;
@@ -129,11 +180,10 @@ export class Stack extends Component {
    * @param event
    */
   private handleLinks(event): void {
-
     if (!event || this.disableTranstitions) return;
     event.preventDefault();
 
-    if (this.pageIsAnimating) return;
+    // if (this.pageIsAnimating) return;
     const url = event?.currentTarget?.getAttribute(Stack.pageUrlAttr);
     window.history.pushState({}, null, url);
   }
@@ -143,7 +193,16 @@ export class Stack extends Component {
    * @param event
    */
   private async handleHistory(event?): Promise<void> {
-    if (this.pageIsAnimating) return;
+      console.log("!playout isFulfilled", this.deferredPlayOut?.promise?.['isFulfilled']());
+      console.log("!playout isPending", this.deferredPlayOut?.promise?.['isPending']());
+    if (this.deferredPlayOut?.promise?.['isPending']() || this.deferredPlayIn?.promise?.['isPending']()) {
+      this.deferredPlayOut.reject()
+      this.deferredPlayIn.reject()
+      const children = this.$pageWrapper.querySelectorAll("*");
+      children.forEach((el, i) => el.remove());
+    }
+
+    //  if (this.pageIsAnimating) return;
 
     // get URL to request
     // const pathname = window.location.pathname;
@@ -156,17 +215,14 @@ export class Stack extends Component {
 
     if (!requestUrl || requestUrl === this.currentUrl) return;
     this.currentUrl = requestUrl;
-    this.pageIsAnimating = true;
 
     // Start page transition manager who resolve newPage obj
     try {
-      const newPage = await this.pageTransitionsMiddleware({
+      await this.pageTransitionsMiddleware({
         currentPage: this.prepareCurrentPage(),
         mountNewPage: () => this.mountNewPage(requestUrl),
       });
-      this.prevPage = this.currentPage;
-      this.currentPage = newPage;
-      this.pageIsAnimating = false;
+
       this.isFirstPage = false;
     } catch (e) {
       console.warn("error on page transition...", e);
@@ -222,11 +278,13 @@ export class Stack extends Component {
   private async mountNewPage(requestUrl: string): Promise<IPage> {
     // prepare playIn transition for new Page
     const preparePlayIn = (pageInstance): Promise<any> => {
+      // select playIn method
       const playIn =
         pageInstance.playIn?.bind(pageInstance) || this.constructor.prototype?.defaultPlayIn;
 
-      // case there is no available playIn method
+      // case there is no available playIn method, resolve the promise
       if (!playIn) {
+        console.log("!playIn || this.pageIsAnimating, resolve");
         return Promise.resolve();
       }
 
@@ -261,7 +319,7 @@ export class Stack extends Component {
     const newPageInstance = this.getPageInstance(newPageName, newPageRoot);
 
     // update local stack events (history)
-    this.update();
+    // this.update();
 
     return {
       $pageRoot: newPageRoot,
@@ -270,6 +328,12 @@ export class Stack extends Component {
       playIn: () => preparePlayIn(newPageInstance),
     };
   }
+
+  protected deferredPlayIn: TDeferredPromise<any>;
+  protected deferredPlayOut: TDeferredPromise<any>;
+
+  // protected playInMiddleware(playInFn) {}
+  // protected playOutMiddleware(playOutFn) {}
 
   /**
    * Page transitions middleware
@@ -283,24 +347,50 @@ export class Stack extends Component {
     mountNewPage,
   }: TManagePageTransitionParams): Promise<IPage> {
     return new Promise(async (resolve) => {
+      this.deferredPlayIn = deferredPromise();
+      this.deferredPlayOut = deferredPromise();
+
       // inject new page in DOM + create page class instance
       const newPage = await mountNewPage();
-       newPage.$pageRoot.style.visibility = "hidden";
+      newPage.$pageRoot.style.visibility = "hidden";
 
       // allow to prepare playOut and pass automatically newPage name
       const preparedCurrentPage = {
         ...currentPage,
-        playOut: (goTo: string, autoUnmountOnComplete = true) =>
-          currentPage?.playOut(newPage.pageName, autoUnmountOnComplete),
+        playOut: (goTo: string, autoUnmountOnComplete = true) => {
+          this.deferredPlayOut.promise;
+          return currentPage
+            ?.playOut(newPage.pageName, autoUnmountOnComplete)
+            .then(this.deferredPlayOut.resolve)
+            .catch(this.deferredPlayOut.reject);
+        },
+      };
+
+      const prepareNewPage = {
+        ...newPage,
+        playIn: () => {
+          this.deferredPlayIn.promise;
+          return newPage.playIn().then(this.deferredPlayIn.resolve).catch(this.deferredPlayIn.reject);
+        },
       };
 
       // called when transition is completed
       const resolver = () => {
         newPage.$pageRoot.style.visibility = "visible";
+        this.pageIsAnimating = false;
+        console.log("this.pageIsAnimating", this.pageIsAnimating);
+        this.prevPage = this.currentPage;
+        this.currentPage = newPage;
         resolve(newPage);
       };
 
-      return this.pageTransitions(preparedCurrentPage, newPage, resolver);
+      // start page is animating state
+      this.pageIsAnimating = true;
+      console.log("this.pageIsAnimating", this.pageIsAnimating);
+      console.log("deferred promise playOut processing ?", this.deferredPlayOut.promise);
+      console.log("deferred promise playIn processing ?", this.deferredPlayIn.promise);
+
+      return this.pageTransitions(preparedCurrentPage, prepareNewPage, resolver);
     });
   }
 
