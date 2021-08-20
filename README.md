@@ -1,16 +1,16 @@
-# @wbe/composition
+# @wbe/compose
 
-Composition is a tiny zero dependency library for vanilla javascript component approach and page transitions management.
+Compose is a tiny zero dependency library for vanilla javascript component approach and page transitions management.
 
-![](https://img.shields.io/npm/v/@wbe/composition/latest.svg)
-![](https://img.shields.io/bundlephobia/minzip/@wbe/composition.svg)
-![](https://img.shields.io/npm/dt/@wbe/composition.svg)
-![](https://img.shields.io/npm/l/@wbe/composition.svg)
+![](https://img.shields.io/npm/v/@wbe/compose/latest.svg)
+![](https://img.shields.io/bundlephobia/minzip/@wbe/compose.svg)
+![](https://img.shields.io/npm/dt/@wbe/compose.svg)
+![](https://img.shields.io/npm/l/@wbe/compose.svg)
 
 ## Installation
 
 ```shell script
-$ npm install -s @wbe/composition
+$ npm install -s @wbe/compose
 ```
 
 ## `Component` extended class
@@ -27,7 +27,7 @@ Set `data-component` name attribute on specific DOM element:
 Create a class called as `data-component` attribute:
 
 ```js
-import { Component } from "@wbe/composition";
+import { Component } from "@wbe/compose";
 import Header from "Header";
 
 class App extends Component {
@@ -75,7 +75,7 @@ new App($app);
 Each Component like `Header` child class component, need to extends the same `Component` class.
 
 ```js
-import { Component } from "@wbe/composition";
+import { Component } from "@wbe/compose";
 
 class Header extends Component {
   static attrName = "Header";
@@ -154,7 +154,7 @@ add<T = Component, P = TProps>(
 ```
 
 ```js
-this.components = {
+components = {
   Bar: this.add(Bar),
 };
 // then, access child Bar instance
@@ -176,7 +176,7 @@ In case, multi children of the same component is found, `add()` will returned an
 ```
 
 ```js
-this.components = {
+components = {
   Bar: this.add(Bar), // will returned array of Bar instances
 };
 ```
