@@ -29,15 +29,18 @@ export default class App extends Stack implements IDefaultPageTransitions {
     newPage: IPage,
     complete: () => void
   ): Promise<any> {
-    await currentPage.playOut();
+    newPage.$pageRoot.style.visibility = "hidden";
+     currentPage.playOut();
     await newPage.playIn();
     complete();
   }
 
-  public defaultPlayOut({ $root, goTo }): Promise<void> {
-    debug("default goTo", goTo);
+  public defaultPlayOut({ $root, goTo, promiseRef }): Promise<void> {
+    //debug("default goTo", goTo);
     gsap.killTweensOf($root);
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
+      promiseRef.reject = () => reject();
+
       gsap.fromTo(
         $root,
         {
@@ -55,10 +58,12 @@ export default class App extends Stack implements IDefaultPageTransitions {
     });
   }
 
-  public defaultPlayIn({ $root, goFrom }): Promise<void> {
-    debug("default goFrom: ", goFrom);
+  public defaultPlayIn({ $root, goFrom, promiseRef }): Promise<void> {
+    // debug("default goFrom: ", goFrom);
     gsap.killTweensOf($root);
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
+      promiseRef.reject = () => reject();
+
       gsap.fromTo(
         $root,
         {
@@ -67,7 +72,6 @@ export default class App extends Stack implements IDefaultPageTransitions {
         },
         {
           y: 0,
-          delay:0.2,
           autoAlpha: 1,
           duration: 0.4,
           ease: "power3.out",
