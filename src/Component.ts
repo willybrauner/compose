@@ -1,3 +1,5 @@
+import { TPromiseRef } from "./Stack";
+
 type TFlatArray<T> = T extends any[] ? T[number] : T;
 
 export type TNewComponent<C, P> = new <P = TProps>(...rest: any[]) => TFlatArray<C>;
@@ -22,8 +24,22 @@ let COMPONENT_ID = 0;
  * on each page used by stack
  */
 export interface IPageTransitions {
-  playIn({ $root, goFrom }: { $root: HTMLElement; goFrom?: string }): Promise<void>;
-  playOut({ $root, goTo }: { $root: HTMLElement; goTo?: string }): Promise<void>;
+  playIn({
+    $root,
+    goFrom,
+  }: {
+    $root: HTMLElement;
+    goFrom?: string;
+    promiseRef: TPromiseRef;
+  }): Promise<void>;
+  playOut({
+    $root,
+    goTo,
+  }: {
+    $root: HTMLElement;
+    goTo?: string;
+    promiseRef: TPromiseRef;
+  }): Promise<void>;
 }
 
 /**

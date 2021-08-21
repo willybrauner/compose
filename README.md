@@ -338,10 +338,10 @@ class HomePage extends Component {
   }
 
   // Prepare playIn and playOut page transitions used by Stack
-  playIn({ $root, goFrom }) {
+  playIn({ $root, goFrom, promiseRef }) {
     return Promise.resove();
   }
-  playOut({ $root, goTo }) {
+  playOut({ $root, goTo, promiseRef }) {
     return Promise.resove();
   }
 }
@@ -355,10 +355,10 @@ no specific methods exist in current page witch is in transition.
 ```js
 class App extends Stack {
   // ...
-  defaultPlayIn({ $root, goFrom }) {
+  defaultPlayIn({ $root, goFrom, promiseRef }) {
     return Promise.resove();
   }
-  defaultPlayOut({ $root, goTo }) {
+  defaultPlayOut({ $root, goTo, promiseRef }) {
     return Promise.resove();
   }
 }
