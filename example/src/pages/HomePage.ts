@@ -7,7 +7,7 @@ const debug = debugModule(`front:HomePage`);
 /**
  * @name HomePage
  */
-export default class HomePage extends Component implements IPageTransitions {
+export default class HomePage extends Component {
   public static attrName = "HomePage";
 
   constructor($root, props) {
@@ -33,43 +33,43 @@ export default class HomePage extends Component implements IPageTransitions {
 
   // ------------------------------------------------------------------------------------- PAGE TRANSITION
 
-  public playOut({ $root, goTo }: { $root: HTMLElement; goTo?: string }): Promise<void> {
-    debug("playout goTo", goTo);
-    return new Promise((resolve) => {
-      gsap.fromTo(
-        this.$root,
-        {
-          x: 0,
-          autoAlpha: 1,
-        },
-        {
-          x: -100,
-          autoAlpha: 0,
-          duration: 0.4,
-          ease: "power3.inOut",
-          onComplete: resolve,
-        }
-      );
-    });
-  }
-
-  playIn({ $root, goFrom }: { $root: HTMLElement; goFrom?: string }): Promise<void> {
-    debug("playIn goFrom", goFrom);
-    return new Promise((resolve) => {
-      gsap.fromTo(
-        this.$root,
-        {
-          autoAlpha: 0,
-          x: -100,
-        },
-        {
-          x: 0,
-          autoAlpha: 1,
-          duration: 0.4,
-          ease: "power3.inOut",
-          onComplete: resolve,
-        }
-      );
-    });
-  }
+  // public playOut({ $root, goTo }: { $root: HTMLElement; goTo?: string }): Promise<void> {
+  //   debug("playout goTo", goTo);
+  //   return new Promise((resolve) => {
+  //     gsap.fromTo(
+  //       this.$root,
+  //       {
+  //         x: 0,
+  //         autoAlpha: 1,
+  //       },
+  //       {
+  //         x: -100,
+  //         autoAlpha: 0,
+  //         duration: 0.4,
+  //         ease: "power3.inOut",
+  //         onComplete: resolve,
+  //       }
+  //     );
+  //   });
+  // }
+  //
+  // playIn({ $root, goFrom }: { $root: HTMLElement; goFrom?: string }): Promise<void> {
+  //   debug("playIn goFrom", goFrom);
+  //   return new Promise((resolve) => {
+  //     gsap.fromTo(
+  //       this.$root,
+  //       {
+  //         autoAlpha: 0,
+  //         x: -100,
+  //       },
+  //       {
+  //         x: 0,
+  //         autoAlpha: 1,
+  //         duration: 0.4,
+  //         ease: "power3.inOut",
+  //         onComplete: resolve,
+  //       }
+  //     );
+  //   });
+  // }
 }

@@ -1,14 +1,26 @@
 import { Component, TNewComponent } from "./Component";
 
-export type TPageList = { [x: string]: TNewComponent<any, any> };
-
-/**
- * default transitions used instead specific page transitions methods
- * They can be implemented on parent Class
- */
+// default transitions used instead specific page transitions methods
+// They can be implemented on parent Class
 export interface IDefaultPageTransitions {
-  defaultPlayIn({ $root, goFrom }: { $root: HTMLElement; goFrom?: string }): Promise<void>;
-  defaultPlayOut({ $root, goTo }: { $root: HTMLElement; goTo?: string }): Promise<void>;
+  defaultPlayIn({
+    $root,
+    goFrom,
+    promiseRef,
+  }: {
+    $root: HTMLElement;
+    goFrom?: string;
+    promiseRef: TPromiseRef;
+  }): Promise<void>;
+  defaultPlayOut({
+    $root,
+    goTo,
+    promiseRef,
+  }: {
+    $root: HTMLElement;
+    goTo?: string;
+    promiseRef: TPromiseRef;
+  }): Promise<void>;
 }
 
 export interface IPage {
@@ -16,10 +28,12 @@ export interface IPage {
   pageName: string;
   instance: any;
   playIn?: () => Promise<void>;
-  playOut?: (goFrom?: string, autoUnmountOnComplete?: boolean) => Promise<void>;
-  unmount?: () => void;
+  playOut?: (goFrom?: string, autoRemoveOnComplete?: boolean) => Promise<void>;
+  remove?: () => void;
 }
 
+export type TPromiseRef = { reject: () => void };
+export type TPageList = { [x: string]: TNewComponent<any, any> };
 export type TCurrentPage = Omit<IPage, "playIn">;
 export type TNewPage = Omit<IPage, "playOut">;
 export type TManagePageTransitionParams = {
@@ -34,15 +48,25 @@ export type TManagePageTransitionParams = {
  * and `Component` extended class.
  */
 export class Stack extends Component {
+  // DOM attributes
   public static pageContainerAttr = "data-page-transition-container";
   public static pageWrapperAttr = "data-page-transition-wrapper";
   public static pageUrlAttr = "data-page-transition-url";
 
+  // page container
   public $pageContainer: HTMLElement;
   public $pageWrapper: HTMLElement;
-  public pageIsAnimating: boolean = false;
-  public disableTranstitions:boolean = false;
 
+  // check if new page document html is in fetching step
+  private _documentIsFetching: boolean = false;
+  // reload if document is fetching
+  public reloadIfDocumentIsFetching: boolean = false;
+  // check if page is in animate process
+  private _pageIsAnimating: boolean = false;
+  // disable transitions from parent class if needed
+  public disableTranstitions: boolean = false;
+
+  // the current URL to request
   protected currentUrl: string = null;
   protected currentPage: IPage;
   protected prevPage: IPage;
@@ -53,6 +77,10 @@ export class Stack extends Component {
   protected pages(): TPageList {
     return {};
   }
+
+  // promise ref used in playIn and playOut medthods to keep reject promise
+  protected playInPromiseRef: TPromiseRef = { reject: undefined };
+  protected playOutPromiseRef: TPromiseRef = { reject: undefined };
 
   constructor($root, props) {
     super($root, props);
@@ -129,12 +157,20 @@ export class Stack extends Component {
    * @param event
    */
   private handleLinks(event): void {
+    if (!event) return;
 
-    if (!event || this.disableTranstitions) return;
-    event.preventDefault();
-
-    if (this.pageIsAnimating) return;
+    // get page url attr
     const url = event?.currentTarget?.getAttribute(Stack.pageUrlAttr);
+
+    // if disable transtiions is active, open new page
+    if (this.disableTranstitions) {
+      window.open(url, "_self");
+      return;
+    }
+
+    // prevent to following the link
+    event.preventDefault();
+    // push it in history
     window.history.pushState({}, null, url);
   }
 
@@ -143,20 +179,31 @@ export class Stack extends Component {
    * @param event
    */
   private async handleHistory(event?): Promise<void> {
-    if (this.pageIsAnimating) return;
-
     // get URL to request
-    // const pathname = window.location.pathname;
-    // const firstUrl =
-    //   pathname[0] === "/" && pathname !== "/"
-    //     ? pathname.slice(1, pathname.length)
-    //     : pathname;
-
     const requestUrl = event?.["arguments"]?.[2] || window.location.href;
 
+    // check before continue
     if (!requestUrl || requestUrl === this.currentUrl) return;
+
+    // SECURITY if document is fetching, just reload the page
+    if ((this.reloadIfDocumentIsFetching && this._documentIsFetching) || this.disableTranstitions) {
+      window.open(requestUrl, "_self");
+      return;
+    }
+
+    // keep new request URL
     this.currentUrl = requestUrl;
-    this.pageIsAnimating = true;
+
+    // if page is animating
+    if (this._pageIsAnimating) {
+      // reject current promise playIn playOut
+      this.playOutPromiseRef.reject?.();
+      this.playInPromiseRef.reject?.();
+      this._pageIsAnimating = false;
+
+      // remove all page wrapper children
+      this.$pageWrapper.querySelectorAll("*").forEach((el) => el.remove());
+    }
 
     // Start page transition manager who resolve newPage obj
     try {
@@ -164,12 +211,12 @@ export class Stack extends Component {
         currentPage: this.prepareCurrentPage(),
         mountNewPage: () => this.mountNewPage(requestUrl),
       });
+      this.isFirstPage = false;
+      this._pageIsAnimating = false;
       this.prevPage = this.currentPage;
       this.currentPage = newPage;
-      this.pageIsAnimating = false;
-      this.isFirstPage = false;
     } catch (e) {
-      console.warn("error on page transition...", e);
+      throw new Error("Error on page transition middleware");
     }
   }
 
@@ -179,27 +226,34 @@ export class Stack extends Component {
   private prepareCurrentPage(): IPage | null {
     const page = this.currentPage;
 
-    // prepare unmount
-    const unmount = () => {
+    // prepare remove dom page
+    const _remove = () => {
       page.$pageRoot.remove();
     };
 
     // prepare playout
-    const playOut = (goTo: string, autoUnmountOnComplete = true) => {
+    const playOut = (goTo: string, autoRemoveOnComplete = true) => {
+      // execute unmounted page method
       page.instance._unmounted();
+
+      // store current playOut (specific anim first, default anim if first doesn't exist)
       const playOut =
         page.instance?.playOut?.bind(page.instance) || this.constructor.prototype?.defaultPlayOut;
 
       // case there is no available playOut method
       if (!playOut) {
-        return Promise.resolve().then(() => unmount());
+        return Promise.resolve().then(() => _remove());
       }
 
-      return playOut({ $root: page.$pageRoot, goTo }).then(() => {
-        autoUnmountOnComplete && unmount();
-      });
+      // return playOut function used by pageTransitons method
+      return playOut({ $root: page.$pageRoot, goTo, promiseRef: this.playOutPromiseRef })
+        .then(() => {
+          autoRemoveOnComplete && _remove();
+        })
+        .catch(() => {});
     };
 
+    // if is first page, return nothing
     if (this.isFirstPage) {
       return null;
     }
@@ -207,7 +261,7 @@ export class Stack extends Component {
     return {
       ...page,
       playOut,
-      unmount,
+      remove: _remove,
     };
   }
 
@@ -221,54 +275,58 @@ export class Stack extends Component {
    */
   private async mountNewPage(requestUrl: string): Promise<IPage> {
     // prepare playIn transition for new Page
-    const preparePlayIn = (pageInstance): Promise<any> => {
+    const _preparePlayIn = (pageInstance): Promise<any> => {
+      // select playIn method
       const playIn =
         pageInstance.playIn?.bind(pageInstance) || this.constructor.prototype?.defaultPlayIn;
 
-      // case there is no available playIn method
+      // case there is no available playIn method, resolve the promise
       if (!playIn) {
         return Promise.resolve();
       }
 
-      return playIn({ $root: pageInstance.$root, goFrom: this.currentPage.pageName });
+      // return playIn function used by pageTransitons method
+      return playIn({
+        $root: pageInstance.$root,
+        goFrom: this.currentPage.pageName,
+        promiseRef: this.playInPromiseRef,
+      }).catch(() => {});
     };
 
     // case of is first page
     if (this.isFirstPage) {
-      const page = this.currentPage;
-
       return {
-        $pageRoot: page.$pageRoot,
-        pageName: page.pageName,
-        instance: page.instance,
-        playIn: () => preparePlayIn(page.instance),
+        $pageRoot: this.currentPage.$pageRoot,
+        pageName: this.currentPage.pageName,
+        instance: this.currentPage.instance,
+        playIn: () => _preparePlayIn(this.currentPage.instance),
       };
     }
 
-    // fetch new page document
-    const newDocument = await this.fetchNewDocument(requestUrl);
+    try {
+      // fetch new page document
+      const newDocument = await this.fetchNewDocument(requestUrl, new AbortController());
+      // change page title
+      document.title = newDocument.title;
 
-    // change page title
-    document.title = newDocument.title;
+      // inject new page content in pages Container
+      const newPageWrapper = this.getPageWrapper(newDocument.body);
+      const newPageRoot = this.getPageRoot(newPageWrapper);
+      this.$pageWrapper.appendChild(newPageRoot);
 
-    // inject new page content in pages Container
-    const newPageWrapper = this.getPageWrapper(newDocument.body);
-    const newPageRoot = this.getPageRoot(newPageWrapper);
-    this.$pageWrapper.appendChild(newPageRoot);
+      //  instance the page after append it in DOM
+      const newPageName = this.getPageName(newPageRoot);
+      const newPageInstance = this.getPageInstance(newPageName, newPageRoot);
 
-    //  instance the page after append it in DOM
-    const newPageName = this.getPageName(newPageRoot);
-    const newPageInstance = this.getPageInstance(newPageName, newPageRoot);
-
-    // update local stack events (history)
-    this.update();
-
-    return {
-      $pageRoot: newPageRoot,
-      pageName: newPageName,
-      instance: newPageInstance,
-      playIn: () => preparePlayIn(newPageInstance),
-    };
+      return {
+        $pageRoot: newPageRoot,
+        pageName: newPageName,
+        instance: newPageInstance,
+        playIn: () => _preparePlayIn(newPageInstance),
+      };
+    } catch (e) {
+      throw new Error(`Fetch new document failed on url: ${requestUrl}`);
+    }
   }
 
   /**
@@ -284,23 +342,28 @@ export class Stack extends Component {
   }: TManagePageTransitionParams): Promise<IPage> {
     return new Promise(async (resolve) => {
       // inject new page in DOM + create page class instance
-      const newPage = await mountNewPage();
-       newPage.$pageRoot.style.visibility = "hidden";
+      try {
+        // fetch and get new page
+        const newPage = await mountNewPage();
 
-      // allow to prepare playOut and pass automatically newPage name
-      const preparedCurrentPage = {
-        ...currentPage,
-        playOut: (goTo: string, autoUnmountOnComplete = true) =>
-          currentPage?.playOut(newPage.pageName, autoUnmountOnComplete),
-      };
+        // prepare playOut and pass automatically goTo newPage name as param
+        const preparedCurrentPage = {
+          ...currentPage,
+          playOut: (goTo: string, autoRemoveOnComplete = true) =>
+            currentPage?.playOut(newPage.pageName, autoRemoveOnComplete),
+        };
 
-      // called when transition is completed
-      const resolver = () => {
-        newPage.$pageRoot.style.visibility = "visible";
-        resolve(newPage);
-      };
+        // called when transition is completed
+        const resolver = () => {
+          resolve(newPage);
+        };
 
-      return this.pageTransitions(preparedCurrentPage, newPage, resolver);
+        // change page is animating state (need to be changed after mount new page)
+        this._pageIsAnimating = true;
+
+        // return page transition function
+        return this.pageTransitions(preparedCurrentPage, newPage, resolver);
+      } catch (e) {}
     });
   }
 
@@ -399,17 +462,39 @@ export class Stack extends Component {
   /**
    * Fetch new document from specific URL
    * @param url
+   * @param controller
    * @protected
    */
-  private async fetchNewDocument(url: string) {
-    try {
-      const data = await fetch(url);
-      const html = await data.text();
-      const parser = new DOMParser();
-      return parser.parseFromString(html, "text/html");
-    } catch (e) {
-      throw new Error("Fetch new document failed");
+  private fetchNewDocument(url: string, controller: AbortController): Promise<any> {
+    // if document is already fetching, abort the current fetch
+    if (this._documentIsFetching) {
+      controller.abort();
+      this._documentIsFetching = false;
     }
+
+    // change document is fetching state
+    this._documentIsFetching = true;
+
+    // fetch new document
+    return fetch(url, {
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.text();
+        } else {
+          this._documentIsFetching = false;
+          throw new Error("Something went wrong");
+        }
+      })
+      .then((html) => {
+        this._documentIsFetching = false;
+        const parser = new DOMParser();
+        return parser.parseFromString(html, "text/html");
+      })
+      .catch((error) => {
+        throw new Error("Fetch new document failed");
+      });
   }
 
   /**
