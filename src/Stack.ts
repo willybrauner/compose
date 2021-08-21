@@ -213,6 +213,11 @@ export class Stack extends Component {
     // check before continue
     if (!requestUrl || requestUrl === this.currentUrl) return;
 
+    // TODO à remettre si pas de abort fetch
+    // if (this.documentIsFetching) {
+    //   window.open(requestUrl, "_self");
+    // }
+
     // keep new request URL
     this.currentUrl = requestUrl;
 
@@ -223,6 +228,7 @@ export class Stack extends Component {
       this.playOutPromiseRef.reject?.();
       this.playInPromiseRef.reject?.();
       this.pageIsAnimating = false;
+
       // remove all page wrapper children
       this.$pageWrapper.querySelectorAll("*").forEach((el) => el.remove());
     }
@@ -329,9 +335,13 @@ export class Stack extends Component {
     }
 
     try {
-      // fetch new page document
-      const newDocument = await this.fetchNewDocument(requestUrl);
 
+      // TODO CONTINUE ICI, le controller fonctionne mais la transition playIn a quand meme lieu
+      //  il faut chercher ailleurs...
+      const controller = new AbortController();
+
+      // fetch new page document
+      const newDocument = await this.fetchNewDocument(requestUrl, controller);
       // change page title
       document.title = newDocument.title;
 
@@ -492,9 +502,17 @@ export class Stack extends Component {
    * @param url
    * @protected
    */
-  private fetchNewDocument(url: string): Promise<any> {
+  private fetchNewDocument(url: string, controller): Promise<any> {
+    if (this.documentIsFetching) {
+      console.log("document is fetching, abort");
+      controller.abort();
+    }
+
     this.documentIsFetching = true;
-    return fetch(url)
+    return fetch(url, {
+      method: "get",
+      signal: controller.signal,
+    })
       .then((response) => {
         if (response.ok) {
           return response.text();
