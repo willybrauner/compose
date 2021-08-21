@@ -179,12 +179,6 @@ export class Stack extends Component {
    * @param event
    */
   private async handleHistory(event?): Promise<void> {
-    // const pathname = window.location.pathname;
-    // const firstUrl =
-    //   pathname[0] === "/" && pathname !== "/"
-    //     ? pathname.slice(1, pathname.length)
-    //     : pathname;
-
     // get URL to request
     const requestUrl = event?.["arguments"]?.[2] || window.location.href;
 
