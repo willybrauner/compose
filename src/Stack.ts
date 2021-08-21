@@ -511,15 +511,6 @@ export class Stack extends Component {
         this.documentIsFetching = false;
         throw new Error("Fetch new document failed");
       });
-
-    // try {
-    //   const data = await fetch(url);
-    //   const html = await data.text();
-    //   const parser = new DOMParser();
-    //   return parser.parseFromString(html, "text/html");
-    // } catch (e) {
-    //   throw new Error("Fetch new document failed");
-    // }
   }
 
   /**
