@@ -290,7 +290,7 @@ export class Stack extends Component {
         $root: pageInstance.$root,
         goFrom: this.currentPage.pageName,
         promiseRef: this.playInPromiseRef,
-      }).catch(() => {});
+      })?.catch?.(() => {});
     };
 
     // case of is first page
@@ -442,8 +442,8 @@ export class Stack extends Component {
     const $pageRoot = this.getPageRoot(this.$pageWrapper);
     const pageName = this.getPageName($pageRoot);
     const instance = this.getPageInstance(pageName, $pageRoot);
-    const playIn = () => instance?.["playIn"]($pageRoot);
-    const playOut = () => instance?.["playOut"]($pageRoot);
+    const playIn = () => instance?.["playIn"]({ $root: $pageRoot });
+    const playOut = () => instance?.["playOut"]({ $root: $pageRoot });
     return { $pageRoot, pageName, instance, playIn, playOut };
   }
 
