@@ -20,7 +20,7 @@
     "build": "npm run clean && npm run compile",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
     "compile": "microbundle",
-    "publish": "npm run build && npm publish"
+    "publish:all": "npm run build && npm publish"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.15.0",
