@@ -7,7 +7,7 @@
     "composite": false,
     "lib": ["dom", "es2015"],
     "moduleResolution": "node",
-    "types": ["node", "jest"],
+    "types": ["node"],
     "jsx": "react",
     "declaration": true,
     "noImplicitAny": false,
