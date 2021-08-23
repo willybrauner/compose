@@ -1,8 +1,13 @@
 .idea
 .cache
+.github
+example
 node_modules
 src
 test
+.babelrc
+.prettierignore
+.prettierrc
 stories
-example
+tsconfig.json
 vite.config.ts
