@@ -246,7 +246,7 @@ export class Component<Props = TProps> {
           if (!nodeRemovedId) return;
 
           this.onChildrenComponents((component) => {
-            if (nodeRemovedId === component.id && component.isMounted) {
+            if (component && nodeRemovedId === component?.id && component.isMounted) {
               component._unmounted();
               component.observer.disconnect();
             }

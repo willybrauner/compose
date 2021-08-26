@@ -101,8 +101,9 @@ export class Stack extends Component {
    * @protected
    */
   protected start(): void {
-    this.initEvents();
     this.handleHistory();
+    this.initHistoryEvent();
+    this.listenLinks();
   }
 
   /**
@@ -110,8 +111,8 @@ export class Stack extends Component {
    * @protected
    */
   protected update(): void {
-    this.removeEvents();
-    this.initEvents();
+    this.unlistenLinks();
+    this.listenLinks();
   }
 
   /**
@@ -119,18 +120,29 @@ export class Stack extends Component {
    * @protected
    */
   protected stop(): void {
-    this.removeEvents();
+    this.removeHistoryEvent();
+    this.unlistenLinks();
+  }
+
+  private listenLinks() {
+    const links = this.getLinksWithAttr();
+    links.forEach((item: HTMLElement) => {
+      item?.addEventListener("click", this.handleLinks.bind(this));
+    });
+  }
+
+  private unlistenLinks() {
+    const links = this.getLinksWithAttr();
+    links.forEach((item: HTMLElement) => {
+      item?.removeEventListener("click", this.handleLinks);
+    });
   }
 
   /**
    * Initialize events
    * @private
    */
-  private initEvents() {
-    const links = this.getLinksWithAttr();
-    links.forEach((item: HTMLElement) => {
-      item?.addEventListener("click", this.handleLinks.bind(this));
-    });
+  private initHistoryEvent() {
     ["pushState", "replaceState", "popstate"].forEach((event) => {
       window.addEventListener(event, this.handleHistory.bind(this));
     });
@@ -140,11 +152,7 @@ export class Stack extends Component {
    * Remove events
    * @private
    */
-  private removeEvents() {
-    const links = this.getLinksWithAttr();
-    links.forEach((item: HTMLElement) => {
-      item?.removeEventListener("click", this.handleLinks);
-    });
+  private removeHistoryEvent() {
     ["pushState", "replaceState", "popstate"].forEach((event) => {
       window.removeEventListener(event, this.handleHistory);
     });
@@ -181,10 +189,8 @@ export class Stack extends Component {
   private async handleHistory(event?): Promise<void> {
     // get URL to request
     const requestUrl = event?.["arguments"]?.[2] || window.location.href;
-
     // check before continue
     if (!requestUrl || requestUrl === this.currentUrl) return;
-
     // SECURITY if document is fetching, just reload the page
     if ((this.reloadIfDocumentIsFetching && this._documentIsFetching) || this.disableTranstitions) {
       window.open(requestUrl, "_self");
@@ -215,6 +221,7 @@ export class Stack extends Component {
       this._pageIsAnimating = false;
       this.prevPage = this.currentPage;
       this.currentPage = newPage;
+      this.update();
     } catch (e) {
       throw new Error("Error on page transition middleware");
     }
