@@ -5,8 +5,8 @@ const debug = debugModule(`front:defaultTransitions`)
 const xValue = 100
 const duration = 1
 
-export const defaultPlayIn = ($root?: HTMLElement, goFrom?: string, resolve?: () => void): void => {
-  debug("goFrom:", goFrom)
+export const defaultPlayIn = ($root?: HTMLElement, comeFrom?: string, resolve?: () => void): void => {
+  debug("comeFrom:", comeFrom)
   gsap.fromTo(
     $root,
     {

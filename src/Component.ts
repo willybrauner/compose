@@ -15,7 +15,7 @@ export type TElements = {
 }
 
 export type TTransition = {
-  goFrom?: string
+  comeFrom?: string
   goTo?: string
   promiseRef?: TPromiseRef
 }
@@ -166,22 +166,22 @@ export class Component<Props = TProps> {
   /**
    * PlayIn Ref used by stack
    * Stack need to access promiseRef object
-   * @param goFrom
+   * @param comeFrom
    * @param promiseRef
    */
-  public _playInRef(goFrom?: string, promiseRef?: { reject: () => void }): Promise<void> {
+  public _playInRef(comeFrom?: string, promiseRef?: { reject: () => void }): Promise<void> {
     return new Promise((resolve, reject) => {
       promiseRef.reject = () => reject()
-      this.playIn(goFrom, resolve)
+      this.playIn(comeFrom, resolve)
     })
   }
 
   /**
    * Component playIn
-   * @param goFrom
+   * @param comeFrom
    * @param resolve
    */
-  public playIn(goFrom: string, resolve: () => void): void {
+  public playIn(comeFrom: string, resolve: () => void): void {
     resolve()
   }
 

@@ -5,7 +5,7 @@ export interface IPage {
   pageName: string
   instance: any
   playIn?: () => Promise<void>
-  playOut?: (goFrom?: string, autoRemoveOnComplete?: boolean) => Promise<void>
+  playOut?: (comeFrom?: string, autoRemoveOnComplete?: boolean) => Promise<void>
   remove?: () => void
 }
 

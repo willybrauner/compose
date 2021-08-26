@@ -14,6 +14,7 @@ export default class App extends Stack {
   constructor($root, props) {
     super($root, props)
   }
+
   protected pages() {
     return {
       HomePage,
@@ -27,7 +28,7 @@ export default class App extends Stack {
     newPage: IPage,
     complete: () => void
   ): Promise<any> {
-//    newPage.$pageRoot.style.visibility = "hidden"
+    newPage.$pageRoot.style.visibility = "hidden"
     currentPage.playOut()
     await newPage.playIn()
     complete()

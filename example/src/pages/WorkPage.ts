@@ -38,7 +38,7 @@ export default class WorkPage extends Component {
     defaultPlayOut(this.$root, goTo, resolve)
   }
 
-  public playIn(goFrom: string, resolve: () => void) {
-    defaultPlayIn(this.$root, goFrom, resolve)
+  public playIn(comeFrom: string, resolve: () => void) {
+    defaultPlayIn(this.$root, comeFrom, resolve)
   }
 }
