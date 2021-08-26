@@ -27,29 +27,29 @@ Set `data-component` name attribute on specific DOM element:
 Create a class called as `data-component` attribute:
 
 ```js
-import { Component } from "@wbe/compose";
-import Header from "Header";
+import { Component } from "@wbe/compose"
+import Header from "Header"
 
 class App extends Component {
   // declare the name value of `data-component` attribute
-  static attrName = "App";
+  static attrName = "App"
 
   // relay and init "Component" extended class methods
   constructor($root, props) {
-    super($root, props);
-    this.init();
+    super($root, props)
+    this.init()
   }
 
   // Create new instance for children component list
   components = {
     Header: this.add(Header),
-  };
+  }
 
   // target child BEM DOM elements
   elements = {
     // find DOM element with "App_title" class
     $title: this.find("title"),
-  };
+  }
 
   // before class component is mounted
   beforeMount() {}
@@ -68,32 +68,32 @@ class App extends Component {
 Then, start component instances chaining by root instance.
 
 ```js
-const $app = document.querySelector(".App");
-new App($app);
+const $app = document.querySelector(".App")
+new App($app)
 ```
 
 Each Component like `Header` child class component, need to extends the same `Component` class.
 
 ```js
-import { Component } from "@wbe/compose";
+import { Component } from "@wbe/compose"
 
 class Header extends Component {
-  static attrName = "Header";
+  static attrName = "Header"
 
   constructor($root, props) {
-    super($root, props);
-    this.init();
+    super($root, props)
+    this.init()
   }
 
   mounted() {
-    window.addEventListener("resize", this.handleResize);
+    window.addEventListener("resize", this.handleResize)
   }
   unmounted() {
-    window.removeEventListener("resize", this.handleResize);
+    window.removeEventListener("resize", this.handleResize)
   }
   handleResize = () => {
     // do something on resize...
-  };
+  }
 }
 ```
 
@@ -134,7 +134,7 @@ need to be `Foo` too.
 
 ```js
 class Foo extends Component {
-  static attrName = "Foo";
+  static attrName = "Foo"
   // ...
 }
 ```
@@ -156,10 +156,10 @@ add<T = Component, P = TProps>(
 ```js
 components = {
   Bar: this.add(Bar),
-};
+}
 // then, access child Bar instance
-this.Bar.$root;
-this.Bar.unmounted();
+this.Bar.$root
+this.Bar.unmounted()
 // ...
 ```
 
@@ -178,7 +178,7 @@ In case, multi children of the same component is found, `add()` will returned an
 ```js
 components = {
   Bar: this.add(Bar), // will returned array of Bar instances
-};
+}
 ```
 
 If we don't know how many instance of our component `Bar` exist,
@@ -187,7 +187,7 @@ it's possible to force `add()` to return an array via `returnArray` parameter.
 ```js
 components = {
   Bar: this.add(Bar, {}, true),
-};
+}
 ```
 
 With typescript, we can explicitly state that we are expecting an array.
@@ -195,7 +195,7 @@ With typescript, we can explicitly state that we are expecting an array.
 ```ts
 components = {
   Bar: this.add<Bar[]>(Bar),
-};
+}
 ```
 
 The method accepts a static props parameter which we can access from the new Bar component via `this.props`.
@@ -203,7 +203,7 @@ The method accepts a static props parameter which we can access from the new Bar
 ```js
 components = {
   Bar: this.add(Bar, { myProp: "foo" }),
-};
+}
 ```
 
 With typescript, we can type the `props` object:
@@ -211,7 +211,7 @@ With typescript, we can type the `props` object:
 ```ts
 components = {
   Bar: this.add<Bar, { myProp: string }>(Bar, { myProp: "foo" }, false),
-};
+}
 ```
 
 ### `components`
@@ -220,11 +220,11 @@ As used on `add()` method, `components` allows to retrieve a list on children co
 When current component instance is unmounted, all instances declared in `components` object, will be automatically unmounted.
 
 ```ts
-components: TComponents = {};
+components: TComponents = {}
 
 type TComponents = {
-  [name: string]: Component | Component[];
-};
+  [name: string]: Component | Component[]
+}
 ```
 
 ### `find()`
@@ -235,9 +235,9 @@ This method allows to retrieve B.E.M. element of current $root component.
 elements = {
   // if $root is "App", "App_title" DOM element will be returned
   $title: this.find("title"),
-};
+}
 // use it...
-console.log(elements.$title);
+console.log(elements.$title)
 ```
 
 With typescript:
@@ -246,7 +246,7 @@ With typescript:
 elements = {
   $title: this.find<HTMLElement>("title"),
   $foo: this.find<HTMLElement[]>("foo"),
-};
+}
 ```
 
 As `add()` method, if a list of element is exist in DOM, `find()` will returns a list of HTMLElement.
@@ -294,14 +294,14 @@ Stack is not a router, it only fetch content of specific page and inject it insi
 
 ```js
 class App extends Stack {
-  static attrName = "App";
+  static attrName = "App"
 
   // list of page components
   pages() {
     return {
       HomePage,
       AboutPage,
-    };
+    }
   }
 }
 ```
@@ -313,53 +313,40 @@ It's possible to define custom transition senario with `pageTransitions`:
 ```js
 class App extends Stack {
   // ...
-
   async pageTransitions(currentPage, newPage, complete) {
-    await currentPage.playOut();
-    await newPage.playIn();
-    complete();
+    // New page is already inject in DOM at this step, we need to manage it manually
+    newPage.$pageRoot.style.visibility = "hidden"
+    // start play out current page
+    await currentPage.playOut()
+    // then play in new page
+    await newPage.playIn()
+    // resolve the page transition promise returned with `complete()` function
+    complete()
   }
 }
 ```
 
 ### Page `playIn()` & `playOut()`
 
-Each pages can have it's own page transition `playIn` & `playOut` too.
+Each pages can declare it's own page transition `playIn` & `playOut`.
 
 `HomePage.js`
 (same for AboutPage)
 
 ```js
 class HomePage extends Component {
-  static attrName = "HomePage";
+  static attrName = "HomePage"
   constructor(...rest) {
-    super(...rest);
-    this.init();
+    super(...rest)
+    this.init()
   }
 
-  // Prepare playIn and playOut page transitions used by Stack
-  playIn({ $root, goFrom, promiseRef }) {
-    return Promise.resove();
+  // Prepare playIn and playOut page transitions used by Stack (example with gsap)
+  playIn(comeFrom, resolve) {
+    gsap.from(this.$root, { autoAlpha: 0, onComplete: ()=> resolve() })
   }
-  playOut({ $root, goTo, promiseRef }) {
-    return Promise.resove();
-  }
-}
-```
-
-### `defaultPlayIn()` & `defaultPlayOut()`
-
-The component who exented `Stack`, accepts default page transition witch will be used if
-no specific methods exist in current page witch is in transition.
-
-```js
-class App extends Stack {
-  // ...
-  defaultPlayIn({ $root, goFrom, promiseRef }) {
-    return Promise.resove();
-  }
-  defaultPlayOut({ $root, goTo, promiseRef }) {
-    return Promise.resove();
+  playOut(goTo, resolve) {
+    gsap.to(this.$root, { autoAlpha: 0, onComplete: ()=> resolve() })
   }
 }
 ```
@@ -371,6 +358,6 @@ For disable page transitions in some case, use `disableTranstitions` property:
 ```js
 class App extends Stack {
   // ...
-  disableTransitions = true;
+  disableTransitions = true
 }
 ```
