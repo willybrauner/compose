@@ -11,6 +11,10 @@ const debug = debugModule(`front:App`)
 export default class App extends Stack {
   public static attrName = "App"
 
+  // disableLinksDuringTransitions = true
+  // disableHistoryDuringTransitions = true
+  forcePageReloadIfDocumentIsFetching = true
+
   constructor($root, props) {
     super($root, props)
   }
