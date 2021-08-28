@@ -351,7 +351,7 @@ class HomePage extends Component {
 }
 ```
 
-### options
+## Options
 
 - `forcePageReload` {boolean} *default: false*
 Force all pages to reload instead of the dynamic new document fetching process.
@@ -375,3 +375,22 @@ class App extends Stack {
   
 }
 ```
+
+## debug
+
+Compose comes with [`@wbe/debug`](https://github.com/willybrauner/debug) tool.
+To get some additional logs, add this line on your browser console:
+
+```shell
+localStorage.debug = "compose:*"
+```
+
+## Credits 
+
+© [Willy Brauner](https://willybrauner.com)
+
+## Licence
+
+MIT
+
+
