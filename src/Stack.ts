@@ -104,7 +104,7 @@ export class Stack extends Component {
   private listenLinks() {
     const links = this.getLinksWithAttr()
     links.forEach((item: HTMLElement) => {
-      item?.addEventListener("click", this.handleLinks.bind(this))
+      item?.addEventListener("click", this.handleLinks)
     })
   }
 
@@ -141,7 +141,7 @@ export class Stack extends Component {
    * Handle links
    * @param event
    */
-  private handleLinks(event): void {
+  private handleLinks = (event): void => {
     if (!event) return
 
     // get page url attr
@@ -164,6 +164,7 @@ export class Stack extends Component {
    * @param event
    */
   private async handleHistory(event?): Promise<void> {
+    console.log("handleHistory")
     // get URL to request
     const requestUrl = event?.["arguments"]?.[2] || window.location.href
     // check before continue

@@ -20,6 +20,7 @@
     "build": "npm run clean && npm run compile",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
     "compile": "microbundle",
+    "compile:watch": "microbundle --watch -f modern",
     "publish:all": "npm run build && npm publish"
   },
   "devDependencies": {
