@@ -1,4 +1,6 @@
 import { Component, TNewComponent } from "./Component"
+import debug from "@wbe/debug"
+const log = debug("compose:Stack")
 
 export interface IPage {
   $pageRoot: HTMLElement
@@ -34,26 +36,29 @@ export class Stack extends Component {
   public $pageContainer: HTMLElement
   public $pageWrapper: HTMLElement
 
-  // check if new page document html is in fetching step
-  private _documentIsFetching: boolean = false
   // reload if document is fetching
-  public reloadIfDocumentIsFetching: boolean = false
-  // check if page is in animate process
-  private _pageIsAnimating: boolean = false
-  // disable transitions from parent class if needed
-  public disableTranstitions: boolean = false
+  public forcePageReloadIfDocumentIsFetching: boolean = false
+  // force all pages to reload instead the dynamic new document fetching process
+  public forcePageReload: boolean = false
+  // disable links during transition
+  public disableLinksDuringTransitions: boolean = false
+  public disableHistoryDuringTransitions: boolean = false
 
   // the current URL to request
   protected currentUrl: string = null
   protected currentPage: IPage
   protected prevPage: IPage
   protected isFirstPage = true
-
   // Register pages from parent class
   protected _pageList: TPageList
   protected pages(): TPageList {
     return {}
   }
+
+  // check if new page document html is in fetching step
+  private _documentIsFetching: boolean = false
+  // check if page is in animate process
+  private _pageIsAnimating: boolean = false
 
   // promise ref used in playIn and playOut medthods to keep reject promise
   protected playInPromiseRef: TPromiseRef = { reject: undefined }
@@ -61,7 +66,7 @@ export class Stack extends Component {
 
   constructor($root, props) {
     super($root, props)
-    this.$pageContainer = this.getPageContainer() || $root
+    this.$pageContainer = this.getPageContainer()
     this.$pageWrapper = this.getPageWrapper(this.$pageContainer)
     this._pageList = this.pages()
     this.currentPage = this.getFirstCurrentPage()
@@ -87,7 +92,7 @@ export class Stack extends Component {
    * Update
    * @protected
    */
-  protected update(): void {
+  protected updateLinks(): void {
     this.unlistenLinks()
     this.listenLinks()
   }
@@ -101,6 +106,10 @@ export class Stack extends Component {
     this.unlistenLinks()
   }
 
+  /**
+   * Listen available dynamics links
+   * @private
+   */
   private listenLinks() {
     const links = this.getLinksWithAttr()
     links.forEach((item: HTMLElement) => {
@@ -108,6 +117,10 @@ export class Stack extends Component {
     })
   }
 
+  /**
+   * Stop to listen dynamics links
+   * @private
+   */
   private unlistenLinks() {
     const links = this.getLinksWithAttr()
     links.forEach((item: HTMLElement) => {
@@ -143,18 +156,17 @@ export class Stack extends Component {
    */
   private handleLinks = (event): void => {
     if (!event) return
-
     // get page url attr
     const url = event?.currentTarget?.getAttribute(Stack.pageUrlAttr)
-
     // if disable transtiions is active, open new page
-    if (this.disableTranstitions) {
+    if (this.forcePageReload) {
       window.open(url, "_self")
-      return
     }
-
     // prevent to following the link
     event.preventDefault()
+
+    if (this.disableLinksDuringTransitions && this._pageIsAnimating) return
+
     // push it in history
     window.history.pushState({}, null, url)
   }
@@ -164,13 +176,18 @@ export class Stack extends Component {
    * @param event
    */
   private async handleHistory(event?): Promise<void> {
-    console.log("handleHistory")
+    if (this.disableHistoryDuringTransitions && this._pageIsAnimating) return
+
     // get URL to request
-    const requestUrl = event?.["arguments"]?.[2] || window.location.href
+    const requestUrl = event?.["arguments"]?.[2] || window.location.pathname
+    log("handleHistory > requestUrl", requestUrl)
     // check before continue
     if (!requestUrl || requestUrl === this.currentUrl) return
     // SECURITY if document is fetching, just reload the page
-    if ((this.reloadIfDocumentIsFetching && this._documentIsFetching) || this.disableTranstitions) {
+    if (
+      (this.forcePageReloadIfDocumentIsFetching && this._documentIsFetching) ||
+      this.forcePageReload
+    ) {
       window.open(requestUrl, "_self")
       return
     }
@@ -184,22 +201,26 @@ export class Stack extends Component {
       this.playOutPromiseRef.reject?.()
       this.playInPromiseRef.reject?.()
       this._pageIsAnimating = false
-
+      log(
+        "handleHistory > page is animating, reject current transitions promises + remove page wrapper content"
+      )
       // remove all page wrapper children
-      this.$pageWrapper.querySelectorAll("*").forEach((el) => el.remove())
+      this.$pageWrapper.querySelectorAll(":scope > *").forEach((el) => el.remove())
+      // hack for the first load
+      this.isFirstPage && await new Promise((resolve) => setTimeout(resolve, 1))
     }
 
     // Start page transition manager who resolve newPage obj
     try {
       const newPage = await this.pageTransitionsMiddleware({
         currentPage: this.prepareCurrentPage(),
-        mountNewPage: () => this.mountNewPage(requestUrl),
+        mountNewPage: () => this.prepareMountNewPage(requestUrl),
       })
       this.isFirstPage = false
       this._pageIsAnimating = false
       this.prevPage = this.currentPage
       this.currentPage = newPage
-      this.update()
+      this.updateLinks()
     } catch (e) {
       throw new Error("Error on page transition middleware")
     }
@@ -250,7 +271,7 @@ export class Stack extends Component {
    *  - prepare playIn
    * @param requestUrl
    */
-  private async mountNewPage(requestUrl: string): Promise<IPage> {
+  private async prepareMountNewPage(requestUrl: string): Promise<IPage> {
     // prepare playIn transition for new Page
     const _preparePlayIn = (pageInstance): Promise<any> => {
       // select playIn method
@@ -329,7 +350,9 @@ export class Stack extends Component {
 
         // return page transition function
         return this.pageTransitions(preparedCurrentPage, newPage, resolver)
-      } catch (e) {}
+      } catch (e) {
+        log("mountNewPage failed", e)
+      }
     })
   }
 
@@ -353,11 +376,10 @@ export class Stack extends Component {
 
   /**
    * Get page container HTMLElement
-   * @param $node
    * @private
    */
-  private getPageContainer($node: HTMLElement = document.body): HTMLElement {
-    return $node.querySelector(`*[${Stack.pageContainerAttr}]`)
+  private getPageContainer(): HTMLElement {
+    return document.body.querySelector(`*[${Stack.pageContainerAttr}]`)
   }
 
   /**
@@ -436,6 +458,7 @@ export class Stack extends Component {
     if (this._documentIsFetching) {
       controller.abort()
       this._documentIsFetching = false
+      log("this._documentIsFetching = true, abort", this._documentIsFetching)
     }
 
     // change document is fetching state

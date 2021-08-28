@@ -351,13 +351,27 @@ class HomePage extends Component {
 }
 ```
 
-### disableTranstitions
+### options
 
-For disable page transitions in some case, use `disableTranstitions` property:
+- `forcePageReload` {boolean} *default: false*
+Force all pages to reload instead of the dynamic new document fetching process.
 
+- `forcePageReloadIfDocumentIsFetching` {boolean} *default: false*
+Force page to reload only if document is fetching.
+  
+- `disableLinksDuringTransitions` {boolean} *default: false*
+disable links during transition.
+
+- `disableHistoryDuringTransitions` {boolean} *default: false*
+disable history during transition allow to block transition on popstate event too.
+  
 ```js
 class App extends Stack {
   // ...
-  disableTransitions = true
+  forcePageReloadIfDocumentIsFetching = false
+  forcePageReload = false
+  disableLinksDuringTransitions = false
+  disableHistoryDuringTransitions = false
+  
 }
 ```

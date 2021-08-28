@@ -23,6 +23,9 @@
     "compile:watch": "microbundle --watch -f modern",
     "publish:all": "npm run build && npm publish"
   },
+  "dependencies": {
+    "@wbe/debug": "^0.1.2"
+  },
   "devDependencies": {
     "@babel/preset-typescript": "^7.15.0",
     "debug": "^4.3.2",
@@ -38,5 +41,5 @@
   ],
   "publishConfig": {
     "access": "public"
-  }
+  },
 }
