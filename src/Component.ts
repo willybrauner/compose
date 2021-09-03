@@ -238,7 +238,7 @@ export class Component<Props = TProps> {
    * @param $node
    */
   private getComponentName($node: HTMLElement = this.$root): string {
-    return $node?.getAttribute(Component.componentAttr)
+    return $node?.getAttribute?.(Component.componentAttr)
   }
 
   /**
@@ -246,7 +246,7 @@ export class Component<Props = TProps> {
    * @param $node
    */
   private getComponentId($node: HTMLElement): number {
-    return $node?.getAttribute(Component.idAttr) && parseInt($node.getAttribute(Component.idAttr))
+    return $node?.getAttribute?.(Component.idAttr) && parseInt($node.getAttribute(Component.idAttr))
   }
 
   /**
