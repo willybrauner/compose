@@ -261,7 +261,8 @@ export class Component<Props = TProps> {
           if (!nodeAddedId) return
 
           this.onChildrenComponents((component) => {
-            if (!component.isMounted) {
+            if (!component) return
+            if (!component?.isMounted) {
               // TODO voir si on devrait pas le register plutot ?
               component.mounted()
             }
@@ -273,7 +274,8 @@ export class Component<Props = TProps> {
           if (!nodeRemovedId) return
 
           this.onChildrenComponents((component) => {
-            if (component && nodeRemovedId === component?.id && component.isMounted) {
+            if (!component) return
+            if (nodeRemovedId === component?.id && component?.isMounted) {
               component._unmounted()
               component.observer.disconnect()
             }
