@@ -1,8 +1,8 @@
 import { Component } from "../../../src"
-import debugModule from "debug"
 import Header from "../components/Header"
 import { defaultPlayIn, defaultPlayOut } from "../helpers/defaultTransitions"
-const debug = debugModule(`front:AboutPage`)
+import debug from "@wbe/debug"
+const log = debug(`front:AboutPage`)
 
 /**
  * @name AboutPage
@@ -28,7 +28,7 @@ export default class AboutPage extends Component {
   }
 
   protected resizeHandler = () => {
-    debug("window.innerWidth", window.innerWidth)
+    log("window.innerWidth", window.innerWidth)
   }
 
   // ------------------------------------------------------------------------------------- PAGE TRANSITION

@@ -1,7 +1,8 @@
 import { Component } from "../../../src";
-import debugModule from "debug";
+
 import MainButton from "./MainButton"
-const debug = debugModule(`front:Header`);
+import debug from "@wbe/debug"
+const log = debug(`front:Header`)
 
 /**
  * @name Header
@@ -27,6 +28,6 @@ export default class Header extends Component {
   }
 
   protected resizeHandler = () => {
-    debug("window.innerWidth", window.innerWidth);
+    log("window.innerWidth", window.innerWidth);
   };
 }

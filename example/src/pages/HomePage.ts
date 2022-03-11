@@ -1,9 +1,9 @@
 import { Component } from "../../../src"
 import debugModule from "debug"
 import Header from "../components/Header"
-import { gsap } from "gsap"
 import { defaultPlayIn, defaultPlayOut } from "../helpers/defaultTransitions"
-const debug = debugModule(`front:HomePage`)
+import debug from "@wbe/debug"
+const log = debug(`front:HomePage`)
 
 /**
  * @name HomePage
@@ -29,7 +29,7 @@ export default class HomePage extends Component {
   }
 
   protected resizeHandler = () => {
-    debug("window.innerWidth", window.innerWidth)
+    log("window.innerWidth", window.innerWidth)
   }
 
   // ------------------------------------------------------------------------------------- PAGE TRANSITION

@@ -1,12 +1,13 @@
 import { gsap } from "gsap"
-import debugModule from "debug"
-const debug = debugModule(`front:defaultTransitions`)
+import debug from "@wbe/debug"
+const log = debug(`front:defaultTransitions`)
+
 
 const xValue = 100
 const duration = 1
 
 export const defaultPlayIn = ($root?: HTMLElement, comeFrom?: string, resolve?: () => void): void => {
-  debug("comeFrom:", comeFrom)
+  log("comeFrom:", comeFrom)
   gsap.fromTo(
     $root,
     {
@@ -24,7 +25,7 @@ export const defaultPlayIn = ($root?: HTMLElement, comeFrom?: string, resolve?: 
 }
 
 export const defaultPlayOut = ($root?: HTMLElement, goTo?: string, resolve?: () => void): void => {
-  debug("goTo: ", goTo)
+  log("goTo: ", goTo)
   gsap.fromTo(
     $root,
     {
