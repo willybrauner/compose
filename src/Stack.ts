@@ -2,6 +2,7 @@ import { Component, TNewComponent } from "./Component"
 import debug from "@wbe/debug"
 const log = debug("compose:Stack")
 
+
 export interface IPage {
   $pageRoot: HTMLElement
   pageName: string

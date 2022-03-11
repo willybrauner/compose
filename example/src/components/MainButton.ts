@@ -1,6 +1,6 @@
 import { Component } from "../../../src";
-import debugModule from "debug";
-const debug = debugModule(`front:MainButton`);
+import debug from "@wbe/debug"
+const log = debug(`front:MainButton`)
 
 /**
  * @name MainButton

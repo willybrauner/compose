@@ -1,9 +1,9 @@
 import { IPage, Stack } from "../../../src"
-import debugModule from "debug"
 import HomePage from "../pages/HomePage"
 import AboutPage from "../pages/AboutPage"
 import WorkPage from "../pages/WorkPage"
-const debug = debugModule(`front:App`)
+import debug from "@wbe/debug"
+const log = debug(`front:App`)
 
 /**
  * @name App
@@ -16,6 +16,7 @@ export default class App extends Stack {
   forcePageReloadIfDocumentIsFetching = true
 
   constructor($root, props) {
+
     super($root, props)
   }
 
