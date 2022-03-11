@@ -8,8 +8,8 @@ export type TNewComponent<C, P> = new <P = TProps>(...rest: any[]) => TFlatArray
 
 export type TProps = { [x: string]: any } | void
 
-export type TComponents = {
-  [name: string]: any | any[]
+export type TComponents<T = any> = {
+  [name: string]: T | T[]
 }
 
 export type TElements = {
@@ -34,10 +34,7 @@ export class Component<Props = TProps> {
   public name: string
   public $root: HTMLElement
   public props: Props
-  public components: TComponents
-  public addComponents(): TComponents {
-    return {}
-  }
+  
   public elements: TElements
   public id: number
   public isMounted: boolean
@@ -60,6 +57,13 @@ export class Component<Props = TProps> {
     this.id = COMPONENT_ID
     COMPONENT_ID++
   }
+
+  // register children components
+  public addComponents(): TComponents {
+    return {}
+  }
+  public components: TComponents
+  
 
   /**
    * Init to call in contructor (to keep context)
@@ -97,11 +101,11 @@ export class Component<Props = TProps> {
   public unmounted() {}
   private _unmounted(): void {
     this.unmounted()
+    this.isMounted = false
     this.onChildrenComponents((component: Component) => {
       COMPONENT_ID--
       component?._unmounted?.()
     })
-    this.isMounted = false
   }
 
   /**
