@@ -24,14 +24,14 @@
     "publish:all": "npm run build && npm publish"
   },
   "dependencies": {
-    "@wbe/debug": "^0.1.7"
+    "@wbe/debug": "^1.0.0"
   },
   "devDependencies": {
-    "@babel/preset-typescript": "^7.15.0",
-    "gsap": "^3.7.1",
-    "microbundle": "^0.13.3",
-    "prettier": "^2.3.2",
-    "vite": "^2.5.3"
+    "@babel/preset-typescript": "^7.16.7",
+    "gsap": "^3.9.1",
+    "microbundle": "^0.14.2",
+    "prettier": "^2.5.1",
+    "vite": "^2.8.6"
   },
   "keywords": [
     "compose",
