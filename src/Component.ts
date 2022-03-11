@@ -1,4 +1,6 @@
 import { TPromiseRef } from "./Stack"
+import debug from "@wbe/debug"
+const log = debug(`compose:Component`)
 
 type TFlatArray<T> = T extends any[] ? T[number] : T
 
@@ -33,6 +35,9 @@ export class Component<Props = TProps> {
   public $root: HTMLElement
   public props: Props
   public components: TComponents
+  public addComponents(): TComponents {
+    return {}
+  }
   public elements: TElements
   public id: number
   public isMounted: boolean
@@ -78,8 +83,11 @@ export class Component<Props = TProps> {
    */
   public mounted(): void {}
   private _mounted(): void {
-    this.isMounted = true
+    log(this.name, "mounted")
+    // instanciate children components just before mounted
+    this.components = this.addComponents()
     this.mounted()
+    this.isMounted = true
   }
 
   /**
@@ -88,12 +96,12 @@ export class Component<Props = TProps> {
    */
   public unmounted() {}
   private _unmounted(): void {
-    this.isMounted = false
     this.unmounted()
     this.onChildrenComponents((component: Component) => {
       COMPONENT_ID--
       component?._unmounted?.()
     })
+    this.isMounted = false
   }
 
   /**

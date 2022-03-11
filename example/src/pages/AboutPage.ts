@@ -15,10 +15,11 @@ export default class AboutPage extends Component {
     this.init()
   }
 
-  public components = {
-    Header: this.add(Header),
+  public addComponents() {
+    return {
+      Header: this.add(Header),
+    }
   }
-
   public mounted() {
     window.addEventListener("resize", this.resizeHandler)
   }

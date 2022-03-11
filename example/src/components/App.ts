@@ -16,8 +16,15 @@ export default class App extends Stack {
   forcePageReloadIfDocumentIsFetching = true
 
   constructor($root, props) {
-
+    log(`constructor`)
     super($root, props)
+  }
+
+  /**
+   * mounted
+   */
+  public mounted() {
+    log('mounted')
   }
 
   protected pages() {

@@ -14,11 +14,13 @@ export default class Header extends Component {
     super($root, props);
     this.init();
   }
-
-  public components = {
-    MainButton: this.add(MainButton)
+  
+  public addComponents() {
+    return {
+      MainButton: this.add(MainButton)          
+    }
   }
-
+  
   public mounted() {
     window.addEventListener("resize", this.resizeHandler);
   }

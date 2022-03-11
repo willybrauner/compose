@@ -1,5 +1,4 @@
 import { Component } from "../../../src"
-import debugModule from "debug"
 import Header from "../components/Header"
 import { defaultPlayIn, defaultPlayOut } from "../helpers/defaultTransitions"
 import debug from "@wbe/debug"
@@ -15,12 +14,15 @@ export default class WorkPage extends Component {
     super($root, props)
     this.init()
   }
-
-  public components = {
-    Header: this.add(Header),
+  
+  public addComponents() {
+    return {
+      Header: this.add(Header),
+    }
   }
 
   public mounted() {
+    log("use this.components", this.components)
     window.addEventListener("resize", this.resizeHandler)
   }
 

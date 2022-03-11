@@ -1,7 +1,6 @@
 import { Component } from "../../../src"
-import debugModule from "debug"
 import Header from "../components/Header"
-import { defaultPlayIn, defaultPlayOut } from "../helpers/defaultTransitions"
+import {  defaultPlayIn,  defaultPlayOut } from "../helpers/defaultTransitions"
 import debug from "@wbe/debug"
 const log = debug(`front:HomePage`)
 
@@ -16,11 +15,12 @@ export default class HomePage extends Component {
     this.init()
   }
 
-  public components = {
+  public addComponents = () => ({
     Header: this.add(Header),
-  }
+  })
 
   public mounted() {
+    log('this.components',this.components)
     window.addEventListener("resize", this.resizeHandler)
   }
 
