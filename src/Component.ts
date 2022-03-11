@@ -2,15 +2,14 @@ import { TPromiseRef } from "./Stack"
 import debug from "@wbe/debug"
 const log = debug(`compose:Component`)
 
-type TFlatArray<T> = T extends any[] ? T[number] : T
-
-export type TNewComponent<C, P> = new <P = TProps>(...rest: any[]) => TFlatArray<C>
 
 export type TProps = { [x: string]: any } | void
+export type TFlatArray<T> = T extends any[] ? T[number] : T
+export type TNewComponent<C, P> = new <P = TProps>(...rest: any[]) => TFlatArray<C>
 
-export type TComponents<T = any> = {
-  [name: string]: T | T[]
-}
+// export type TComponents<T = any> = {
+//   [name: string]: T | T[]
+// }
 
 export type TElements = {
   [x: string]: HTMLElement | HTMLElement[]
@@ -30,7 +29,7 @@ let COMPONENT_ID = 0
 /**
  * Component
  */
-export class Component<Props = TProps> {
+export class Component<Props = TProps, TChildren = any> {
   public name: string
   public $root: HTMLElement
   public props: Props
@@ -59,12 +58,9 @@ export class Component<Props = TProps> {
   }
 
   // register children components
-  public addComponents(): TComponents {
-    return {}
-  }
-  public components: TComponents
-  
-
+  public addComponents (): TChildren  { return {} as TChildren };
+  public components: TChildren
+ 
   /**
    * Init to call in contructor (to keep context)
    */
@@ -149,6 +145,15 @@ export class Component<Props = TProps> {
     // return single instance or instances array
     return localInstances.length === 1 && !returnArray ? localInstances[0] : localInstances
   }
+
+  // protected addAll<T = any, P = TProps>(
+  //   classComponent: TNewComponent<T, P>,
+  //   props?: P,
+  //   attrName?: string,
+  //   returnArray: boolean = false
+  // ): T[] {
+  //   return this.add()
+  // }
 
   /**
    * Find HTML element with BEM element name
