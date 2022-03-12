@@ -7,6 +7,8 @@ Compose is a tiny zero dependency library for vanilla javascript component appro
 ![](https://img.shields.io/npm/dt/@wbe/compose.svg)
 ![](https://img.shields.io/npm/l/@wbe/compose.svg)
 
+[test @wbe/compose in codesandbox](https://codesandbox.io/s/compose-example-ts-xdz1q6)
+
 ## Installation
 
 ```shell script
