@@ -4,10 +4,17 @@ import { defaultPlayIn, defaultPlayOut } from "../helpers/defaultTransitions"
 import debug from "@wbe/debug"
 const log = debug(`front:AboutPage`)
 
+
+type TStaticProps = {}
+
+type TAddComponents = {
+  Header: InstanceType<typeof Header>
+}
+
 /**
  * @name AboutPage
  */
-export default class AboutPage extends Component {
+export default class AboutPage extends Component<TStaticProps, TAddComponents> {
   public static attrName = "AboutPage"
 
   constructor($root, props) {

@@ -4,10 +4,16 @@ import MainButton from "./MainButton"
 import debug from "@wbe/debug"
 const log = debug(`front:Header`)
 
+type TStaticProps = {}
+
+type TAddComponents = {
+  MainButton: InstanceType<typeof MainButton>
+}
+
 /**
  * @name Header
  */
-export default class Header extends Component {
+export default class Header extends Component<TStaticProps, TAddComponents> {
   public static attrName = "Header";
 
   constructor($root, props) {

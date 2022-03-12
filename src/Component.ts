@@ -5,11 +5,7 @@ const log = debug(`compose:Component`)
 export type TProps = { [x: string]: any } | void
 export type TFlatArray<T> = T extends any[] ? T[number] : T
 export type TNewComponent<C, P> = new <P = TProps>(...rest: any[]) => TFlatArray<C>
-
-export type TElements = {
-  [x: string]: HTMLElement | HTMLElement[]
-}
-
+export type TElements = {  [x: string]: HTMLElement | HTMLElement[] }
 export type TTransition = {
   comeFrom?: string
   goTo?: string
@@ -24,10 +20,14 @@ let COMPONENT_ID = 0
 /**
  * Component
  */
-export class Component<Props = TProps, TChildren = any> {
+export class Component<Props = TProps, TAddComponents = {}> {
   public name: string
   public $root: HTMLElement
   public props: Props
+
+  // register children components
+  public addComponents(): TAddComponents { return {} as TAddComponents } 
+  public components: TAddComponents
 
   public elements: TElements
   public id: number
@@ -51,12 +51,6 @@ export class Component<Props = TProps, TChildren = any> {
     this.id = COMPONENT_ID
     COMPONENT_ID++
   }
-
-  // register children components
-  public addComponents(): TChildren {
-    return {} as TChildren
-  }
-  public components: TChildren
 
   /**
    * Init to call in contructor (to keep context)

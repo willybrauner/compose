@@ -4,10 +4,16 @@ import { defaultPlayIn, defaultPlayOut } from "../helpers/defaultTransitions"
 import debug from "@wbe/debug"
 const log = debug(`front:WorkPage`)
 
+type TStaticProps = {}
+
+type TAddComponents = {
+  Header: InstanceType<typeof Header>
+}
+
 /**
  * @name WorkPage
  */
-export default class WorkPage extends Component {
+export default class WorkPage extends Component<TStaticProps, TAddComponents> {
   public static attrName = "WorkPage"
 
   constructor($root, props) {

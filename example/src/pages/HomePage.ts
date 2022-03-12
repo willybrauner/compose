@@ -23,12 +23,10 @@ export default class HomePage extends Component<TStaticProps, TAddComponents> {
     this.init()
   }
 
-  addComponents() {
-    return {
+  public addComponents = () => ({
       Header: this.add(Header),
       MainButton: this.add<MainButton[]>(MainButton),
-    }
-  }
+  })
 
   public mounted() {
     log("this.components", this.components)
