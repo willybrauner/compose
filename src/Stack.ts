@@ -3,7 +3,6 @@ import type { TProps } from "./Component"
 import debug from "@wbe/debug"
 const log = debug("compose:Stack")
 
-
 export interface IPage {
   $pageRoot: HTMLElement
   pageName: string
@@ -14,7 +13,7 @@ export interface IPage {
 }
 
 export type TPromiseRef = { reject: () => void }
-export type TPages = { [x: string]: new (...rest:any[]) => Component }
+export type TPages = { [x: string]: new (...rest: any[]) => Component }
 export type TCurrentPage = Omit<IPage, "playIn">
 export type TNewPage = Omit<IPage, "playOut">
 export type TManagePageTransitionParams = {
@@ -33,7 +32,7 @@ export class Stack<Props = TProps> extends Component {
   public static pageContainerAttr = "data-page-transition-container"
   public static pageWrapperAttr = "data-page-transition-wrapper"
   public static pageUrlAttr = "data-page-transition-url"
-  
+
   // reload if document is fetching
   public forcePageReloadIfDocumentIsFetching: boolean = false
   // force all pages to reload instead the dynamic new document fetching process
@@ -43,9 +42,11 @@ export class Stack<Props = TProps> extends Component {
   public disableHistoryDuringTransitions: boolean = false
 
   // Register pages from parent class
-  public addPages(): TPages { return }
+  public addPages(): TPages {
+    return
+  }
   private pages: TPages
-  
+
   // the current URL to request
   protected currentUrl: string = null
   protected currentPage: IPage
@@ -55,7 +56,7 @@ export class Stack<Props = TProps> extends Component {
   // page container
   protected $pageContainer: HTMLElement
   protected $pageWrapper: HTMLElement
-  
+
   // promise ref used in playIn and playOut medthods to keep reject promise
   protected playInPromiseRef: TPromiseRef = { reject: undefined }
   protected playOutPromiseRef: TPromiseRef = { reject: undefined }
@@ -65,10 +66,12 @@ export class Stack<Props = TProps> extends Component {
   // check if page is in animate process
   private _pageIsAnimating: boolean = false
 
+  private _cache = {}
+
   constructor($root: HTMLElement, props: Props) {
     // relay
     super($root, props)
-    
+
     // init
     this.$pageContainer = this.getPageContainer()
     this.$pageWrapper = this.getPageWrapper(this.$pageContainer)
@@ -77,10 +80,10 @@ export class Stack<Props = TProps> extends Component {
 
     // start patch history
     this.patchHistoryStates()
-    
+
     // init method from extended Component class
     // IMPORTANT to init Component lifecicle after addding setting this.pages property
-    this.init();    
+    this.init()
 
     // start page events
     this.start()
@@ -217,7 +220,7 @@ export class Stack<Props = TProps> extends Component {
       // remove all page wrapper children
       this.$pageWrapper.querySelectorAll(":scope > *").forEach((el) => el.remove())
       // hack for the first load
-      this.isFirstPage && await new Promise((resolve) => setTimeout(resolve, 1))
+      this.isFirstPage && (await new Promise((resolve) => setTimeout(resolve, 1)))
     }
 
     // Start page transition manager who resolve newPage obj
@@ -275,7 +278,7 @@ export class Stack<Props = TProps> extends Component {
 
   /**
    *  Prepare mount new page
-   *  - request new page
+   *  - request new page or use page in cache
    *  - change title
    *  - inject new DOM in current DOM container
    *  - prepare playIn
@@ -284,8 +287,10 @@ export class Stack<Props = TProps> extends Component {
   private async prepareMountNewPage(requestUrl: string): Promise<IPage> {
     // prepare playIn transition for new Page
     const _preparePlayIn = (pageInstance): Promise<any> => {
+     
       // select playIn method
       const _playInRef = pageInstance._playInRef.bind(pageInstance)
+     
       // return playIn function used by pageTransitons method
       return _playInRef(this.currentPage.pageName, this.playInPromiseRef)?.catch?.(() => {})
     }
@@ -300,29 +305,38 @@ export class Stack<Props = TProps> extends Component {
       }
     }
 
+    let newDocument: Document
+    const pageInCache = !!this._cache?.[requestUrl]
+
+    if (pageInCache) {
+      log("Cache exist, use it", pageInCache)
+      newDocument = this._cache[requestUrl]
+    }
+
     try {
       // fetch new page document
-      const newDocument = await this.fetchNewDocument(requestUrl, new AbortController())
-      // change page title
-      document.title = newDocument.title
-
-      // inject new page content in pages Container
-      const newPageWrapper = this.getPageWrapper(newDocument.body)
-      const newPageRoot = this.getPageRoot(newPageWrapper)
-      this.$pageWrapper.appendChild(newPageRoot)
-
-      //  instance the page after append it in DOM
-      const newPageName = this.getPageName(newPageRoot)
-      const newPageInstance = this.getPageInstance(newPageName, newPageRoot)
-
-      return {
-        $pageRoot: newPageRoot,
-        pageName: newPageName,
-        instance: newPageInstance,
-        playIn: () => _preparePlayIn(newPageInstance),
-      }
+      newDocument = await this.fetchNewDocument(requestUrl, new AbortController())
     } catch (e) {
       throw new Error(`Fetch new document failed on url: ${requestUrl}`)
+    }
+
+    // change page title
+    document.title = newDocument.title
+
+    // inject new page content in pages Container
+    const newPageWrapper = this.getPageWrapper(newDocument.body)
+    const newPageRoot = this.getPageRoot(newPageWrapper)
+    this.$pageWrapper.appendChild(newPageRoot)
+
+    //  instance the page after append it in DOM
+    const newPageName = this.getPageName(newPageRoot)
+    const newPageInstance = this.getPageInstance(newPageName, newPageRoot)
+
+    return {
+      $pageRoot: newPageRoot,
+      pageName: newPageName,
+      instance: newPageInstance,
+      playIn: () => _preparePlayIn(newPageInstance),
     }
   }
 
@@ -489,6 +503,11 @@ export class Stack<Props = TProps> extends Component {
       .then((html) => {
         this._documentIsFetching = false
         const parser = new DOMParser()
+
+        // store current page in cache
+        this._cache = { ...this._cache, ...{ [url]: parser.parseFromString(html, "text/html") } }
+        log("this._cache", this._cache)
+
         return parser.parseFromString(html, "text/html")
       })
       .catch((error) => {
