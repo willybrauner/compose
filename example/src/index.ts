@@ -1,4 +1,4 @@
 import "./index.css";
 import App from "./components/App"
 
-new App(document.querySelector(".App"), {});
+new App(document.querySelector(".App"), { foo: "bar" });

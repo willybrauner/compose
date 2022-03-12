@@ -20,7 +20,7 @@ let COMPONENT_ID = 0
 /**
  * Component
  */
-export class Component<Props = TProps, TAddComponents = {}> {
+export class Component<Props = TProps, TAddComponents = any> {
   public name: string
   public $root: HTMLElement
   public props: Props

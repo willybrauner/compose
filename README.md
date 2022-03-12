@@ -307,7 +307,7 @@ class App extends Stack {
   static attrName = "App"
 
   // list of page components
-  pages() {
+  addPages() {
     return {
       HomePage,
       AboutPage,

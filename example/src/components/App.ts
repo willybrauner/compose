@@ -5,34 +5,33 @@ import WorkPage from "../pages/WorkPage"
 import debug from "@wbe/debug"
 const log = debug(`front:App`)
 
+type TProps = {
+  foo: string
+}
+
 /**
  * @name App
  */
-export default class App extends Stack {
+export default class App extends Stack<TProps> {
   public static attrName = "App"
 
-  // disableLinksDuringTransitions = true
-  // disableHistoryDuringTransitions = true
-  forcePageReloadIfDocumentIsFetching = true
-
-  constructor($root, props) {
-    log(`constructor`)
+  constructor($root, props: TProps) {
     super($root, props)
+  }
+
+  public addPages() {
+    return {
+      HomePage,
+      AboutPage,
+      WorkPage,
+    }
   }
 
   /**
    * mounted
    */
   public mounted() {
-    log('mounted')
-  }
-
-  protected pages() {
-    return {
-      HomePage,
-      AboutPage,
-      WorkPage,
-    }
+    
   }
 
   protected async pageTransitions(
@@ -45,4 +44,8 @@ export default class App extends Stack {
     await newPage.playIn()
     complete()
   }
+
+  // disableLinksDuringTransitions = true
+  // disableHistoryDuringTransitions = true
+  forcePageReloadIfDocumentIsFetching = true
 }

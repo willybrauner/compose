@@ -1,4 +1,5 @@
-import { Component, TNewComponent } from "./Component"
+import { Component } from "./Component"
+import type { TProps } from "./Component"
 import debug from "@wbe/debug"
 const log = debug("compose:Stack")
 
@@ -13,7 +14,7 @@ export interface IPage {
 }
 
 export type TPromiseRef = { reject: () => void }
-export type TPageList = { [x: string]: TNewComponent<any, any> }
+export type TPages = { [x: string]: new (...rest:any[]) => Component }
 export type TCurrentPage = Omit<IPage, "playIn">
 export type TNewPage = Omit<IPage, "playOut">
 export type TManagePageTransitionParams = {
@@ -27,16 +28,12 @@ export type TManagePageTransitionParams = {
  * `Stack` extended class is a middleware class between our App root component
  * and `Component` extended class.
  */
-export class Stack extends Component {
+export class Stack<Props = TProps> extends Component {
   // DOM attributes
   public static pageContainerAttr = "data-page-transition-container"
   public static pageWrapperAttr = "data-page-transition-wrapper"
   public static pageUrlAttr = "data-page-transition-url"
-
-  // page container
-  public $pageContainer: HTMLElement
-  public $pageWrapper: HTMLElement
-
+  
   // reload if document is fetching
   public forcePageReloadIfDocumentIsFetching: boolean = false
   // force all pages to reload instead the dynamic new document fetching process
@@ -45,34 +42,46 @@ export class Stack extends Component {
   public disableLinksDuringTransitions: boolean = false
   public disableHistoryDuringTransitions: boolean = false
 
+  // Register pages from parent class
+  public addPages(): TPages { return }
+  private pages: TPages
+  
   // the current URL to request
   protected currentUrl: string = null
   protected currentPage: IPage
   protected prevPage: IPage
   protected isFirstPage = true
-  // Register pages from parent class
-  protected _pageList: TPageList
-  protected pages(): TPageList {
-    return {}
-  }
+
+  // page container
+  protected $pageContainer: HTMLElement
+  protected $pageWrapper: HTMLElement
+  
+  // promise ref used in playIn and playOut medthods to keep reject promise
+  protected playInPromiseRef: TPromiseRef = { reject: undefined }
+  protected playOutPromiseRef: TPromiseRef = { reject: undefined }
 
   // check if new page document html is in fetching step
   private _documentIsFetching: boolean = false
   // check if page is in animate process
   private _pageIsAnimating: boolean = false
 
-  // promise ref used in playIn and playOut medthods to keep reject promise
-  protected playInPromiseRef: TPromiseRef = { reject: undefined }
-  protected playOutPromiseRef: TPromiseRef = { reject: undefined }
-
-  constructor($root, props) {
+  constructor($root: HTMLElement, props: Props) {
+    // relay
     super($root, props)
+    
+    // init
     this.$pageContainer = this.getPageContainer()
     this.$pageWrapper = this.getPageWrapper(this.$pageContainer)
-    this._pageList = this.pages()
+    this.pages = this.addPages()
     this.currentPage = this.getFirstCurrentPage()
+
     // start patch history
     this.patchHistoryStates()
+    
+    // init method from extended Component class
+    // IMPORTANT to init Component lifecicle after addding setting this.pages property
+    this.init();    
+
     // start page events
     this.start()
   }
@@ -407,7 +416,7 @@ export class Stack extends Component {
    * @private
    */
   private getPageName($pageRoot: HTMLElement): string {
-    for (const page of Object.keys(this._pageList)) {
+    for (const page of Object.keys(this.pages)) {
       if (page == $pageRoot.getAttribute(Component.componentAttr)) return page
     }
   }
@@ -419,7 +428,7 @@ export class Stack extends Component {
    * @private
    */
   private getPageInstance(pageName: string, $pageRoot?: HTMLElement): Component {
-    const classComponent = this._pageList[pageName]
+    const classComponent = this.pages[pageName]
     return classComponent ? new classComponent($pageRoot, {}, pageName) : null
   }
 
