@@ -1,15 +1,10 @@
-import { TPromiseRef } from "./Stack"
+import type { TPromiseRef } from "./Stack"
 import debug from "@wbe/debug"
 const log = debug(`compose:Component`)
-
 
 export type TProps = { [x: string]: any } | void
 export type TFlatArray<T> = T extends any[] ? T[number] : T
 export type TNewComponent<C, P> = new <P = TProps>(...rest: any[]) => TFlatArray<C>
-
-// export type TComponents<T = any> = {
-//   [name: string]: T | T[]
-// }
 
 export type TElements = {
   [x: string]: HTMLElement | HTMLElement[]
@@ -33,7 +28,7 @@ export class Component<Props = TProps, TChildren = any> {
   public name: string
   public $root: HTMLElement
   public props: Props
-  
+
   public elements: TElements
   public id: number
   public isMounted: boolean
@@ -58,9 +53,11 @@ export class Component<Props = TProps, TChildren = any> {
   }
 
   // register children components
-  public addComponents (): TChildren  { return {} as TChildren };
+  public addComponents(): TChildren {
+    return {} as TChildren
+  }
   public components: TChildren
- 
+
   /**
    * Init to call in contructor (to keep context)
    */
@@ -145,15 +142,6 @@ export class Component<Props = TProps, TChildren = any> {
     // return single instance or instances array
     return localInstances.length === 1 && !returnArray ? localInstances[0] : localInstances
   }
-
-  // protected addAll<T = any, P = TProps>(
-  //   classComponent: TNewComponent<T, P>,
-  //   props?: P,
-  //   attrName?: string,
-  //   returnArray: boolean = false
-  // ): T[] {
-  //   return this.add()
-  // }
 
   /**
    * Find HTML element with BEM element name
