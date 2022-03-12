@@ -41,9 +41,9 @@ class App extends Component {
   }
 
   // Create new instance for children component list
-  components = {
+  addComponents = () => ({
     Header: this.add(Header),
-  }
+  })
 
   // target child BEM DOM elements
   elements = {
@@ -102,21 +102,21 @@ class Header extends Component {
 ### `beforeMount()`
 
 Method called before class component is mounted.
-Current class instance is already available.
+Current class instance is already available but children component instances are not yet.
 
 ### `mounted()`
 
-Method called after class component is mounted.
+Method called after class component is mounted. Children component instances are now available.
 
 ### `unmounted()`
 
 Method called after class component is unmounted.
-The parent component observer will called this unmounted method automatically  
-if the current component is removed from DOM.
+The parent component observer will called this unmounted method automatically if the current component is removed from DOM.
+All children component instances are also unmounted after this method is called.
 
 ### `updated()`
 
-Method called when any children component in DOM subtree changed.
+Method called when any **children** component in DOM subtree changed.
 
 ## Methods & Properties
 
@@ -153,13 +153,23 @@ add<T = Component, P = TProps>(
 ): T;
 ```
 
+To "add" all children components, use `addComponents()` method.
+
 ```js
-components = {
-  Bar: this.add(Bar),
+addComponents() {
+  return {
+    Bar: this.add(Bar),
+  }
 }
+
+// or the short version with arrow function not assigned to the prototype
+addComponents = () => ({
+    Bar: this.add(Bar),
+})
+
 // then, access child Bar instance
-this.Bar.$root
-this.Bar.unmounted()
+this.components.Bar.$root
+this.components.Bar.unmounted()
 // ...
 ```
 
@@ -176,34 +186,34 @@ In case, multi children of the same component is found, `add()` will returned an
 ```
 
 ```js
-components = {
+addComponents = () => ({
   Bar: this.add(Bar), // will returned array of Bar instances
-}
+})
 ```
 
 If we don't know how many instance of our component `Bar` exist,
 it's possible to force `add()` to return an array via `returnArray` parameter.
 
 ```js
-components = {
+addComponents = () => ({
   Bar: this.add(Bar, {}, true),
-}
+})
 ```
 
 With typescript, we can explicitly state that we are expecting an array.
 
 ```ts
-components = {
+addComponents = () => ({
   Bar: this.add<Bar[]>(Bar),
-}
+})
 ```
 
 The method accepts a static props parameter which we can access from the new Bar component via `this.props`.
 
 ```js
-components = {
+addComponents = () => ({
   Bar: this.add(Bar, { myProp: "foo" }),
-}
+})
 ```
 
 With typescript, we can type the `props` object:
@@ -297,7 +307,7 @@ class App extends Stack {
   static attrName = "App"
 
   // list of page components
-  pages() {
+  addPages() {
     return {
       HomePage,
       AboutPage,

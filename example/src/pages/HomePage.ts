@@ -1,14 +1,21 @@
 import { Component } from "../../../src"
-import debugModule from "debug"
 import Header from "../components/Header"
 import { defaultPlayIn, defaultPlayOut } from "../helpers/defaultTransitions"
 import debug from "@wbe/debug"
+import MainButton from "../components/MainButton"
 const log = debug(`front:HomePage`)
+
+type TStaticProps = {}
+
+type TAddComponents = {
+  Header: InstanceType<typeof Header>
+  MainButton: InstanceType<typeof MainButton>[]
+}
 
 /**
  * @name HomePage
  */
-export default class HomePage extends Component {
+export default class HomePage extends Component<TStaticProps, TAddComponents> {
   public static attrName = "HomePage"
 
   constructor($root, props) {
@@ -16,11 +23,13 @@ export default class HomePage extends Component {
     this.init()
   }
 
-  public components = {
-    Header: this.add(Header),
-  }
+  public addComponents = () => ({
+      Header: this.add(Header),
+      MainButton: this.add<MainButton[]>(MainButton),
+  })
 
   public mounted() {
+    log("this.components", this.components)
     window.addEventListener("resize", this.resizeHandler)
   }
 

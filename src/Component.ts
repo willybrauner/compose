@@ -1,19 +1,11 @@
-import { TPromiseRef } from "./Stack"
-
-type TFlatArray<T> = T extends any[] ? T[number] : T
-
-export type TNewComponent<C, P> = new <P = TProps>(...rest: any[]) => TFlatArray<C>
+import type { TPromiseRef } from "./Stack"
+import debug from "@wbe/debug"
+const log = debug(`compose:Component`)
 
 export type TProps = { [x: string]: any } | void
-
-export type TComponents = {
-  [name: string]: any | any[]
-}
-
-export type TElements = {
-  [x: string]: HTMLElement | HTMLElement[]
-}
-
+export type TFlatArray<T> = T extends any[] ? T[number] : T
+export type TNewComponent<C, P> = new <P = TProps>(...rest: any[]) => TFlatArray<C>
+export type TElements = {  [x: string]: HTMLElement | HTMLElement[] }
 export type TTransition = {
   comeFrom?: string
   goTo?: string
@@ -28,11 +20,15 @@ let COMPONENT_ID = 0
 /**
  * Component
  */
-export class Component<Props = TProps> {
+export class Component<Props = TProps, TAddComponents = any> {
   public name: string
   public $root: HTMLElement
   public props: Props
-  public components: TComponents
+
+  // register children components
+  public addComponents(): TAddComponents { return {} as TAddComponents } 
+  public components: TAddComponents
+
   public elements: TElements
   public id: number
   public isMounted: boolean
@@ -78,8 +74,11 @@ export class Component<Props = TProps> {
    */
   public mounted(): void {}
   private _mounted(): void {
-    this.isMounted = true
+    log(this.name, "mounted")
+    // instanciate children components just before mounted
+    this.components = this.addComponents()
     this.mounted()
+    this.isMounted = true
   }
 
   /**
@@ -88,8 +87,8 @@ export class Component<Props = TProps> {
    */
   public unmounted() {}
   private _unmounted(): void {
-    this.isMounted = false
     this.unmounted()
+    this.isMounted = false
     this.onChildrenComponents((component: Component) => {
       COMPONENT_ID--
       component?._unmounted?.()
