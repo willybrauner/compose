@@ -216,7 +216,7 @@ export class Stack<Props = TProps> extends Component {
     // keep new request URL
     this.currentUrl = requestUrl
 
-    // if page is animating
+     
     if (this._pageIsAnimating) {
       // reject current promise playIn playOut
       this.playOutPromiseRef.reject?.()
@@ -224,7 +224,12 @@ export class Stack<Props = TProps> extends Component {
       this._pageIsAnimating = false
 
       log(
-        "handleHistory > page is animating, reject current transitions promises + remove page wrapper content"
+        `
+        handleHistory > New request while page is animating,
+        For security:  
+         - reject current transitions promises 
+         - remove page wrapper content
+         `
       )
       // remove all page wrapper children
       this.$pageWrapper.querySelectorAll(":scope > *").forEach((el) => el.remove())
