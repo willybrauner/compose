@@ -203,16 +203,12 @@ export class Stack<Props = TProps> extends Component {
 
     // get URL to request
     const requestUrl = event?.["arguments"]?.[2] || window.location.pathname
+
     log("handleHistory > requestUrl", requestUrl)
-    // check before continue
     if (!requestUrl || requestUrl === this.currentUrl) return
-    // SECURITY if document is fetching, just reload the page
+
     if ((this.forcePageReloadIfDocumentIsFetching && this._fetching) || this.forcePageReload) {
-      log({
-        "this.forcePageReloadIfDocumentIsFetching": this.forcePageReloadIfDocumentIsFetching,
-        "this._documentIsFetching": this._fetching,
-        "this.forcePageReload": this.forcePageReload,
-      })
+      log("handleHistory > security, force page reload...")
       window.open(requestUrl, "_self")
       return
     }
@@ -226,6 +222,7 @@ export class Stack<Props = TProps> extends Component {
       this.playOutPromiseRef.reject?.()
       this.playInPromiseRef.reject?.()
       this._pageIsAnimating = false
+
       log(
         "handleHistory > page is animating, reject current transitions promises + remove page wrapper content"
       )
@@ -258,7 +255,9 @@ export class Stack<Props = TProps> extends Component {
     const page = this.currentPage
 
     // prepare remove dom page
-    const _remove = () => { page.$pageRoot.remove() }
+    const _remove = () => {
+      page.$pageRoot.remove()
+    }
 
     // prepare playout
     const playOut = (goTo: string, autoRemoveOnComplete = true) => {
@@ -295,47 +294,54 @@ export class Stack<Props = TProps> extends Component {
    * @param requestUrl
    */
   private async prepareMountNewPage(requestUrl: string): Promise<IPage> {
+    const { $pageRoot, pageName, instance } = this.currentPage
+
     // prepare playIn transition for new Page used by pageTransitons method
     const _preparePlayIn = (pageInstance): Promise<any> => {
       const _playInRef = pageInstance._playInRef.bind(pageInstance)
-      return _playInRef(this.currentPage.pageName, this.playInPromiseRef)?.catch?.(() => {})
+      return _playInRef(pageName, this.playInPromiseRef)?.catch?.(() => {})
     }
 
     // case of is first page
     if (this.isFirstPage) {
+      // prettier-ignore
+      this.addInCache(
+        requestUrl,
+        document.title,
+        $pageRoot,
+        pageName,
+        instance,
+        () => _preparePlayIn(instance)
+      )
+
       return {
-        $pageRoot: this.currentPage.$pageRoot,
-        pageName: this.currentPage.pageName,
-        instance: this.currentPage.instance,
-        playIn: () => _preparePlayIn(this.currentPage.instance),
+        $pageRoot,
+        pageName,
+        instance,
+        playIn: () => _preparePlayIn(instance),
       }
     }
 
-    log(this._cache)
     const cache = this._cache?.[requestUrl]
-    log(">>>>>>>>> page is in cache ?", !!cache, this._cache, cache)
 
     if (cache) {
       log("Use cache", cache)
       const { title, $pageRoot, pageName, instance, playIn } = cache
       this.addPageInDOM($pageRoot)
       this.updateMetas(title)
-
       return { $pageRoot, pageName, instance, playIn }
     }
 
     // fetch new document or use cache
     try {
       const newDocument = await this.fetchNewDocument(requestUrl, new AbortController())
-
-      
       const $newPageWrapper = this.getPageWrapper(newDocument.body)
-      const $newPageRoot = this.getPageRoot($newPageWrapper)      
-      this.addPageInDOM($newPageRoot)
-      this.updateMetas(newDocument.title)
-
+      const $newPageRoot = this.getPageRoot($newPageWrapper)
       const newPageName = this.getPageName($newPageRoot)
       const newPageInstance = this.getPageInstance(newPageName, $newPageRoot)
+
+      this.addPageInDOM($newPageRoot)
+      this.updateMetas(newDocument.title)
 
       // prettier-ignore
       this.addInCache(
@@ -490,21 +496,21 @@ export class Stack<Props = TProps> extends Component {
    * Update Metas
    * @param newDocument
    */
-  private updateMetas(title:string): void {
+  private updateMetas(title: string): void {
     document.title = title
   }
 
-
   /**
-   * 
-   * @param url 
-   * @param title 
-   * @param render 
-   * @param pageName 
-   * @param instance 
-   * @param playIn 
+   * Add current page in cache cache
    */
-  private addInCache(url, title, $pageRoot, pageName, instance, playIn): void {
+  private addInCache(
+    url: string,
+    title: string,
+    $pageRoot: HTMLElement,
+    pageName: string,
+    instance,
+    playIn: () => Promise<void>
+  ): void {
     this._cache = {
       ...this._cache,
       [url]: { title, $pageRoot, pageName, instance, playIn },
