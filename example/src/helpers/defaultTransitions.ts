@@ -18,7 +18,7 @@ export const defaultPlayIn = ($root?: HTMLElement, comeFrom?: string, resolve?: 
       x: 0,
       autoAlpha: 1,
       duration,
-      ease: "power3.out",
+      ease: "power3.inOut",
       onComplete: resolve,
     }
   )
@@ -36,7 +36,7 @@ export const defaultPlayOut = ($root?: HTMLElement, goTo?: string, resolve?: () 
       autoAlpha: 0,
       x: -xValue,
       duration,
-      ease: "power3.out",
+      ease: "power3.inOut",
       onComplete: resolve,
     }
   )
