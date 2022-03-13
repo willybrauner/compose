@@ -221,23 +221,15 @@ addComponents = () => ({
 With typescript, we can type the `props` object:
 
 ```ts
-components = {
+addComponents = () => ({
   Bar: this.add<Bar, { myProp: string }>(Bar, { myProp: "foo" }, false),
-}
+})
 ```
 
-### `components`
+### `components()`
 
 As used on `add()` method, `components` allows to retrieve a list on children component instances create by `add()`.
-When current component instance is unmounted, all instances declared in `components` object, will be automatically unmounted.
-
-```ts
-components: TComponents = {}
-
-type TComponents = {
-  [name: string]: Component | Component[]
-}
-```
+When current component instance is unmounted, all instances returned by `components` method, will be automatically unmounted.
 
 ### `find()`
 
