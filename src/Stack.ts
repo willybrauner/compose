@@ -233,8 +233,9 @@ export class Stack<Props = TProps> extends Component {
       )
       // remove all page wrapper children
       this.$pageWrapper.querySelectorAll(":scope > *").forEach((el) => el.remove())
-      // hack for the first load
-      this.isFirstPage && (await new Promise((resolve) => setTimeout(resolve, 1)))
+      
+      // hack before process the new transition
+      await new Promise((resolve) => setTimeout(resolve, 1))
     }
 
     // Start page transition manager who resolve newPage obj
