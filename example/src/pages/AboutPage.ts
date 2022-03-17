@@ -4,7 +4,6 @@ import { defaultPlayIn, defaultPlayOut } from "../helpers/defaultTransitions"
 import debug from "@wbe/debug"
 const log = debug(`front:AboutPage`)
 
-
 type TStaticProps = {}
 
 type TAddComponents = {
@@ -22,16 +21,17 @@ export default class AboutPage extends Component<TStaticProps, TAddComponents> {
     this.init()
   }
 
-  public addComponents() {
-    return {
-      Header: this.add(Header),
-    }
-  }
+  public addComponents = () => ({
+    Header: this.add(Header),
+  })
+
   public mounted() {
+    log("> mounted")
     window.addEventListener("resize", this.resizeHandler)
   }
 
   public unmounted() {
+    log("> unmounted")
     window.removeEventListener("resize", this.resizeHandler)
   }
 

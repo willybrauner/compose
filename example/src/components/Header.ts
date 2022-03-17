@@ -1,5 +1,4 @@
-import { Component } from "../../../src";
-
+import { Component } from "../../../src"
 import MainButton from "./MainButton"
 import debug from "@wbe/debug"
 const log = debug(`front:Header`)
@@ -7,35 +6,34 @@ const log = debug(`front:Header`)
 type TStaticProps = {}
 
 type TAddComponents = {
-  MainButton: InstanceType<typeof MainButton>
+  MainButton: InstanceType<typeof MainButton>[]
 }
 
 /**
  * @name Header
  */
 export default class Header extends Component<TStaticProps, TAddComponents> {
-  public static attrName = "Header";
+  public static attrName = "Header"
 
   constructor($root, props) {
-    super($root, props);
-    this.init();
+    super($root, props)
+    this.init()
   }
-  
-  public addComponents() {
-    return {
-      MainButton: this.add(MainButton)          
-    }
-  }
-  
+
+  public addComponents = () => ({
+    MainButton: this.add<MainButton[]>(MainButton),
+  })
+
   public mounted() {
-    window.addEventListener("resize", this.resizeHandler);
+    log("mounted")
+    window.addEventListener("resize", this.resizeHandler)
   }
 
   public unmounted() {
-    window.removeEventListener("resize", this.resizeHandler);
+    window.removeEventListener("resize", this.resizeHandler)
   }
 
   protected resizeHandler = () => {
-    log("window.innerWidth", window.innerWidth);
-  };
+    log("window.innerWidth", window.innerWidth)
+  }
 }

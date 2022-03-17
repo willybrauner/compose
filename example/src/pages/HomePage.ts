@@ -30,10 +30,12 @@ export default class HomePage extends Component<TStaticProps, TAddComponents> {
 
   public mounted() {
     log("this.components", this.components)
+    log('> mounted')
     window.addEventListener("resize", this.resizeHandler)
   }
 
   public unmounted() {
+    log('> unmounted')
     window.removeEventListener("resize", this.resizeHandler)
   }
 
