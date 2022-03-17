@@ -1,6 +1,6 @@
 {
   "name": "@wbe/compose",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Compose is a tiny zero dependency library for vanilla javascript component approach and page transitions management.",
   "author": "Willy Brauner",
   "license": "MIT",
