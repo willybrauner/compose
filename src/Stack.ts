@@ -216,7 +216,6 @@ export class Stack<Props = TProps> extends Component {
     // keep new request URL
     this.currentUrl = requestUrl
 
-     
     if (this._pageIsAnimating) {
       // reject current promise playIn playOut
       this.playOutPromiseRef.reject?.()
@@ -233,7 +232,7 @@ export class Stack<Props = TProps> extends Component {
       )
       // remove all page wrapper children
       this.$pageWrapper.querySelectorAll(":scope > *").forEach((el) => el.remove())
-      
+
       // hack before process the new transition
       await new Promise((resolve) => setTimeout(resolve, 1))
     }
@@ -303,9 +302,9 @@ export class Stack<Props = TProps> extends Component {
     const { $pageRoot, pageName, instance } = this.currentPage
 
     // prepare playIn transition for new Page used by pageTransitons method
-    const _preparePlayIn = (pageInstance): Promise<any> => {
-      const _playInRef = pageInstance._playInRef.bind(pageInstance)
-      return _playInRef(pageName, this.playInPromiseRef)?.catch?.(() => {})
+    const preparePlayIn = (pageInstance): Promise<any> => {
+      const playInRef = pageInstance._playInRef.bind(pageInstance)
+      return playInRef(pageName, this.playInPromiseRef)?.catch?.(() => {})
     }
 
     // case of is first page
@@ -317,22 +316,22 @@ export class Stack<Props = TProps> extends Component {
         $pageRoot,
         pageName,
         instance,
-        () => _preparePlayIn(instance)
+        () => preparePlayIn(instance)
       )
 
       return {
         $pageRoot,
         pageName,
         instance,
-        playIn: () => _preparePlayIn(instance),
+        playIn: () => preparePlayIn(instance),
       }
     }
 
     const cache = this._cache?.[requestUrl]
-
     if (cache) {
       log("Use cache", cache)
       const { title, $pageRoot, pageName, instance, playIn } = cache
+      instance.init()
       this.addPageInDOM($pageRoot)
       this.updateMetas(title)
       return { $pageRoot, pageName, instance, playIn }
@@ -344,7 +343,7 @@ export class Stack<Props = TProps> extends Component {
       const $newPageWrapper = this.getPageWrapper(newDocument.body)
       const $newPageRoot = this.getPageRoot($newPageWrapper)
       const newPageName = this.getPageName($newPageRoot)
-      const newPageInstance = this.getPageInstance(newPageName, $newPageRoot)
+      const newPageInstance = this.createPageInstance(newPageName, $newPageRoot)
 
       this.addPageInDOM($newPageRoot)
       this.updateMetas(newDocument.title)
@@ -356,14 +355,14 @@ export class Stack<Props = TProps> extends Component {
         $newPageRoot,
         newPageName,
         newPageInstance,
-        () => _preparePlayIn(newPageInstance)
+        () => preparePlayIn(newPageInstance)
       )
 
       return {
         $pageRoot: $newPageRoot,
         pageName: newPageName,
         instance: newPageInstance,
-        playIn: () => _preparePlayIn(newPageInstance),
+        playIn: () => preparePlayIn(newPageInstance),
       }
     } catch (e) {
       throw new Error(`Fetch new document failed on url: ${requestUrl}`)
@@ -471,7 +470,8 @@ export class Stack<Props = TProps> extends Component {
    * @param $pageRoot
    * @private
    */
-  private getPageInstance(pageName: string, $pageRoot?: HTMLElement): Component {
+  private createPageInstance(pageName: string, $pageRoot?: HTMLElement): Component {
+    log("getPageInstance > pageName:", pageName)
     const classComponent = this.pages[pageName]
     return classComponent ? new classComponent($pageRoot, {}, pageName) : null
   }
@@ -483,7 +483,7 @@ export class Stack<Props = TProps> extends Component {
   private getFirstCurrentPage(): IPage {
     const $pageRoot = this.getPageRoot(this.$pageWrapper)
     const pageName = this.getPageName($pageRoot)
-    const instance = this.getPageInstance(pageName, $pageRoot)
+    const instance = this.createPageInstance(pageName, $pageRoot)
     const playIn = () => instance._playInRef()
     const playOut = () => instance._playOutRef()
     return { $pageRoot, pageName, instance, playIn, playOut }

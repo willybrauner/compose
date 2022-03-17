@@ -9,7 +9,7 @@ type TStaticProps = {}
 
 type TAddComponents = {
   Header: InstanceType<typeof Header>
-  MainButton: InstanceType<typeof MainButton>[]
+  MainButton: InstanceType<typeof MainButton>
 }
 
 /**
@@ -25,15 +25,17 @@ export default class HomePage extends Component<TStaticProps, TAddComponents> {
 
   public addComponents = () => ({
       Header: this.add(Header),
-      MainButton: this.add<MainButton[]>(MainButton),
+      MainButton: this.add<MainButton>(MainButton),
   })
 
   public mounted() {
     log("this.components", this.components)
+    log('> mounted')
     window.addEventListener("resize", this.resizeHandler)
   }
 
   public unmounted() {
+    log('> unmounted')
     window.removeEventListener("resize", this.resizeHandler)
   }
 

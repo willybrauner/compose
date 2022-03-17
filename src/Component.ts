@@ -5,7 +5,7 @@ const log = debug(`compose:Component`)
 export type TProps = { [x: string]: any } | void
 export type TFlatArray<T> = T extends any[] ? T[number] : T
 export type TNewComponent<C, P> = new <P = TProps>(...rest: any[]) => TFlatArray<C>
-export type TElements = {  [x: string]: HTMLElement | HTMLElement[] }
+export type TElements = { [x: string]: HTMLElement | HTMLElement[] }
 export type TTransition = {
   comeFrom?: string
   goTo?: string
@@ -26,7 +26,9 @@ export class Component<Props = TProps, TAddComponents = any> {
   public props: Props
 
   // register children components
-  public addComponents(): TAddComponents { return {} as TAddComponents } 
+  public addComponents(): TAddComponents {
+    return {} as TAddComponents
+  }
   public components: TAddComponents
 
   public elements: TElements
@@ -89,10 +91,12 @@ export class Component<Props = TProps, TAddComponents = any> {
   private _unmounted(): void {
     this.unmounted()
     this.isMounted = false
+
     this.onChildrenComponents((component: Component) => {
       COMPONENT_ID--
       component?._unmounted?.()
     })
+    log(this.name, "unmounted")
   }
 
   /**
@@ -263,7 +267,7 @@ export class Component<Props = TProps, TAddComponents = any> {
             if (!component) return
             if (!component?.isMounted) {
               // TODO voir si on devrait pas le register plutot ?
-              component.mounted()
+              component._mounted()
             }
           })
         }
