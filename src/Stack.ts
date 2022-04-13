@@ -91,10 +91,6 @@ export class Stack<Props = TProps> extends Component {
     // start patch history
     this.patchHistoryStates()
 
-    // init method from extended Component class
-    // IMPORTANT to init Component lifecicle after addding setting this.pages property
-    this.init()
-
     // start page events
     this.start()
   }

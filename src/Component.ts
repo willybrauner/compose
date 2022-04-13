@@ -28,18 +28,15 @@ export class Component<Props = TProps> {
    */
   public name: string
 
-
   /**
    * Root DOM element
    */
   public $root: HTMLElement
 
-
   /**
    * Static props from the parent component
    */
   public props: Props
-
   
   /**
    * Random ID of current instance
@@ -236,7 +233,7 @@ export class Component<Props = TProps> {
   private getDomElement($root: HTMLElement, name: string): HTMLElement[] {
     return [
       // @ts-ignore
-      ...($root?.querySelectorAll(`*[${Component.componentAttr}=${name}]`) || []),
+      ...($root?.querySelectorAll(`*[${COMPONENT_ATTR}=${name}]`) || []),
     ]
   }
 
