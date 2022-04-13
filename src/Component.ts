@@ -15,6 +15,8 @@ export type TTransition = {
  * Glob scope
  */
 let COMPONENT_ID = 0
+export const COMPONENT_ATTR = "data-component"
+export const ID_ATTR = "data-component-id"
 
 /**
  * Component class 
@@ -55,14 +57,6 @@ export class Component<Props = TProps> {
    */
   private observer: MutationObserver
   
-
-  /**
-   * Attributes used for DOM
-   * ex: data-component="HomePage" data-component-id="1"
-   */
-  public static componentAttr: string = "data-component"
-  public static idAttr: string = "data-component-id"
-
   /**
    * @param $root Dom element link with the instance
    * @param props Object properties of the instance
@@ -78,7 +72,7 @@ export class Component<Props = TProps> {
     this.name = attrName || this.getComponentName(this.$root)
 
     // set ID on DOM element
-    this.$root.setAttribute(Component.idAttr, `${COMPONENT_ID}`)
+    this.$root.setAttribute(ID_ATTR, `${COMPONENT_ID}`)
     this.id = COMPONENT_ID
     COMPONENT_ID++
 
@@ -127,11 +121,6 @@ export class Component<Props = TProps> {
     })
     log(this.name, "UNmounted")
   }
-
-  /**
-   * Callback of watch method execute each time children DOM nodes changed
-   */
-  public updated(mutation: MutationRecord): void {}
 
   /**
    * Add is a register child component function
@@ -279,7 +268,7 @@ export class Component<Props = TProps> {
    * @param $node
    */
   private getComponentName($node: HTMLElement = this.$root): string {
-    return $node?.getAttribute?.(Component.componentAttr)
+    return $node?.getAttribute?.(COMPONENT_ATTR)
   }
 
   /**
@@ -287,7 +276,7 @@ export class Component<Props = TProps> {
    * @param $node
    */
   private getComponentId($node: HTMLElement): number {
-    return $node?.getAttribute?.(Component.idAttr) && parseInt($node.getAttribute(Component.idAttr))
+    return $node?.getAttribute?.(ID_ATTR) && parseInt($node.getAttribute(ID_ATTR))
   }
 
   /**
@@ -322,8 +311,6 @@ export class Component<Props = TProps> {
             }
           })
         }
-
-        this.updated(mutation)
       }
     }
 

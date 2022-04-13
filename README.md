@@ -11,7 +11,7 @@ Compose is a tiny zero dependency library for vanilla javascript component appro
 
 ## Installation
 
-```shell script
+```shell
 $ npm install -s @wbe/compose
 ```
 
@@ -86,12 +86,6 @@ Method called after class component is mounted. Children component instances are
 Method called after class component is unmounted.
 The parent component observer will called this unmounted method automatically if the current component is removed from DOM.
 All children component instances are also unmounted after this method is called.
-
-### updated
-
-`updated()`
-
-Method called when any **children** component in DOM subtree changed.
 
 ## Methods & Properties
 

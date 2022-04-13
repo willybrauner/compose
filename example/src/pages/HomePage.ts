@@ -18,6 +18,7 @@ export default class HomePage extends Component<TStaticProps> {
 
   public mounted() {
     log('> mounted')
+
     window.addEventListener("resize", this.resizeHandler)
   }
 

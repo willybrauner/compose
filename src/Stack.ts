@@ -1,4 +1,4 @@
-import { Component } from "./Component"
+import { Component, COMPONENT_ATTR } from "./Component"
 import type { TProps } from "./Component"
 import debug from "@wbe/debug"
 const log = debug("compose:Stack")
@@ -461,7 +461,7 @@ export class Stack<Props = TProps> extends Component {
    */
   private getPageName($pageRoot: HTMLElement): string {
     for (const page of Object.keys(this.pages)) {
-      if (page == $pageRoot.getAttribute(Component.componentAttr)) return page
+      if (page == $pageRoot.getAttribute(COMPONENT_ATTR)) return page
     }
   }
 
