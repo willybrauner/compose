@@ -17,7 +17,9 @@ Compose is a tiny zero dependency library for vanilla javascript component appro
 $ npm install -s @wbe/compose
 ```
 
-## `Component` extended class
+## Component
+
+In order to use `Component`:
 
 Set `data-component` name attribute on specific DOM element:
 
