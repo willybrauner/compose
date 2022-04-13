@@ -21,17 +21,26 @@
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
     "compile": "microbundle",
     "compile:watch": "microbundle --watch -f modern",
-    "publish:all": "npm run build && npm publish"
+    "publish:all": "npm run build && npm publish",
+    "test": "jest"
   },
   "dependencies": {
     "@wbe/debug": "^1.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.17.9",
+    "@babel/preset-env": "^7.16.11",
     "@babel/preset-typescript": "^7.16.7",
     "gsap": "^3.10.4",
     "microbundle": "^0.15.0",
     "prettier": "^2.6.2",
-    "vite": "^2.9.6"
+    "vite": "^2.9.6",
+    "@testing-library/dom": "^8.13.0",
+    "@types/jest": "^27.4.1",
+    "babel-jest": "^27.5.1",
+    "jest": "^27.5.1",
+    "ts-jest": "^27.1.4",
+    "ts-node": "^10.7.0"
   },
   "keywords": [
     "compose",
