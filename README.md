@@ -33,9 +33,8 @@ import { Component } from "@wbe/compose"
 import Header from "Header"
 
 class App extends Component {
-  // set the same value than `data-component` attribute value
+  // same value than `data-component` attribute
   static attrName = "App"
-  
 }
 ```
 
@@ -96,7 +95,7 @@ Method called when any **children** component in DOM subtree changed.
 
 ## Methods & Properties
 
-### `attrName`
+### attrName
 
 static `string`
 
@@ -115,7 +114,9 @@ class Foo extends Component {
 }
 ```
 
-### `add()`
+### add
+
+`add()`
 
 This method allows to 'add', 'create' new Component instance to the tree.
 It returns instance(s) and associated properties.
@@ -129,10 +130,10 @@ add<T = Component, P = TProps>(
 ): T;
 ```
 
-Add component in class core: 
+Add component in class core:
 
 ```js
-bar = this.add(Bar);
+bar = this.add(Bar)
 
 // then, access child Bar instance
 this.bar.$root
@@ -153,7 +154,7 @@ In case, multi children of the same component is found, `add()` will returned an
 ```
 
 ```js
-bar = this.add(Bar); // will returned array of bar instances
+bar = this.add(Bar) // will returned array of bar instances
 ```
 
 If we don't know how many instance of our component `Bar` exist,
@@ -181,18 +182,15 @@ With typescript, we can type the `props` object:
 bar = this.add<Bar, { myProp: string }>(Bar, { myProp: "foo" }, false)
 ```
 
-### `components()`
+### find
 
-As used on `add()` method, `components` allows to retrieve a list on children component instances create by `add()`.
-When current component instance is unmounted, all instances returned by `components` method, will be automatically unmounted.
-
-### `find()`
+`find()`
 
 This method allows to retrieve B.E.M. element of current $root component.
 
 ```js
-  // if $root is "App", "App_title" DOM element will be returned
-$title =  this.find("title")
+// if $root is "App", "App_title" DOM element will be returned
+$title = this.find("title")
 ```
 
 With typescript:
@@ -205,7 +203,7 @@ $foo = this.find<HTMLElement[]>("foo")
 As `add()` method, if a list of element is exist in DOM, `find()` will returns a list of HTMLElement.
 It's possible to force an array return via `returnArray` params.
 
-## `Stack` extented class
+## Stack
 
 In order to get dynamic page fetching and refreshing without reload,
 `Stack` extended class is a middleware class between our App root component and `Component` extended class.
@@ -255,7 +253,9 @@ class App extends Stack {
 }
 ```
 
-### `pageTransitions()`
+### pageTransitions
+
+`pageTransitions()`
 
 It's possible to define custom transition senario with `pageTransitions`:
 
@@ -275,9 +275,9 @@ class App extends Stack {
 }
 ```
 
-### Page `playIn()` & `playOut()`
+### Page playIn & playOut
 
-Each pages can declare it's own page transition `playIn` & `playOut`.
+Each pages can declare it's own page transition `playIn()` & `playOut()`.
 
 `HomePage.js`
 (same for AboutPage)
@@ -285,31 +285,31 @@ Each pages can declare it's own page transition `playIn` & `playOut`.
 ```js
 class HomePage extends Component {
   static attrName = "HomePage"
-  
+
   // Prepare playIn and playOut page transitions used by Stack (example with gsap)
   playIn(comeFrom, resolve) {
-    gsap.from(this.$root, { autoAlpha: 0, onComplete: ()=> resolve() })
+    gsap.from(this.$root, { autoAlpha: 0, onComplete: () => resolve() })
   }
   playOut(goTo, resolve) {
-    gsap.to(this.$root, { autoAlpha: 0, onComplete: ()=> resolve() })
+    gsap.to(this.$root, { autoAlpha: 0, onComplete: () => resolve() })
   }
 }
 ```
 
 ## Options
 
-- `forcePageReload` {boolean} *default: false*
-Force all pages to reload instead of the dynamic new document fetching process.
+- `forcePageReload` {boolean} _default: false_
+  Force all pages to reload instead of the dynamic new document fetching process.
 
-- `forcePageReloadIfDocumentIsFetching` {boolean} *default: false*
-Force page to reload only if document is fetching.
-  
-- `disableLinksDuringTransitions` {boolean} *default: false*
-disable links during transition.
+- `forcePageReloadIfDocumentIsFetching` {boolean} _default: false_
+  Force page to reload only if document is fetching.
 
-- `disableHistoryDuringTransitions` {boolean} *default: false*
-disable history during transition allow to block transition on popstate event too.
-  
+- `disableLinksDuringTransitions` {boolean} _default: false_
+  disable links during transition.
+
+- `disableHistoryDuringTransitions` {boolean} _default: false_
+  disable history during transition allow to block transition on popstate event too.
+
 ```js
 class App extends Stack {
   // ...
@@ -317,7 +317,6 @@ class App extends Stack {
   forcePageReload = false
   disableLinksDuringTransitions = false
   disableHistoryDuringTransitions = false
-  
 }
 ```
 
@@ -330,12 +329,10 @@ To get some additional logs, add this line on your browser console:
 localStorage.debug = "compose:*"
 ```
 
-## Credits 
+## Credits
 
 © [Willy Brauner](https://willybrauner.com)
 
 ## Licence
 
 MIT
-
-
