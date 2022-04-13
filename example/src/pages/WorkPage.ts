@@ -16,19 +16,9 @@ type TAddComponents = {
 export default class WorkPage extends Component<TStaticProps, TAddComponents> {
   public static attrName = "WorkPage"
 
-  constructor($root, props) {
-    super($root, props)
-    this.init()
-  }
-  
-  public addComponents() {
-    return {
-      Header: this.add(Header),
-    }
-  }
+  protected Header = this.add(Header)
 
   public mounted() {
-    log("use this.components", this.components)
     window.addEventListener("resize", this.resizeHandler)
   }
 

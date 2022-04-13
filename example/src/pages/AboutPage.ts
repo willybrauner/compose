@@ -16,14 +16,7 @@ type TAddComponents = {
 export default class AboutPage extends Component<TStaticProps, TAddComponents> {
   public static attrName = "AboutPage"
 
-  constructor($root, props) {
-    super($root, props)
-    this.init()
-  }
-
-  public addComponents = () => ({
-    Header: this.add(Header),
-  })
+  protected Header = this.add(Header)
 
   public mounted() {
     log("> mounted")

@@ -15,14 +15,7 @@ type TAddComponents = {
 export default class Header extends Component<TStaticProps, TAddComponents> {
   public static attrName = "Header"
 
-  constructor($root, props) {
-    super($root, props)
-    this.init()
-  }
-
-  public addComponents = () => ({
-    MainButton: this.add<MainButton[]>(MainButton),
-  })
+  protected MainButton = this.add<MainButton[]>(MainButton)
 
   public mounted() {
     log("mounted")

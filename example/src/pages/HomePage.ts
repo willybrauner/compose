@@ -18,18 +18,9 @@ type TAddComponents = {
 export default class HomePage extends Component<TStaticProps, TAddComponents> {
   public static attrName = "HomePage"
 
-  constructor($root, props) {
-    super($root, props)
-    this.init()
-  }
-
-  public addComponents = () => ({
-      Header: this.add(Header),
-      MainButton: this.add<MainButton>(MainButton),
-  })
+  protected Header = this.add(Header)
 
   public mounted() {
-    log("this.components", this.components)
     log('> mounted')
     window.addEventListener("resize", this.resizeHandler)
   }

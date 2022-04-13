@@ -15,9 +15,9 @@ type TProps = {
 export default class App extends Stack<TProps> {
   public static attrName = "App"
 
-  constructor($root, props: TProps) {
-    super($root, props)
-  }
+  // constructor($root, props: TProps) {
+  //   super($root, props)
+  // }
 
   public addPages() {
     return {

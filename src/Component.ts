@@ -25,12 +25,6 @@ export class Component<Props = TProps, TAddComponents = any> {
   public $root: HTMLElement
   public props: Props
 
-  // register children components
-  public addComponents(): TAddComponents {
-    return {} as TAddComponents
-  }
-  public components: TAddComponents
-
   public elements: TElements
   public id: number
   public isMounted: boolean
@@ -52,6 +46,7 @@ export class Component<Props = TProps, TAddComponents = any> {
     this.$root.setAttribute(Component.idAttr, `${COMPONENT_ID}`)
     this.id = COMPONENT_ID
     COMPONENT_ID++
+    window.setTimeout(() => this.init(), 0)
   }
 
   /**
@@ -78,7 +73,6 @@ export class Component<Props = TProps, TAddComponents = any> {
   private _mounted(): void {
     log(this.name, "mounted")
     // instanciate children components just before mounted
-    this.components = this.addComponents()
     this.mounted()
     this.isMounted = true
   }
@@ -91,10 +85,9 @@ export class Component<Props = TProps, TAddComponents = any> {
   private _unmounted(): void {
     this.unmounted()
     this.isMounted = false
-
     this.onChildrenComponents((component: Component) => {
       COMPONENT_ID--
-      component?._unmounted?.()
+      component?._unmounted()
     })
     log(this.name, "unmounted")
   }
@@ -223,16 +216,25 @@ export class Component<Props = TProps, TAddComponents = any> {
   }
 
   /**
-   * Process callback function on each children component
+   * Process callback function on each children components
    * @param callback
    * @protected
    */
   private onChildrenComponents(callback: (component) => void): void {
-    this.components &&
-      Object.keys(this.components).forEach((component) => {
-        const child = this.components?.[component]
-        Array.isArray(child) ? child?.forEach((c) => callback(c)) : callback(child)
-      })
+    Object.keys(this)?.forEach((child) => {
+      const curr = this?.[child]
+      if (Array.isArray(curr) )
+      {
+        curr.forEach(c => {
+          if (c instanceof Component) {
+            callback(c)
+         }
+        })
+      }
+      else if (curr instanceof Component) {
+         callback(curr)
+      }
+    })
   }
 
   /**
