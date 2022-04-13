@@ -6,29 +6,15 @@ const log = debug(`front:WorkPage`)
 
 type TStaticProps = {}
 
-type TAddComponents = {
-  Header: InstanceType<typeof Header>
-}
-
 /**
  * @name WorkPage
  */
-export default class WorkPage extends Component<TStaticProps, TAddComponents> {
+export default class WorkPage extends Component<TStaticProps> {
   public static attrName = "WorkPage"
 
-  constructor($root, props) {
-    super($root, props)
-    this.init()
-  }
-  
-  public addComponents() {
-    return {
-      Header: this.add(Header),
-    }
-  }
+  protected Header = this.add(Header)
 
   public mounted() {
-    log("use this.components", this.components)
     window.addEventListener("resize", this.resizeHandler)
   }
 

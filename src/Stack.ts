@@ -1,4 +1,4 @@
-import { Component } from "./Component"
+import { Component, COMPONENT_ATTR } from "./Component"
 import type { TProps } from "./Component"
 import debug from "@wbe/debug"
 const log = debug("compose:Stack")
@@ -29,6 +29,9 @@ type TCache = {
 }
 
 const PARSER = new DOMParser()
+const PAGE_CONTAINER_ATTR = "data-page-transition-container"
+const PAGE_WRAPPER_ATTR = "data-page-transition-wrapper"
+const PAGE_URL_ATTR = "data-page-transition-url"
 
 /**
  * Stack
@@ -37,48 +40,94 @@ const PARSER = new DOMParser()
  * and `Component` extended class.
  */
 export class Stack<Props = TProps> extends Component {
-  // DOM attributes
-  public static pageContainerAttr = "data-page-transition-container"
-  public static pageWrapperAttr = "data-page-transition-wrapper"
-  public static pageUrlAttr = "data-page-transition-url"
-
-  // reload if document is fetching
+  /**
+   * reload if document is fetching
+   */
   public forcePageReloadIfDocumentIsFetching: boolean = false
-  // force all pages to reload instead the dynamic new document fetching process
+  
+  /**
+   * force all pages to reload instead the dynamic new document fetching process
+   */
   public forcePageReload: boolean = false
-  // disable links during transition
+  
+  /**
+   * disable links during transition
+   */
   public disableLinksDuringTransitions: boolean = false
+
+  /**
+   * disable history during transition
+   */
   public disableHistoryDuringTransitions: boolean = false
 
-  // Register pages from parent class
+  /**
+   * Register pages from parent class
+   * @returns 
+   */
   public addPages(): TPages {
     return
   }
   private pages: TPages
 
-  // the current URL to request
+  /**
+   *  the current URL to request
+   */
   protected currentUrl: string = null
-  protected currentPage: IPage
-  protected prevPage: IPage
-  protected isFirstPage = true
 
-  // page container
+  /**
+   * current page {IPage}
+   */
+  protected currentPage: IPage
+
+  /**
+   * previous page {IPage}
+   */
+  protected prevPage: IPage
+
+  /**
+   * is first page state 
+   */
+  protected isFirstPage: boolean = true
+
+  /**
+   * page container DOM element 
+   */
   protected $pageContainer: HTMLElement
+
+  /**
+   * page wrapper DOM element
+   */
   protected $pageWrapper: HTMLElement
 
-  // promise ref used in playIn and playOut medthods to keep reject promise
+  /**
+   * promise ref used in playIn and playOut medthods to keep reject promise
+   */
   protected playInPromiseRef: TPromiseRef = { reject: undefined }
   protected playOutPromiseRef: TPromiseRef = { reject: undefined }
 
-  // check if new page document html is in fetching step
+  /**
+   * check if new page document html is in fetching step
+   */
   private _fetching: boolean = false
-  // check if page is in animate process
+  
+  /**
+   * check if page is in animate process
+   */
   private _pageIsAnimating: boolean = false
-  // cache
+
+  /**
+   * Page requested cache
+   * this cache contains all visited/ requested pages information
+   * used instead of re-fetch new Document 
+   */
   private _cache: { [url: string]: TCache }
 
+  /**
+   * Construct
+   * @param $root  
+   * @param props 
+   */
   constructor($root: HTMLElement, props: Props) {
-    // relay
     super($root, props)
 
     // init
@@ -90,10 +139,6 @@ export class Stack<Props = TProps> extends Component {
 
     // start patch history
     this.patchHistoryStates()
-
-    // init method from extended Component class
-    // IMPORTANT to init Component lifecicle after addding setting this.pages property
-    this.init()
 
     // start page events
     this.start()
@@ -180,7 +225,7 @@ export class Stack<Props = TProps> extends Component {
   private handleLinks = (event): void => {
     if (!event) return
     // get page url attr
-    const url = event?.currentTarget?.getAttribute(Stack.pageUrlAttr)
+    const url = event?.currentTarget?.getAttribute(PAGE_URL_ATTR)
     // if disable transtiions is active, open new page
     if (this.forcePageReload) {
       window.open(url, "_self")
@@ -331,6 +376,7 @@ export class Stack<Props = TProps> extends Component {
     if (cache) {
       log("Use cache", cache)
       const { title, $pageRoot, pageName, instance, playIn } = cache
+      instance.beforeMount()
       instance.init()
       this.addPageInDOM($pageRoot)
       this.updateMetas(title)
@@ -432,7 +478,7 @@ export class Stack<Props = TProps> extends Component {
    * @private
    */
   private getPageContainer(): HTMLElement {
-    return document.body.querySelector(`*[${Stack.pageContainerAttr}]`)
+    return document.body.querySelector(`*[${PAGE_CONTAINER_ATTR}]`)
   }
 
   /**
@@ -441,7 +487,7 @@ export class Stack<Props = TProps> extends Component {
    * @private
    */
   private getPageWrapper($node: HTMLElement): HTMLElement {
-    return $node.querySelector(`*[${Stack.pageWrapperAttr}]`)
+    return $node.querySelector(`*[${PAGE_WRAPPER_ATTR}]`)
   }
 
   /**
@@ -460,7 +506,7 @@ export class Stack<Props = TProps> extends Component {
    */
   private getPageName($pageRoot: HTMLElement): string {
     for (const page of Object.keys(this.pages)) {
-      if (page == $pageRoot.getAttribute(Component.componentAttr)) return page
+      if (page == $pageRoot.getAttribute(COMPONENT_ATTR)) return page
     }
   }
 
@@ -531,7 +577,7 @@ export class Stack<Props = TProps> extends Component {
   private getLinksWithAttr(): HTMLElement[] {
     return [
       // @ts-ignore
-      ...this.$pageContainer?.querySelectorAll(`*[${Stack.pageUrlAttr}]`),
+      ...this.$pageContainer?.querySelectorAll(`*[${PAGE_URL_ATTR}]`),
     ]
   }
 

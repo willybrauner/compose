@@ -11,7 +11,7 @@ Compose is a tiny zero dependency library for vanilla javascript component appro
 
 ## Installation
 
-```shell script
+```shell
 $ npm install -s @wbe/compose
 ```
 
@@ -33,37 +33,8 @@ import { Component } from "@wbe/compose"
 import Header from "Header"
 
 class App extends Component {
-  // declare the name value of `data-component` attribute
+  // same value than `data-component` attribute
   static attrName = "App"
-
-  // relay and init "Component" extended class methods
-  constructor($root, props) {
-    super($root, props)
-    this.init()
-  }
-
-  // Create new instance for children component list
-  addComponents = () => ({
-    Header: this.add(Header),
-  })
-
-  // target child BEM DOM elements
-  elements = {
-    // find DOM element with "App_title" class
-    $title: this.find("title"),
-  }
-
-  // before class component is mounted
-  beforeMount() {}
-
-  // after class component is mounted
-  mounted() {}
-
-  // after class component is unmounted or the component $root is removed from DOM
-  unmounted() {}
-
-  // when children components are updated
-  updated() {}
 }
 ```
 
@@ -82,11 +53,6 @@ import { Component } from "@wbe/compose"
 class Header extends Component {
   static attrName = "Header"
 
-  constructor($root, props) {
-    super($root, props)
-    this.init()
-  }
-
   mounted() {
     window.addEventListener("resize", this.handleResize)
   }
@@ -101,28 +67,29 @@ class Header extends Component {
 
 ## Life cycle
 
-### `beforeMount()`
+### beforeMount
 
-Method called before class component is mounted.
-Current class instance is already available but children component instances are not yet.
+`beforeMount()`
 
-### `mounted()`
+Method called before class component is mounted, in at begining of class constructor.
+
+### mounted
+
+`mounted()`
 
 Method called after class component is mounted. Children component instances are now available.
 
-### `unmounted()`
+### unmounted
+
+`unmounted()`
 
 Method called after class component is unmounted.
 The parent component observer will called this unmounted method automatically if the current component is removed from DOM.
 All children component instances are also unmounted after this method is called.
 
-### `updated()`
-
-Method called when any **children** component in DOM subtree changed.
-
 ## Methods & Properties
 
-### `attrName`
+### attrName
 
 static `string`
 
@@ -141,37 +108,30 @@ class Foo extends Component {
 }
 ```
 
-### `add()`
+### add
+
+`add()`
 
 This method allows to 'add', 'create' new Component instance to the tree.
 It returns instance(s) and associated properties.
 
-```
+```ts
 add<T = Component, P = TProps>(
     classComponent: TAddComponent,
     props?: P,
-    attrName?: string,
-    returnArray: boolean = false
+    returnArray?: boolean,
+    attrName?: string
 ): T;
 ```
 
-To "add" all children components, use `addComponents()` method.
+Add component in class core:
 
 ```js
-addComponents() {
-  return {
-    Bar: this.add(Bar),
-  }
-}
-
-// or the short version with arrow function not assigned to the prototype
-addComponents = () => ({
-    Bar: this.add(Bar),
-})
+bar = this.add(Bar)
 
 // then, access child Bar instance
-this.components.Bar.$root
-this.components.Bar.unmounted()
+this.bar.$root
+this.bar.unmounted()
 // ...
 ```
 
@@ -188,79 +148,56 @@ In case, multi children of the same component is found, `add()` will returned an
 ```
 
 ```js
-addComponents = () => ({
-  Bar: this.add(Bar), // will returned array of Bar instances
-})
+bar = this.add(Bar) // will returned array of bar instances
 ```
 
 If we don't know how many instance of our component `Bar` exist,
 it's possible to force `add()` to return an array via `returnArray` parameter.
 
 ```js
-addComponents = () => ({
-  Bar: this.add(Bar, {}, true),
-})
+bar = this.add(Bar, {}, true)
 ```
 
 With typescript, we can explicitly state that we are expecting an array.
 
 ```ts
-addComponents = () => ({
-  Bar: this.add<Bar[]>(Bar),
-})
+bar = this.add<Bar[]>(Bar)
 ```
 
 The method accepts a static props parameter which we can access from the new Bar component via `this.props`.
 
 ```js
-addComponents = () => ({
-  Bar: this.add(Bar, { myProp: "foo" }),
-})
+bar = this.add(Bar, { myProp: "foo" })
 ```
 
 With typescript, we can type the `props` object:
 
 ```ts
-addComponents = () => ({
-  Bar: this.add<Bar, { myProp: string }>(Bar, { myProp: "foo" }, false),
-})
+bar = this.add<Bar, { myProp: string }>(Bar, { myProp: "foo" }, false)
 ```
 
-### `components()`
+### find
 
-As used on `add()` method, `components` allows to retrieve a list on children component instances create by `add()`.
-When current component instance is unmounted, all instances returned by `components` method, will be automatically unmounted.
-
-### `find()`
+`find()`
 
 This method allows to retrieve B.E.M. element of current $root component.
 
 ```js
-elements = {
-  // if $root is "App", "App_title" DOM element will be returned
-  $title: this.find("title"),
-}
-// use it...
-console.log(elements.$title)
+// if $root is "App", "App_title" DOM element will be returned
+$title = this.find("title")
 ```
 
 With typescript:
 
 ```ts
-elements = {
-  $title: this.find<HTMLElement>("title"),
-  $foo: this.find<HTMLElement[]>("foo"),
-}
+$title = this.find<HTMLElement>("title")
+$foo = this.find<HTMLElement[]>("foo")
 ```
 
 As `add()` method, if a list of element is exist in DOM, `find()` will returns a list of HTMLElement.
 It's possible to force an array return via `returnArray` params.
 
-### `elements`
-
-this property is a simple list of BEM elements of current component.
-
-## `Stack` extented class
+## Stack
 
 In order to get dynamic page fetching and refreshing without reload,
 `Stack` extended class is a middleware class between our App root component and `Component` extended class.
@@ -310,7 +247,9 @@ class App extends Stack {
 }
 ```
 
-### `pageTransitions()`
+### pageTransitions
+
+`pageTransitions()`
 
 It's possible to define custom transition senario with `pageTransitions`:
 
@@ -330,9 +269,9 @@ class App extends Stack {
 }
 ```
 
-### Page `playIn()` & `playOut()`
+### Page playIn & playOut
 
-Each pages can declare it's own page transition `playIn` & `playOut`.
+Each pages can declare it's own page transition `playIn()` & `playOut()`.
 
 `HomePage.js`
 (same for AboutPage)
@@ -340,35 +279,31 @@ Each pages can declare it's own page transition `playIn` & `playOut`.
 ```js
 class HomePage extends Component {
   static attrName = "HomePage"
-  constructor(...rest) {
-    super(...rest)
-    this.init()
-  }
 
   // Prepare playIn and playOut page transitions used by Stack (example with gsap)
   playIn(comeFrom, resolve) {
-    gsap.from(this.$root, { autoAlpha: 0, onComplete: ()=> resolve() })
+    gsap.from(this.$root, { autoAlpha: 0, onComplete: () => resolve() })
   }
   playOut(goTo, resolve) {
-    gsap.to(this.$root, { autoAlpha: 0, onComplete: ()=> resolve() })
+    gsap.to(this.$root, { autoAlpha: 0, onComplete: () => resolve() })
   }
 }
 ```
 
 ## Options
 
-- `forcePageReload` {boolean} *default: false*
-Force all pages to reload instead of the dynamic new document fetching process.
+- `forcePageReload` {boolean} _default: false_
+  Force all pages to reload instead of the dynamic new document fetching process.
 
-- `forcePageReloadIfDocumentIsFetching` {boolean} *default: false*
-Force page to reload only if document is fetching.
-  
-- `disableLinksDuringTransitions` {boolean} *default: false*
-disable links during transition.
+- `forcePageReloadIfDocumentIsFetching` {boolean} _default: false_
+  Force page to reload only if document is fetching.
 
-- `disableHistoryDuringTransitions` {boolean} *default: false*
-disable history during transition allow to block transition on popstate event too.
-  
+- `disableLinksDuringTransitions` {boolean} _default: false_
+  disable links during transition.
+
+- `disableHistoryDuringTransitions` {boolean} _default: false_
+  disable history during transition allow to block transition on popstate event too.
+
 ```js
 class App extends Stack {
   // ...
@@ -376,7 +311,6 @@ class App extends Stack {
   forcePageReload = false
   disableLinksDuringTransitions = false
   disableHistoryDuringTransitions = false
-  
 }
 ```
 
@@ -389,12 +323,10 @@ To get some additional logs, add this line on your browser console:
 localStorage.debug = "compose:*"
 ```
 
-## Credits 
+## Credits
 
 © [Willy Brauner](https://willybrauner.com)
 
 ## Licence
 
 MIT
-
-

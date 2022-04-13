@@ -5,7 +5,6 @@ const log = debug(`compose:Component`)
 export type TProps = { [x: string]: any } | void
 export type TFlatArray<T> = T extends any[] ? T[number] : T
 export type TNewComponent<C, P> = new <P = TProps>(...rest: any[]) => TFlatArray<C>
-export type TElements = { [x: string]: HTMLElement | HTMLElement[] }
 export type TTransition = {
   comeFrom?: string
   goTo?: string
@@ -16,49 +15,72 @@ export type TTransition = {
  * Glob scope
  */
 let COMPONENT_ID = 0
+export const COMPONENT_ATTR = "data-component"
+export const ID_ATTR = "data-component-id"
 
 /**
- * Component
+ * Component class 
  */
-export class Component<Props = TProps, TAddComponents = any> {
+export class Component<Props = TProps> {
+
+  /**
+   * Component name
+   */
   public name: string
+
+  /**
+   * Root DOM element
+   */
   public $root: HTMLElement
+
+  /**
+   * Static props from the parent component
+   */
   public props: Props
-
-  // register children components
-  public addComponents(): TAddComponents {
-    return {} as TAddComponents
-  }
-  public components: TAddComponents
-
-  public elements: TElements
+  
+  /**
+   * Random ID of current instance
+   * Counter is incremented on each instance and add as attribute on DOM element 
+   */
   public id: number
-  public isMounted: boolean
-  private observer: MutationObserver
-  public static componentAttr: string = "data-component"
-  public static idAttr: string = "data-component-id"
 
+  /**
+   * Flag to know if current instance is mounted 
+   */
+  private isMounted: boolean
+
+  /**
+   * Mutation observer allows to know if current DOM element change
+   */
+  private observer: MutationObserver
+  
   /**
    * @param $root Dom element link with the instance
    * @param props Object properties of the instance
    * @param attrName is value from data-component="{name}"
    */
   constructor($root?: HTMLElement, props?: Props, attrName?: string) {
+    // Before mount method executed on construct root, before all process
+    this._beforeMount()
+
+    // keep params in local
     this.props = props
     this.$root = $root
     this.name = attrName || this.getComponentName(this.$root)
 
     // set ID on DOM element
-    this.$root.setAttribute(Component.idAttr, `${COMPONENT_ID}`)
+    this.$root.setAttribute(ID_ATTR, `${COMPONENT_ID}`)
     this.id = COMPONENT_ID
     COMPONENT_ID++
+
+    // hack: exe init method with timeout to access `this` inside component methods
+    window.setTimeout(() => this.init(), 0)
   }
 
   /**
-   * Init to call in contructor (to keep context)
+   * Init 
    */
   protected init() {
-    this._beforeMount()
     this._mounted()
     this._watchChildren()
   }
@@ -78,7 +100,6 @@ export class Component<Props = TProps, TAddComponents = any> {
   private _mounted(): void {
     log(this.name, "mounted")
     // instanciate children components just before mounted
-    this.components = this.addComponents()
     this.mounted()
     this.isMounted = true
   }
@@ -91,18 +112,12 @@ export class Component<Props = TProps, TAddComponents = any> {
   private _unmounted(): void {
     this.unmounted()
     this.isMounted = false
-
     this.onChildrenComponents((component: Component) => {
       COMPONENT_ID--
-      component?._unmounted?.()
+      component?._unmounted()
     })
-    log(this.name, "unmounted")
+    log(this.name, "UNmounted")
   }
-
-  /**
-   * Callback of watch method execute each time children DOM nodes changed
-   */
-  public updated(mutation: MutationRecord): void {}
 
   /**
    * Add is a register child component function
@@ -111,8 +126,8 @@ export class Component<Props = TProps, TAddComponents = any> {
   protected add<T = any, P = TProps>(
     classComponent: TNewComponent<T, P>,
     props?: P,
-    attrName?: string,
-    returnArray: boolean = false
+    returnArray?: boolean,
+    attrName?: string
   ): T {
     // prepare instances array
     const localInstances = []
@@ -218,21 +233,30 @@ export class Component<Props = TProps, TAddComponents = any> {
   private getDomElement($root: HTMLElement, name: string): HTMLElement[] {
     return [
       // @ts-ignore
-      ...($root?.querySelectorAll(`*[${Component.componentAttr}=${name}]`) || []),
+      ...($root?.querySelectorAll(`*[${COMPONENT_ATTR}=${name}]`) || []),
     ]
   }
 
   /**
-   * Process callback function on each children component
+   * Process callback function on each children components
    * @param callback
    * @protected
    */
   private onChildrenComponents(callback: (component) => void): void {
-    this.components &&
-      Object.keys(this.components).forEach((component) => {
-        const child = this.components?.[component]
-        Array.isArray(child) ? child?.forEach((c) => callback(c)) : callback(child)
-      })
+    Object.keys(this)?.forEach((child) => {
+      const curr = this?.[child]
+      if (Array.isArray(curr) )
+      {
+        curr.forEach(c => {
+          if (c instanceof Component) {
+            callback(c)
+         }
+        })
+      }
+      else if (curr instanceof Component) {
+         callback(curr)
+      }
+    })
   }
 
   /**
@@ -241,7 +265,7 @@ export class Component<Props = TProps, TAddComponents = any> {
    * @param $node
    */
   private getComponentName($node: HTMLElement = this.$root): string {
-    return $node?.getAttribute?.(Component.componentAttr)
+    return $node?.getAttribute?.(COMPONENT_ATTR)
   }
 
   /**
@@ -249,7 +273,7 @@ export class Component<Props = TProps, TAddComponents = any> {
    * @param $node
    */
   private getComponentId($node: HTMLElement): number {
-    return $node?.getAttribute?.(Component.idAttr) && parseInt($node.getAttribute(Component.idAttr))
+    return $node?.getAttribute?.(ID_ATTR) && parseInt($node.getAttribute(ID_ATTR))
   }
 
   /**
@@ -284,8 +308,6 @@ export class Component<Props = TProps, TAddComponents = any> {
             }
           })
         }
-
-        this.updated(mutation)
       }
     }
 

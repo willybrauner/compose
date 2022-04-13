@@ -6,31 +6,20 @@ const log = debug(`front:AboutPage`)
 
 type TStaticProps = {}
 
-type TAddComponents = {
-  Header: InstanceType<typeof Header>
-}
-
 /**
  * @name AboutPage
  */
-export default class AboutPage extends Component<TStaticProps, TAddComponents> {
+export default class AboutPage extends Component<TStaticProps> {
   public static attrName = "AboutPage"
 
-  constructor($root, props) {
-    super($root, props)
-    this.init()
-  }
+  protected header = this.add(Header)
 
-  public addComponents = () => ({
-    Header: this.add(Header),
-  })
-
-  public mounted() {
+  mounted() {
     log("> mounted")
     window.addEventListener("resize", this.resizeHandler)
   }
 
-  public unmounted() {
+  unmounted() {
     log("> unmounted")
     window.removeEventListener("resize", this.resizeHandler)
   }
