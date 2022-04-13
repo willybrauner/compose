@@ -2,6 +2,8 @@
 
 Compose is a tiny zero dependency library for vanilla javascript component approach and page transitions management.
 
+> This library is work in progress, the API is subject to change drastically until the v1.0 release.
+
 ![](https://img.shields.io/npm/v/@wbe/compose/latest.svg)
 ![](https://img.shields.io/bundlephobia/minzip/@wbe/compose.svg)
 ![](https://img.shields.io/npm/dt/@wbe/compose.svg)
