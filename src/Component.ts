@@ -126,8 +126,8 @@ export class Component<Props = TProps> {
   protected add<T = any, P = TProps>(
     classComponent: TNewComponent<T, P>,
     props?: P,
-    attrName?: string,
-    returnArray: boolean = false
+    returnArray?: boolean,
+    attrName?: string
   ): T {
     // prepare instances array
     const localInstances = []

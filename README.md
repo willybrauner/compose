@@ -119,8 +119,8 @@ It returns instance(s) and associated properties.
 add<T = Component, P = TProps>(
     classComponent: TAddComponent,
     props?: P,
-    attrName?: string,
-    returnArray: boolean = false
+    returnArray?: boolean,
+    attrName?: string
 ): T;
 ```
 
