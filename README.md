@@ -85,21 +85,29 @@ class Header extends Component {
 
 ## Life cycle
 
-### `beforeMount()`
+### beforeMount
+
+`beforeMount()`
 
 Method called before class component is mounted, in at begining of class constructor.
 
-### `mounted()`
+### mounted
+
+`mounted()`
 
 Method called after class component is mounted. Children component instances are now available.
 
-### `unmounted()`
+### unmounted
+
+`unmounted()`
 
 Method called after class component is unmounted.
 The parent component observer will called this unmounted method automatically if the current component is removed from DOM.
 All children component instances are also unmounted after this method is called.
 
-### `updated()`
+### updated
+
+`updated()`
 
 Method called when any **children** component in DOM subtree changed.
 
