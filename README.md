@@ -33,25 +33,14 @@ import { Component } from "@wbe/compose"
 import Header from "Header"
 
 class App extends Component {
-  // declare the name value of `data-component` attribute
+  // set the same value than `data-component` attribute value
   static attrName = "App"
 
-  // relay and init "Component" extended class methods
-  constructor($root, props) {
-    super($root, props)
-    this.init()
-  }
+  // create new child instance 
+  header = this.add(Header)
 
-  // Create new instance for children component list
-  addComponents = () => ({
-    Header: this.add(Header),
-  })
-
-  // target child BEM DOM elements
-  elements = {
-    // find DOM element with "App_title" class
-    $title: this.find("title"),
-  }
+  // target child BEM DOM elements ("App_title")
+  $title = this.find("title")
 
   // before class component is mounted
   beforeMount() {}
@@ -82,11 +71,6 @@ import { Component } from "@wbe/compose"
 class Header extends Component {
   static attrName = "Header"
 
-  constructor($root, props) {
-    super($root, props)
-    this.init()
-  }
-
   mounted() {
     window.addEventListener("resize", this.handleResize)
   }
@@ -103,8 +87,7 @@ class Header extends Component {
 
 ### `beforeMount()`
 
-Method called before class component is mounted.
-Current class instance is already available but children component instances are not yet.
+Method called before class component is mounted, in at begining of class constructor.
 
 ### `mounted()`
 
@@ -155,23 +138,14 @@ add<T = Component, P = TProps>(
 ): T;
 ```
 
-To "add" all children components, use `addComponents()` method.
+Add component in class core: 
 
 ```js
-addComponents() {
-  return {
-    Bar: this.add(Bar),
-  }
-}
-
-// or the short version with arrow function not assigned to the prototype
-addComponents = () => ({
-    Bar: this.add(Bar),
-})
+bar = this.add(Bar);
 
 // then, access child Bar instance
-this.components.Bar.$root
-this.components.Bar.unmounted()
+this.bar.$root
+this.bar.unmounted()
 // ...
 ```
 
@@ -188,42 +162,32 @@ In case, multi children of the same component is found, `add()` will returned an
 ```
 
 ```js
-addComponents = () => ({
-  Bar: this.add(Bar), // will returned array of Bar instances
-})
+bar = this.add(Bar); // will returned array of bar instances
 ```
 
 If we don't know how many instance of our component `Bar` exist,
 it's possible to force `add()` to return an array via `returnArray` parameter.
 
 ```js
-addComponents = () => ({
-  Bar: this.add(Bar, {}, true),
-})
+bar = this.add(Bar, {}, true)
 ```
 
 With typescript, we can explicitly state that we are expecting an array.
 
 ```ts
-addComponents = () => ({
-  Bar: this.add<Bar[]>(Bar),
-})
+bar = this.add<Bar[]>(Bar)
 ```
 
 The method accepts a static props parameter which we can access from the new Bar component via `this.props`.
 
 ```js
-addComponents = () => ({
-  Bar: this.add(Bar, { myProp: "foo" }),
-})
+bar = this.add(Bar, { myProp: "foo" })
 ```
 
 With typescript, we can type the `props` object:
 
 ```ts
-addComponents = () => ({
-  Bar: this.add<Bar, { myProp: string }>(Bar, { myProp: "foo" }, false),
-})
+bar = this.add<Bar, { myProp: string }>(Bar, { myProp: "foo" }, false)
 ```
 
 ### `components()`
@@ -236,29 +200,19 @@ When current component instance is unmounted, all instances returned by `compone
 This method allows to retrieve B.E.M. element of current $root component.
 
 ```js
-elements = {
   // if $root is "App", "App_title" DOM element will be returned
-  $title: this.find("title"),
-}
-// use it...
-console.log(elements.$title)
+$title =  this.find("title")
 ```
 
 With typescript:
 
 ```ts
-elements = {
-  $title: this.find<HTMLElement>("title"),
-  $foo: this.find<HTMLElement[]>("foo"),
-}
+$title = this.find<HTMLElement>("title")
+$foo = this.find<HTMLElement[]>("foo")
 ```
 
 As `add()` method, if a list of element is exist in DOM, `find()` will returns a list of HTMLElement.
 It's possible to force an array return via `returnArray` params.
-
-### `elements`
-
-this property is a simple list of BEM elements of current component.
 
 ## `Stack` extented class
 
@@ -340,11 +294,7 @@ Each pages can declare it's own page transition `playIn` & `playOut`.
 ```js
 class HomePage extends Component {
   static attrName = "HomePage"
-  constructor(...rest) {
-    super(...rest)
-    this.init()
-  }
-
+  
   // Prepare playIn and playOut page transitions used by Stack (example with gsap)
   playIn(comeFrom, resolve) {
     gsap.from(this.$root, { autoAlpha: 0, onComplete: ()=> resolve() })
