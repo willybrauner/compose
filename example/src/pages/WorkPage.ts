@@ -6,14 +6,10 @@ const log = debug(`front:WorkPage`)
 
 type TStaticProps = {}
 
-type TAddComponents = {
-  Header: InstanceType<typeof Header>
-}
-
 /**
  * @name WorkPage
  */
-export default class WorkPage extends Component<TStaticProps, TAddComponents> {
+export default class WorkPage extends Component<TStaticProps> {
   public static attrName = "WorkPage"
 
   protected Header = this.add(Header)

@@ -331,6 +331,7 @@ export class Stack<Props = TProps> extends Component {
     if (cache) {
       log("Use cache", cache)
       const { title, $pageRoot, pageName, instance, playIn } = cache
+      instance.beforeMount()
       instance.init()
       this.addPageInDOM($pageRoot)
       this.updateMetas(title)

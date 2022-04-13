@@ -5,20 +5,15 @@ const log = debug(`front:Header`)
 
 type TStaticProps = {}
 
-type TAddComponents = {
-  MainButton: InstanceType<typeof MainButton>[]
-}
-
 /**
  * @name Header
  */
-export default class Header extends Component<TStaticProps, TAddComponents> {
+export default class Header extends Component<TStaticProps> {
   public static attrName = "Header"
 
-  protected MainButton = this.add<MainButton[]>(MainButton)
+  public MainButton = this.add<MainButton[]>(MainButton)
 
   public mounted() {
-    log("mounted")
     window.addEventListener("resize", this.resizeHandler)
   }
 

@@ -7,15 +7,11 @@ const log = debug(`front:HomePage`)
 
 type TStaticProps = {}
 
-type TAddComponents = {
-  Header: InstanceType<typeof Header>
-  MainButton: InstanceType<typeof MainButton>
-}
 
 /**
  * @name HomePage
  */
-export default class HomePage extends Component<TStaticProps, TAddComponents> {
+export default class HomePage extends Component<TStaticProps> {
   public static attrName = "HomePage"
 
   protected Header = this.add(Header)
