@@ -35,24 +35,7 @@ import Header from "Header"
 class App extends Component {
   // set the same value than `data-component` attribute value
   static attrName = "App"
-
-  // create new child instance 
-  header = this.add(Header)
-
-  // target child BEM DOM elements ("App_title")
-  $title = this.find("title")
-
-  // before class component is mounted
-  beforeMount() {}
-
-  // after class component is mounted
-  mounted() {}
-
-  // after class component is unmounted or the component $root is removed from DOM
-  unmounted() {}
-
-  // when children components are updated
-  updated() {}
+  
 }
 ```
 
