@@ -129,7 +129,7 @@ class Foo extends Component {
 This method allows to 'add', 'create' new Component instance to the tree.
 It returns instance(s) and associated properties.
 
-```
+```ts
 add<T = Component, P = TProps>(
     classComponent: TAddComponent,
     props?: P,
