@@ -89,7 +89,7 @@ export class Component<Props = TProps> {
   /**
    * Init 
    */
-  private init() {
+  protected init() {
     this._mounted()
     this._watchChildren()
   }
