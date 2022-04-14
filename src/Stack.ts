@@ -375,12 +375,15 @@ export class Stack<Props = TProps> extends Component {
     const cache = this._cache?.[requestUrl]
     if (cache) {
       log("Use cache", cache)
-      const { title, $pageRoot, pageName, instance, playIn } = cache
-      instance.beforeMount()
-      instance.init()
+      const { title, $pageRoot, pageName, playIn } = cache
+      
+      const newPageInstance = this.createPageInstance(pageName, $pageRoot)
+      log('Create new page instance from cache informations', newPageInstance)
+
       this.addPageInDOM($pageRoot)
       this.updateMetas(title)
-      return { $pageRoot, pageName, instance, playIn }
+      
+      return { $pageRoot, pageName, instance: newPageInstance, playIn }
     }
 
     // fetch new document or use cache
