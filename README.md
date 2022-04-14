@@ -24,21 +24,19 @@ In order to use `Component`:
 Set `data-component` name attribute on specific DOM element:
 
 ```html
-<div class="App" data-component="App">
-  <h1 class="App_title">...</h1>
-  <header class="Header" data-component="Header">...</header>
+<div data-component="App">
+  <h1>...</h1>
+  <header data-component="Header">...</header>
 </div>
 ```
 
-Create a class called as `data-component` attribute:
+Create a class extended by `Component`:
 
 ```js
 import { Component } from "@wbe/compose"
-import Header from "Header"
 
 class App extends Component {
-  // same value than `data-component` attribute
-  static attrName = "App"
+  static attrName = "App" // same value than `data-component` attribute
 }
 ```
 
