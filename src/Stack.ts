@@ -447,6 +447,11 @@ export class Stack<Props = TProps> extends Component {
         // change page is animating state (need to be changed after mount new page)
         this._pageIsAnimating = true
 
+        // HACK to execute pageTransitions on next frame
+        // we want to execute pageTransitions after new page instance was made
+        // (page instance use the same hack to get his own instance)
+        await new Promise(e => setTimeout(e, 0))
+
         // return page transition function
         return this.pageTransitions(preparedCurrentPage, newPage, resolver)
       } catch (e) {
