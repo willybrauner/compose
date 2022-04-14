@@ -375,12 +375,15 @@ export class Stack<Props = TProps> extends Component {
     const cache = this._cache?.[requestUrl]
     if (cache) {
       log("Use cache", cache)
-      const { title, $pageRoot, pageName, instance, playIn } = cache
-      instance.beforeMount()
-      instance.init()
+      const { title, $pageRoot, pageName, playIn } = cache
+      
+      const newPageInstance = this.createPageInstance(pageName, $pageRoot)
+      log('Create new page instance from cache informations', newPageInstance)
+
       this.addPageInDOM($pageRoot)
       this.updateMetas(title)
-      return { $pageRoot, pageName, instance, playIn }
+      
+      return { $pageRoot, pageName, instance: newPageInstance, playIn }
     }
 
     // fetch new document or use cache
@@ -446,6 +449,11 @@ export class Stack<Props = TProps> extends Component {
 
         // change page is animating state (need to be changed after mount new page)
         this._pageIsAnimating = true
+
+        // HACK to execute pageTransitions on next frame
+        // we want to execute pageTransitions after new page instance was made
+        // (page instance use the same hack to get his own instance)
+        await new Promise(e => setTimeout(e, 0))
 
         // return page transition function
         return this.pageTransitions(preparedCurrentPage, newPage, resolver)
