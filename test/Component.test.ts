@@ -24,6 +24,11 @@ describe("component", () => {
   class App extends Component {
     button = this.add(Button)
 
+    // public add(...rest) 
+    // {
+    //   return this.add(...rest)
+    // }
+
     beforeMount() {
       beforMountedMock()
     }
@@ -87,14 +92,4 @@ describe("component", () => {
     await wait()
     expect(buttonUnmountedMock).toBeCalled()
   })
-})
-
-/**
- * add()
- */
-
-
-
-/**
- * find()
- */
+ })

@@ -99,7 +99,6 @@ export class Component<Props = TProps> {
   public mounted(): void {}
   private _mounted(): void {
     log(this.name, "mounted")
-    // instanciate children components just before mounted
     this.mounted()
     this.isMounted = true
   }
