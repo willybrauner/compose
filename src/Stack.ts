@@ -44,12 +44,12 @@ export class Stack<Props = TProps> extends Component {
    * reload if document is fetching
    */
   public forcePageReloadIfDocumentIsFetching: boolean = false
-  
+
   /**
    * force all pages to reload instead the dynamic new document fetching process
    */
   public forcePageReload: boolean = false
-  
+
   /**
    * disable links during transition
    */
@@ -62,7 +62,7 @@ export class Stack<Props = TProps> extends Component {
 
   /**
    * Register pages from parent class
-   * @returns 
+   * @returns
    */
   public addPages(): TPages {
     return
@@ -85,12 +85,12 @@ export class Stack<Props = TProps> extends Component {
   protected prevPage: IPage
 
   /**
-   * is first page state 
+   * is first page state
    */
   protected isFirstPage: boolean = true
 
   /**
-   * page container DOM element 
+   * page container DOM element
    */
   protected $pageContainer: HTMLElement
 
@@ -106,26 +106,26 @@ export class Stack<Props = TProps> extends Component {
   protected playOutPromiseRef: TPromiseRef = { reject: undefined }
 
   /**
+   * check if page is in animate process
+   */
+  protected _pageIsAnimating: boolean = false
+
+  /**
    * check if new page document html is in fetching step
    */
   private _fetching: boolean = false
-  
-  /**
-   * check if page is in animate process
-   */
-  private _pageIsAnimating: boolean = false
 
   /**
    * Page requested cache
    * this cache contains all visited/ requested pages information
-   * used instead of re-fetch new Document 
+   * used instead of re-fetch new Document
    */
   private _cache: { [url: string]: TCache }
 
   /**
    * Construct
-   * @param $root  
-   * @param props 
+   * @param $root
+   * @param props
    */
   constructor($root: HTMLElement, props: Props) {
     super($root, props)
@@ -376,13 +376,13 @@ export class Stack<Props = TProps> extends Component {
     if (cache) {
       log("Use cache", cache)
       const { title, $pageRoot, pageName, playIn } = cache
-      
+
       const newPageInstance = this.createPageInstance(pageName, $pageRoot)
-      log('Create new page instance from cache informations', newPageInstance)
+      log("Create new page instance from cache informations", newPageInstance)
 
       this.addPageInDOM($pageRoot)
-      this.updateMetas(title)
-      
+      Stack.updateMetas(title)
+
       return { $pageRoot, pageName, instance: newPageInstance, playIn }
     }
 
@@ -395,7 +395,7 @@ export class Stack<Props = TProps> extends Component {
       const newPageInstance = this.createPageInstance(newPageName, $newPageRoot)
 
       this.addPageInDOM($newPageRoot)
-      this.updateMetas(newDocument.title)
+      Stack.updateMetas(newDocument.title)
 
       // prettier-ignore
       this.addInCache(
@@ -432,6 +432,9 @@ export class Stack<Props = TProps> extends Component {
     return new Promise(async (resolve) => {
       // inject new page in DOM + create page class instance
       try {
+        // before fetch promise
+        await this.beforeFetch()
+
         // fetch and get new page
         const newPage = await mountNewPage()
 
@@ -453,12 +456,12 @@ export class Stack<Props = TProps> extends Component {
         // HACK to execute pageTransitions on next frame
         // we want to execute pageTransitions after new page instance was made
         // (page instance use the same hack to get his own instance)
-        await new Promise(e => setTimeout(e, 0))
+        await new Promise((e) => setTimeout(e, 0))
 
         // return page transition function
         return this.pageTransitions(preparedCurrentPage, newPage, resolver)
       } catch (e) {
-        log("mountNewPage failed", e)
+        console.error("mountNewPage failed", e)
       }
     })
   }
@@ -478,6 +481,14 @@ export class Stack<Props = TProps> extends Component {
     await currentPage.playOut()
     await newPage.playIn()
     complete()
+  }
+
+  /**
+   * Method to overwrite from parent class
+   * @protected
+   */
+  protected beforeFetch(): Promise<void> {
+    return Promise.resolve()
   }
   // --------------------------------------------------------------------------- PREPARE PAGE
 
@@ -556,7 +567,7 @@ export class Stack<Props = TProps> extends Component {
    * Update Metas
    * @param newDocument
    */
-  private updateMetas(title: string): void {
+  private static updateMetas(title: string): void {
     document.title = title
   }
 
