@@ -461,7 +461,7 @@ export class Stack<Props = TProps> extends Component {
         // return page transition function
         return this.pageTransitions(preparedCurrentPage, newPage, resolver)
       } catch (e) {
-        log("mountNewPage failed", e)
+        console.error("mountNewPage failed", e)
       }
     })
   }
