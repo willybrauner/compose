@@ -4,6 +4,7 @@ import AboutPage from "../pages/AboutPage"
 import WorkPage from "../pages/WorkPage"
 import debug from "@wbe/debug"
 import Footer from "./Footer"
+import Header from "./Header"
 const log = debug(`front:App`)
 
 type TProps = {
@@ -16,7 +17,6 @@ type TProps = {
 export default class App extends Stack<TProps> {
   public static attrName = "App"
 
-  
   public addPages() {
     return {
       HomePage,
@@ -24,11 +24,11 @@ export default class App extends Stack<TProps> {
       WorkPage,
     }
   }
-  
-  footer = this.add(Footer)
-  
+
+  footer = this.addAll<Footer>(Footer)
+
   public mounted() {
-    log("this", this.footer);
+    log("typeof this.footer", this.footer)
   }
 
   protected async pageTransitions(

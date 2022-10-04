@@ -1,15 +1,7 @@
-import type { TPromiseRef } from "./Stack"
 import debug from "@wbe/debug"
 const log = debug(`compose:Component`)
 
 export type TProps = { [x: string]: any } | void
-export type TFlatArray<T> = T extends any[] ? T[number] : T
-export type TNewComponent<C, P> = new <P = TProps>(...rest: any[]) => TFlatArray<C>
-export type TTransition = {
-  comeFrom?: string
-  goTo?: string
-  promiseRef?: TPromiseRef
-}
 
 /**
  * Glob scope
@@ -19,10 +11,9 @@ export const COMPONENT_ATTR = "data-component"
 export const ID_ATTR = "data-component-id"
 
 /**
- * Component class 
+ * Component class
  */
 export class Component<Props = TProps> {
-
   /**
    * Component name
    */
@@ -37,15 +28,15 @@ export class Component<Props = TProps> {
    * Static props from the parent component
    */
   public props: Props
-  
+
   /**
    * Random ID of current instance
-   * Counter is incremented on each instance and add as attribute on DOM element 
+   * Counter is incremented on each instance and add as attribute on DOM element
    */
   public id: number
 
   /**
-   * Flag to know if current instance is mounted 
+   * Flag to know if current instance is mounted
    */
   private isMounted: boolean
 
@@ -53,7 +44,7 @@ export class Component<Props = TProps> {
    * Mutation observer allows to know if current DOM element change
    */
   private observer: MutationObserver
-  
+
   /**
    * @param $root Dom element link with the instance
    * @param props Object properties of the instance
@@ -78,7 +69,7 @@ export class Component<Props = TProps> {
   }
 
   /**
-   * Init 
+   * Init
    */
   protected init() {
     this._mounted()
@@ -123,15 +114,40 @@ export class Component<Props = TProps> {
    * Add is a register child component function
    * It create new children instance
    */
-  protected add<T = any, P = TProps>(
-    classComponent: TNewComponent<T, P>,
+  protected add<C extends Component, P = TProps>(
+    classComponent: new <P = TProps>(...args: any[]) => C,
     props?: P,
-    returnArray?: boolean,
     attrName?: string
-  ): T {
+  ): C {
+    // get string name instance from param or static attrName property
+    const name: string = attrName || classComponent?.["attrName"]
+    // get DOM elements
+    const element = this.getDomElement(this.$root, name)?.[0]
+    // if no elements, exit
+    if (!element) return
+    // create and return child instance
+    return new classComponent<P>(
+      element,
+      {
+        ...props,
+        key: 0,
+        parentId: this.id,
+      },
+      name
+    )
+  }
+
+  /**
+   * Add multiple children components
+   */
+  protected addAll<C extends Component, P = TProps>(
+    classComponent: new <P = TProps>(...args: any[]) => C,
+    props?: P,
+    attrName?: string
+  ): C[] {
     // prepare instances array
     const localInstances = []
-    // get string name instance from from param or static attrName property
+    // get string name instance from param or static attrName property
     const name: string = attrName || classComponent?.["attrName"]
     // get DOM elements
     const elements = this.getDomElement(this.$root, name)
@@ -140,7 +156,7 @@ export class Component<Props = TProps> {
     // map on each elements (because elements return an array)
     for (let i = 0; i < elements.length; i++) {
       // create child instance
-      const classInstance: T = new classComponent<P>(
+      const classInstance = new classComponent<P>(
         elements[i],
         {
           ...props,
@@ -149,11 +165,10 @@ export class Component<Props = TProps> {
         },
         name
       )
-      // push it store and local list
       localInstances.push(classInstance)
     }
-    // return single instance or instances array
-    return localInstances.length === 1 && !returnArray ? localInstances[0] : localInstances
+    // return all instances
+    return localInstances
   }
 
   /**
@@ -162,21 +177,33 @@ export class Component<Props = TProps> {
    *  if class name is "Block_section"
    *  this.find("section") will return DOM element with "Block_section" class
    */
-  protected find<T extends HTMLElement | HTMLElement[]>(
+  protected find<T extends HTMLElement>(
     bemElementName: string,
-    returnArray: boolean = false,
     className = this.$root?.classList?.[0]
   ): T {
-    // check and exit
     if (!className || !bemElementName || !this.$root) return
-    // query elements
-    const elements = this.$root.querySelectorAll(`.${className}_${bemElementName}`)
+    const element = this.$root.querySelector<T>(`.${className}_${bemElementName}`)
+    if (!element) return
+    return element
+  }
 
+  /**
+   * Find HTML element list with BEM element name
+   * ex:
+   *  if class name is "Block_section"
+   *  this.find("section") will return DOM element with "Block_section" class
+   *
+   * @param bemElementName
+   * @param className
+   */
+  protected findAll<T extends HTMLElement[]>(
+    bemElementName: string,
+    className = this.$root?.classList?.[0]
+  ): T {
+    if (!className || !bemElementName || !this.$root) return
+    const elements = this.$root.querySelectorAll(`.${className}_${bemElementName}`)
     if (!elements.length) return
-    // transform to array
-    const formatElements: T = Array.from(elements) as T
-    // return 1 element or array of elements
-    return (formatElements as any).length === 1 && !returnArray ? formatElements[0] : formatElements
+    return Array.from(elements) as T
   }
 
   // ------------------------------------------------------------------------------------- TRANSITIONS
@@ -245,16 +272,14 @@ export class Component<Props = TProps> {
   private onChildrenComponents(callback: (component) => void): void {
     Object.keys(this)?.forEach((child) => {
       const curr = this?.[child]
-      if (Array.isArray(curr) )
-      {
-        curr.forEach(c => {
+      if (Array.isArray(curr)) {
+        curr.forEach((c) => {
           if (c instanceof Component) {
             callback(c)
-         }
+          }
         })
-      }
-      else if (curr instanceof Component) {
-         callback(curr)
+      } else if (curr instanceof Component) {
+        callback(curr)
       }
     })
   }

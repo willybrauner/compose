@@ -18,4 +18,6 @@ export default class Footer extends Component<TProps> {
   {
     log("Log Me!", this)
   }
+
+
 }
