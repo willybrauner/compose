@@ -1,8 +1,8 @@
 {
-  "installCommand": "install",
   "buildCommand": "build",
-  "packages": ["src/*"],
+  "packages": ["./"],
   "sandboxes": [
-    "examples/basic"
-  ]
+    "/examples/basic"
+  ],
+  "node": "16"
 }
