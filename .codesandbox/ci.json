@@ -1,0 +1,8 @@
+{
+  "installCommand": "install",
+  "buildCommand": "build",
+  "packages": ["src/*"],
+  "sandboxes": [
+    "examples/basic"
+  ]
+}

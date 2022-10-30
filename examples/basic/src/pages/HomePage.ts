@@ -1,4 +1,4 @@
-import { Component } from "../../../src"
+import { Component } from "../../../../src"
 import Header from "../components/Header"
 import { defaultPlayIn, defaultPlayOut } from "../helpers/defaultTransitions"
 import debug from "@wbe/debug"

@@ -1,4 +1,4 @@
-import { Component } from "../../../src";
+import { Component } from "../../../../src";
 import debug from "@wbe/debug"
 const log = debug(`front:Footer`)
 

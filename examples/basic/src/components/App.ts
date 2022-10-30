@@ -1,4 +1,4 @@
-import { IPage, Stack } from "../../../src"
+import { IPage, Stack } from "../../../../src"
 import HomePage from "../pages/HomePage"
 import AboutPage from "../pages/AboutPage"
 import WorkPage from "../pages/WorkPage"

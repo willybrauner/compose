@@ -16,5 +16,8 @@
     "strictNullChecks": false,
     "skipLibCheck": false,
   },
-  "exclude": ["node_modules", "dist", "example", "test", "vite.config.ts"]
+  "exclude": ["node_modules", "dist",
+    "examples/basic", "test",
+    "examples/basic/vite.config.ts"
+  ]
 }
