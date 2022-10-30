@@ -44,8 +44,8 @@ Set `data-component` name attribute on specific DOM element:
 
 ```html
 <div data-component="App">
-  <h1>...</h1>
-  <header data-component="Header">...</header>
+  <h1>Hello</h1>
+  <header data-component="Header">Header content</header>
 </div>
 ```
 
@@ -65,7 +65,7 @@ Then, start component instances chaining by root instance.
 new App(document.querySelector(".App"))
 ```
 
-Each Component like `Header` child class component, need to extends the same `Component` class.
+Each Component like `Header` child class component, need to extend `Component` class:
 
 ```js
 import { Component } from "@wbe/compose"
@@ -82,6 +82,15 @@ class Header extends Component {
   handleResize = () => {
     // do something on resize...
   }
+}
+```
+
+And because `Header` component is a App child component, it can be instantiated from `App` class:
+
+```js
+class App extends Component {
+  static attrName = "App"
+  header = this.add(Header)
 }
 ```
 
@@ -132,11 +141,11 @@ class Foo extends Component {
 add<C extends Component, P = TProps>(classComponent: new <P = TProps>(...args: any[]) => C, props?: P, attrName?: string): C;
 ```
 
-This method allows to 'add', 'create' new Component instance to the tree.
-It returns instance(s) and associated properties.
+This method allows to 'add' new Component instance to the tree.
+It returns a single instance and associated properties.
 
 
-Add component in class core:
+Add component inside the class:
 
 ```js
 bar = this.add(Bar)
