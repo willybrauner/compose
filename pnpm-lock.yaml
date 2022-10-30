@@ -5,11 +5,13 @@ importers:
   .:
     specifiers:
       '@wbe/debug': ^1.1.0
+      history: ^5.3.0
       microbundle: ^0.15.1
       prettier: ^2.7.1
       vitest: ^0.24.3
     dependencies:
       '@wbe/debug': 1.1.0
+      history: 5.3.0
     devDependencies:
       microbundle: 0.15.1
       prettier: 2.7.1
@@ -1274,7 +1276,6 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.13.10
-    dev: true
 
   /@babel/template/7.18.10:
     resolution: {integrity: sha512-TI+rCtooWHr3QJ27kJxfjutghu44DLnasDMwpDqCXVTal9RLp3RSYNh4NdBrRP2cQAoG9A8juOQl6P6oZG4JxA==}
@@ -2528,6 +2529,12 @@ packages:
       function-bind: 1.1.1
     dev: true
 
+  /history/5.3.0:
+    resolution: {integrity: sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==}
+    dependencies:
+      '@babel/runtime': 7.20.0
+    dev: false
+
   /icss-replace-symbols/1.1.0:
     resolution: {integrity: sha512-chIaY3Vh2mh2Q3RGXttaDIzeiPvaVXJ+C4DAh/w3c37SKZ/U6PGMmuicR2EQQp9bKG8zLMCl7I+PtIoOOPp8Gg==}
     dev: true
@@ -3497,7 +3504,6 @@ packages:
 
   /regenerator-runtime/0.13.10:
     resolution: {integrity: sha512-KepLsg4dU12hryUO7bp/axHAKvwGOCV0sGloQtpagJ12ai+ojVDqkeGSiRX1zlq+kjIMZ1t7gpze+26QqtdGqw==}
-    dev: true
 
   /regenerator-transform/0.15.0:
     resolution: {integrity: sha512-LsrGtPmbYg19bcPHwdtmXwbW+TqNvtY4riE3P83foeHRroMbH6/2ddFBfab3t7kbzc7v7p4wbkIecHImqt0QNg==}

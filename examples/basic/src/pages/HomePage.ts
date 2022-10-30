@@ -2,6 +2,7 @@ import { Component } from "@wbe/compose"
 import Header from "../components/Header"
 import { defaultPlayIn, defaultPlayOut } from "../helpers/defaultTransitions"
 import debug from "@wbe/debug"
+import {history} from "../history"
 const log = debug(`front:HomePage`)
 
 type TStaticProps = {}
@@ -16,7 +17,11 @@ export default class HomePage extends Component<TStaticProps> {
   public $sections = this.findAll("section")
 
   public mounted() {
-    log("$sections",this.$sections)
+
+    setTimeout(()=> {
+      history.push('/about.html')
+    }, 2000)
+
     window.addEventListener("resize", this.resizeHandler)
   }
 
