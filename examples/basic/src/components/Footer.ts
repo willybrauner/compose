@@ -1,4 +1,4 @@
-import { Component } from "../../../../src";
+import { Component } from "@wbe/compose";
 import debug from "@wbe/debug"
 const log = debug(`front:Footer`)
 
@@ -10,15 +10,10 @@ type TProps = {}
 export default class Footer extends Component<TProps> {
   public static attrName = "Footer";
   mounted () {
-    log('Footer is mounted')
+    log('Footer is mounted', this)
   }
 
-  unmounted () {}
-
-  logMe()
-  {
+  logMe() {
     log("Log Me!", this)
   }
-
-
 }

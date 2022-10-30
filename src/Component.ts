@@ -90,7 +90,7 @@ export class Component<Props = TProps> {
   public mounted(): void {}
   private _mounted(): void {
     log(this.name, "mounted")
-    // instanciate children components just before mounted
+    // instantiate children components just before mounted
     this.mounted()
     this.isMounted = true
   }
@@ -114,15 +114,15 @@ export class Component<Props = TProps> {
    * Add is a register child component function
    * It create new children instance
    */
-  protected add<C extends Component, P = TProps>(
+  public add<C extends Component, P = TProps>(
     classComponent: new <P = TProps>(...args: any[]) => C,
     props?: P,
     attrName?: string
   ): C {
     // get string name instance from param or static attrName property
     const name: string = attrName || classComponent?.["attrName"]
-    // get DOM elements
-    const element = this.getDomElement(this.$root, name)?.[0]
+    // get first DOM element
+    const element = Component.getDomElement(this.$root, name)?.[0]
     // if no elements, exit
     if (!element) return
     // create and return child instance
@@ -140,7 +140,7 @@ export class Component<Props = TProps> {
   /**
    * Add multiple children components
    */
-  protected addAll<C extends Component, P = TProps>(
+  public addAll<C extends Component, P = TProps>(
     classComponent: new <P = TProps>(...args: any[]) => C,
     props?: P,
     attrName?: string
@@ -150,7 +150,7 @@ export class Component<Props = TProps> {
     // get string name instance from param or static attrName property
     const name: string = attrName || classComponent?.["attrName"]
     // get DOM elements
-    const elements = this.getDomElement(this.$root, name)
+    const elements = Component.getDomElement(this.$root, name)
     // if no elements, exit
     if (!elements.length) return
     // map on each elements (because elements return an array)
@@ -177,7 +177,7 @@ export class Component<Props = TProps> {
    *  if class name is "Block_section"
    *  this.find("section") will return DOM element with "Block_section" class
    */
-  protected find<T extends HTMLElement>(
+  public find<T extends HTMLElement>(
     bemElementName: string,
     className = this.$root?.classList?.[0]
   ): T {
@@ -196,7 +196,7 @@ export class Component<Props = TProps> {
    * @param bemElementName
    * @param className
    */
-  protected findAll<T extends HTMLElement[]>(
+  public findAll<T extends HTMLElement[]>(
     bemElementName: string,
     className = this.$root?.classList?.[0]
   ): T {
@@ -256,11 +256,8 @@ export class Component<Props = TProps> {
   /**
    * Get DOM element
    */
-  private getDomElement($root: HTMLElement, name: string): HTMLElement[] {
-    return [
-      // @ts-ignore
-      ...($root?.querySelectorAll(`*[${COMPONENT_ATTR}=${name}]`) || []),
-    ]
+  private static getDomElement($root: HTMLElement, name: string): HTMLElement[] {
+    return Array.from($root?.querySelectorAll(`*[${COMPONENT_ATTR}=${name}]`) || [])
   }
 
   /**

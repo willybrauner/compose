@@ -2,6 +2,7 @@
 .cache
 .github
 example
+examples
 node_modules
 src
 test
@@ -10,4 +11,3 @@ test
 .prettierrc
 stories
 tsconfig.json
-vite.config.ts

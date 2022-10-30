@@ -1,4 +1,4 @@
-import { Component } from "../../../../src";
+import { Component } from "@wbe/compose";
 import debug from "@wbe/debug"
 const log = debug(`front:MainButton`)
 

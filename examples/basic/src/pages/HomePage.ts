@@ -1,4 +1,4 @@
-import { Component } from "../../../../src"
+import { Component } from "@wbe/compose"
 import Header from "../components/Header"
 import { defaultPlayIn, defaultPlayOut } from "../helpers/defaultTransitions"
 import debug from "@wbe/debug"
@@ -6,11 +6,11 @@ const log = debug(`front:HomePage`)
 
 type TStaticProps = {}
 
-
 /**
  * @name HomePage
  */
 export default class HomePage extends Component<TStaticProps> {
+
   public static attrName = "HomePage"
   public header = this.add(Header)
   public $sections = this.findAll("section")
@@ -38,3 +38,4 @@ export default class HomePage extends Component<TStaticProps> {
     defaultPlayIn(this.$root, comeFrom, resolve)
   }
 }
+

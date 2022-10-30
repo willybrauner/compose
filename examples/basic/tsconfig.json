@@ -1,21 +1,17 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "esnext",
     "target": "esnext",
-    "outDir": "./dist",
-    "rootDir": "../",
-    "composite": false,
-    "lib": ["dom", "es2015"],
-    "moduleResolution": "node",
-    "types": ["node", "jest"],
+    "lib": ["es2015.promise", "es6", "dom", "esnext"],
     "jsx": "react",
+    "moduleResolution": "node",
     "declaration": true,
+    "isolatedModules": false,
     "noImplicitAny": false,
     "esModuleInterop": true,
     "preserveConstEnums": true,
-    "strictNullChecks": false,
-    "skipLibCheck": false,
-  }
+    "strictNullChecks": false
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "dist", "test"]
 }
-
-

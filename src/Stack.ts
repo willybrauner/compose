@@ -65,7 +65,7 @@ export class Stack<Props = TProps> extends Component {
    * @returns
    */
   public addPages(): TPages {
-    return
+    return {}
   }
   private pages: TPages
 
@@ -131,8 +131,8 @@ export class Stack<Props = TProps> extends Component {
     super($root, props)
 
     // init
-    this.$pageContainer = this.getPageContainer()
-    this.$pageWrapper = this.getPageWrapper(this.$pageContainer)
+    this.$pageContainer = Stack.getPageContainer()
+    this.$pageWrapper = Stack.getPageWrapper(this.$pageContainer)
     this.pages = this.addPages()
     this.currentPage = this.getFirstCurrentPage()
     this._cache = {}
@@ -180,7 +180,7 @@ export class Stack<Props = TProps> extends Component {
    */
   private listenLinks() {
     const links = this.getLinksWithAttr()
-    links.forEach((item: HTMLElement) => {
+    links?.forEach((item: HTMLElement) => {
       item?.addEventListener("click", this.handleLinks)
     })
   }
@@ -191,7 +191,7 @@ export class Stack<Props = TProps> extends Component {
    */
   private unlistenLinks() {
     const links = this.getLinksWithAttr()
-    links.forEach((item: HTMLElement) => {
+    links?.forEach((item: HTMLElement) => {
       item?.removeEventListener("click", this.handleLinks)
     })
   }
@@ -389,8 +389,8 @@ export class Stack<Props = TProps> extends Component {
     // fetch new document or use cache
     try {
       const newDocument = await this.fetchNewDocument(requestUrl, new AbortController())
-      const $newPageWrapper = this.getPageWrapper(newDocument.body)
-      const $newPageRoot = this.getPageRoot($newPageWrapper)
+      const $newPageWrapper = Stack.getPageWrapper(newDocument.body)
+      const $newPageRoot = Stack.getPageRoot($newPageWrapper)
       const newPageName = this.getPageName($newPageRoot)
       const newPageInstance = this.createPageInstance(newPageName, $newPageRoot)
 
@@ -496,7 +496,7 @@ export class Stack<Props = TProps> extends Component {
    * Get page container HTMLElement
    * @private
    */
-  private getPageContainer(): HTMLElement {
+  private static getPageContainer(): HTMLElement {
     return document.body.querySelector(`*[${PAGE_CONTAINER_ATTR}]`)
   }
 
@@ -505,7 +505,7 @@ export class Stack<Props = TProps> extends Component {
    * @param $node
    * @private
    */
-  private getPageWrapper($node: HTMLElement): HTMLElement {
+  private static getPageWrapper($node: HTMLElement): HTMLElement {
     return $node.querySelector(`*[${PAGE_WRAPPER_ATTR}]`)
   }
 
@@ -514,7 +514,7 @@ export class Stack<Props = TProps> extends Component {
    * @param $wrapper
    * @private
    */
-  private getPageRoot($wrapper: HTMLElement): HTMLElement {
+  private static getPageRoot($wrapper: HTMLElement): HTMLElement {
     return $wrapper.children[0] as HTMLElement
   }
 
@@ -546,7 +546,7 @@ export class Stack<Props = TProps> extends Component {
    * @private
    */
   private getFirstCurrentPage(): IPage {
-    const $pageRoot = this.getPageRoot(this.$pageWrapper)
+    const $pageRoot = Stack.getPageRoot(this.$pageWrapper)
     const pageName = this.getPageName($pageRoot)
     const instance = this.createPageInstance(pageName, $pageRoot)
     const playIn = () => instance._playInRef()
@@ -565,14 +565,14 @@ export class Stack<Props = TProps> extends Component {
 
   /**
    * Update Metas
-   * @param newDocument
+   * @param title
    */
   private static updateMetas(title: string): void {
     document.title = title
   }
 
   /**
-   * Add current page in cache cache
+   * Add current page in cache
    */
   private addInCache(
     url: string,
@@ -591,13 +591,12 @@ export class Stack<Props = TProps> extends Component {
   // --------------------------------------------------------------------------- HELPERS
 
   /**
-   * Get link with with URL ATTR
+   * Get link with URL ATTR
    */
   private getLinksWithAttr(): HTMLElement[] {
-    return [
-      // @ts-ignore
-      ...this.$pageContainer?.querySelectorAll(`*[${PAGE_URL_ATTR}]`),
-    ]
+    return  Array.from(
+      this.$pageContainer?.querySelectorAll(`*[${PAGE_URL_ATTR}]`),
+    )
   }
 
   private parseDOM = (html) =>

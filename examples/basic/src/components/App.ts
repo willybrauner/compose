@@ -1,10 +1,9 @@
-import { IPage, Stack } from "../../../../src"
+import {IPage, Stack} from "@wbe/compose"
 import HomePage from "../pages/HomePage"
 import AboutPage from "../pages/AboutPage"
 import WorkPage from "../pages/WorkPage"
 import debug from "@wbe/debug"
 import Footer from "./Footer"
-import Header from "./Header"
 const log = debug(`front:App`)
 
 type TProps = {
@@ -14,8 +13,9 @@ type TProps = {
 /**
  * @name App
  */
-export default class App extends Stack<TProps> {
+export class App extends Stack {
   public static attrName = "App"
+  public footer = this.add<Footer>(Footer)
 
   public addPages() {
     return {
@@ -25,10 +25,8 @@ export default class App extends Stack<TProps> {
     }
   }
 
-  footer = this.addAll<Footer>(Footer)
-
   public mounted() {
-    log("typeof this.footer", this.footer)
+    log("this.footer", this.footer)
   }
 
   protected async pageTransitions(
@@ -44,5 +42,5 @@ export default class App extends Stack<TProps> {
 
   // disableLinksDuringTransitions = true
   // disableHistoryDuringTransitions = true
-  forcePageReloadIfDocumentIsFetching = true
+  // forcePageReloadIfDocumentIsFetching = true
 }
