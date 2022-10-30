@@ -11,8 +11,7 @@ type TStaticProps = {}
  */
 export default class WorkPage extends Component<TStaticProps> {
   public static attrName = "WorkPage"
-
-  protected Header = this.add(Header)
+  public header = this.add(Header)
 
   public mounted() {
     window.addEventListener("resize", this.resizeHandler)

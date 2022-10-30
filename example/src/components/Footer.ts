@@ -12,6 +12,7 @@ export default class Footer extends Component<TProps> {
   mounted () {
     log('Footer is mounted')
   }
+
   unmounted () {}
 
   logMe()

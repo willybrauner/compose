@@ -184,7 +184,7 @@ export class Component<Props = TProps> {
     if (!className || !bemElementName || !this.$root) return
     const element = this.$root.querySelector<T>(`.${className}_${bemElementName}`)
     if (!element) return
-    return element
+    else return element
   }
 
   /**
@@ -202,8 +202,7 @@ export class Component<Props = TProps> {
   ): T {
     if (!className || !bemElementName || !this.$root) return
     const elements = this.$root.querySelectorAll(`.${className}_${bemElementName}`)
-    if (!elements.length) return
-    return Array.from(elements) as T
+    return Array.from(elements || []) as T
   }
 
   // ------------------------------------------------------------------------------------- TRANSITIONS
