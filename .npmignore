@@ -11,3 +11,5 @@ test
 .prettierrc
 stories
 tsconfig.json
+pnpm-lock.yaml
+pnpm-workspace.yaml

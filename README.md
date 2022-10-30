@@ -2,22 +2,41 @@
 
 Compose is a tiny zero dependency library for vanilla javascript component approach and page transitions management.
 
-> This library is work in progress, the API is subject to change drastically until the v1.0 release.
+> ⚠️ This library is work in progress, the API is subject to change until the v1.0 release.
 
 ![](https://img.shields.io/npm/v/@wbe/compose/latest.svg)
 ![](https://img.shields.io/bundlephobia/minzip/@wbe/compose.svg)
 ![](https://img.shields.io/npm/dt/@wbe/compose.svg)
 ![](https://img.shields.io/npm/l/@wbe/compose.svg)
 
-[test @wbe/compose in codesandbox](https://codesandbox.io/s/compose-example-ts-xdz1q6)
+## Summary
 
-## Installation
+- [Installation](#Installation)
+- [Component](#Component)
+  - [beforeMount](#beforeMount)
+  - [mounted](#mounted)
+  - [unmounted](#unmounted)
+  - [attrName](#attrName)
+  - [add](#add)
+  - [addAll](#addAll)
+  - [find](#find)
+  - [findAll](#findAll)
+- [Stack](#Stack)
+  - [pageTransitions](#pageTransitions)
+  - [Page playIn & playOut](#PageplayIn&playOut)
+  - [Stack options](#StackOptions)
+- [debug](#debug)
+- [Credits](#Credits)
+- [Licence](#Licence)
+
+
+## <a name="Installation"></a>Installation
 
 ```shell
-$ npm install -s @wbe/compose
+$ npm i @wbe/compose
 ```
 
-## Component
+## <a name="Component"></a>Component
 
 In order to use `Component`:
 
@@ -43,8 +62,7 @@ class App extends Component {
 Then, start component instances chaining by root instance.
 
 ```js
-const $app = document.querySelector(".App")
-new App($app)
+new App(document.querySelector(".App"))
 ```
 
 Each Component like `Header` child class component, need to extends the same `Component` class.
@@ -67,21 +85,20 @@ class Header extends Component {
 }
 ```
 
-## Life cycle
 
-### beforeMount
+### <a name="beforeMount"></a>beforeMount
 
 `beforeMount()`
 
 Method called before class component is mounted, in at begining of class constructor.
 
-### mounted
+### <a name="mounted"></a>mounted
 
 `mounted()`
 
 Method called after class component is mounted. Children component instances are now available.
 
-### unmounted
+### <a name="unmounted"></a>unmounted
 
 `unmounted()`
 
@@ -89,9 +106,8 @@ Method called after class component is unmounted.
 The parent component observer will called this unmounted method automatically if the current component is removed from DOM.
 All children component instances are also unmounted after this method is called.
 
-## Methods & Properties
 
-### attrName
+### <a name="attrName"></a>attrName
 
 static `string`
 
@@ -110,21 +126,15 @@ class Foo extends Component {
 }
 ```
 
-### add
+### <a name="add"></a>add
 
-`add()`
+```ts
+add<C extends Component, P = TProps>(classComponent: new <P = TProps>(...args: any[]) => C, props?: P, attrName?: string): C;
+```
 
 This method allows to 'add', 'create' new Component instance to the tree.
 It returns instance(s) and associated properties.
 
-```ts
-add<T = Component, P = TProps>(
-    classComponent: TAddComponent,
-    props?: P,
-    returnArray?: boolean,
-    attrName?: string
-): T;
-```
 
 Add component in class core:
 
@@ -137,33 +147,10 @@ this.bar.unmounted()
 // ...
 ```
 
-`add()` will created as many instances
-as there are components found as children.
-
-In case, multi children of the same component is found, `add()` will returned an array of instances.
-
-```html
-<div>
-  <div data-component="Bar"></div>
-  <div data-component="Bar"></div>
-</div>
-```
-
-```js
-bar = this.add(Bar) // will returned array of bar instances
-```
-
-If we don't know how many instance of our component `Bar` exist,
-it's possible to force `add()` to return an array via `returnArray` parameter.
-
-```js
-bar = this.add(Bar, {}, true)
-```
-
 With typescript, we can explicitly state that we are expecting an array.
 
 ```ts
-bar = this.add<Bar[]>(Bar)
+bar = this.add<Bar>(Bar)
 ```
 
 The method accepts a static props parameter which we can access from the new Bar component via `this.props`.
@@ -178,28 +165,80 @@ With typescript, we can type the `props` object:
 bar = this.add<Bar, { myProp: string }>(Bar, { myProp: "foo" }, false)
 ```
 
-### find
 
-`find()`
+### <a name="addAll"></a>addAll
+
+```ts
+addAll<C extends Component, P = TProps>(classComponent: new <P = TProps>(...args: any[]) => C, props?: P, attrName?: string): C[];
+```
+
+`addAll` will return an array of instances.
+
+```html
+<div>
+  <div data-component="Bar"></div>
+  <div data-component="Bar"></div>
+</div>
+```
+
+```js
+bar = this.addAll(Bar) // [Bar, Bar]
+```
+
+With typescript, we can explicitly state that we are expecting an array.
+
+```ts
+bar = this.addAll<Bar>(Bar)
+```
+
+### <a name="find"></a>find
+
+```ts
+find<T extends HTMLElement>(bemElementName: string, className?: string): T;
+```
 
 This method allows to retrieve B.E.M. element of current $root component.
 
+```html
+<h1 class="Bar_title">Hello</h1>
+```
+
 ```js
-// if $root is "App", "App_title" DOM element will be returned
-$title = this.find("title")
+// if $root is "Bar", "Bar_title" DOM element will be returned
+$title = this.find("title") // <h1 class="Bar_title">Hello</h1>
 ```
 
 With typescript:
 
 ```ts
 $title = this.find<HTMLElement>("title")
-$foo = this.find<HTMLElement[]>("foo")
 ```
 
-As `add()` method, if a list of element is exist in DOM, `find()` will returns a list of HTMLElement.
-It's possible to force an array return via `returnArray` params.
+### <a name="findAll"></a>findAll
 
-## Stack
+```ts
+findAll<T extends HTMLElement[]>(bemElementName: string, className?: string): T;
+```
+
+`finAll` returns a DOM Element array. 
+
+
+```html
+<div class="Bar_icon">icon</div>
+<div class="Bar_icon">icon</div>
+```
+```js
+$title = this.findAll("icon") // [div.Bar_icon, div.Bar_icon] 
+```
+
+With typescript:
+
+```ts
+$title = this.find<HTMLElement>("title")
+```
+
+
+## <a name="Stack"></a>Stack
 
 In order to get dynamic page fetching and refreshing without reload,
 `Stack` extended class is a middleware class between our App root component and `Component` extended class.
@@ -209,7 +248,7 @@ Stack is not a router, it only fetch content of specific page and inject it insi
 `index.html`
 
 ```html
-<!-- set "data-page-transition-container" attr to the class extened `Stack` -->
+<!-- set "data-page-transition-container" attr to the class extended `Stack` -->
 <main data-component="App" data-page-transition-container>
   <!-- content who not change between page transitions -->
   <nav>
@@ -217,7 +256,7 @@ Stack is not a router, it only fetch content of specific page and inject it insi
     <a href="index.html" data-page-transition-url="index.html">home</a>
     <a href="about.html" data-page-transition-url="about.html">about</a>
   </nav>
-  <!-- inside 'data-page-transition-wrapper' content will changed between page transition -->
+  <!-- inside 'data-page-transition-wrapper' content will be changed between page transition -->
   <div data-page-transition-wrapper>
     <div data-component="HomePage">...</div>
   </div>
@@ -227,7 +266,7 @@ Stack is not a router, it only fetch content of specific page and inject it insi
 `about.html`
 
 ```html
-<!-- same page than index.html exept "data-page-transition-wrapper" content -->
+<!-- same page than index.html except "data-page-transition-wrapper" content -->
 <div data-page-transition-wrapper>
   <div data-component="AboutPage">...</div>
 </div>
@@ -249,7 +288,7 @@ class App extends Stack {
 }
 ```
 
-### pageTransitions
+### <a name="pageTransitions"></a>pageTransitions
 
 `pageTransitions()`
 
@@ -271,7 +310,7 @@ class App extends Stack {
 }
 ```
 
-### Page playIn & playOut
+### <a name="PageplayIn&playOut"></a>Page playIn & playOut
 
 Each pages can declare it's own page transition `playIn()` & `playOut()`.
 
@@ -292,7 +331,7 @@ class HomePage extends Component {
 }
 ```
 
-## Options
+### <a name="StackOptions"></a>Stack options
 
 - `forcePageReload` {boolean} _default: false_
   Force all pages to reload instead of the dynamic new document fetching process.
@@ -316,7 +355,7 @@ class App extends Stack {
 }
 ```
 
-## debug
+## <a name="debug"></a>debug
 
 Compose comes with [`@wbe/debug`](https://github.com/willybrauner/debug) tool.
 To get some additional logs, add this line on your browser console:
@@ -325,10 +364,10 @@ To get some additional logs, add this line on your browser console:
 localStorage.debug = "compose:*"
 ```
 
-## Credits
+## <a name="Credits"></a>Credits
 
 © [Willy Brauner](https://willybrauner.com)
 
-## Licence
+## <a name="Licence"></a>Licence
 
 MIT
