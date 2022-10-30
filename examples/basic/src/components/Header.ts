@@ -1,4 +1,4 @@
-import { Component } from "../../../src"
+import { Component } from "@wbe/compose"
 import MainButton from "./MainButton"
 import debug from "@wbe/debug"
 const log = debug(`front:Header`)
@@ -11,9 +11,10 @@ type TStaticProps = {}
 export default class Header extends Component<TStaticProps> {
   public static attrName = "Header"
 
-  public MainButton = this.add<MainButton[]>(MainButton)
+  public mainButton = this.addAll<MainButton>(MainButton)
 
   public mounted() {
+    log('mainButton',this.mainButton)
     window.addEventListener("resize", this.resizeHandler)
   }
 

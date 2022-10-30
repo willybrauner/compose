@@ -1,4 +1,4 @@
-import { Component } from "../../../src"
+import { Component } from "@wbe/compose"
 import Header from "../components/Header"
 import { defaultPlayIn, defaultPlayOut } from "../helpers/defaultTransitions"
 import debug from "@wbe/debug"
@@ -11,8 +11,7 @@ type TStaticProps = {}
  */
 export default class WorkPage extends Component<TStaticProps> {
   public static attrName = "WorkPage"
-
-  protected Header = this.add(Header)
+  public header = this.add(Header)
 
   public mounted() {
     window.addEventListener("resize", this.resizeHandler)

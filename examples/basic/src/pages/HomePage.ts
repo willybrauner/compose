@@ -1,29 +1,26 @@
-import { Component } from "../../../src"
+import { Component } from "@wbe/compose"
 import Header from "../components/Header"
 import { defaultPlayIn, defaultPlayOut } from "../helpers/defaultTransitions"
 import debug from "@wbe/debug"
-import MainButton from "../components/MainButton"
 const log = debug(`front:HomePage`)
 
 type TStaticProps = {}
-
 
 /**
  * @name HomePage
  */
 export default class HomePage extends Component<TStaticProps> {
-  public static attrName = "HomePage"
 
-  protected Header = this.add(Header)
+  public static attrName = "HomePage"
+  public header = this.add(Header)
+  public $sections = this.findAll("section")
 
   public mounted() {
-    log('> mounted')
-
+    log("$sections",this.$sections)
     window.addEventListener("resize", this.resizeHandler)
   }
 
   public unmounted() {
-    log('> unmounted')
     window.removeEventListener("resize", this.resizeHandler)
   }
 
@@ -41,3 +38,4 @@ export default class HomePage extends Component<TStaticProps> {
     defaultPlayIn(this.$root, comeFrom, resolve)
   }
 }
+

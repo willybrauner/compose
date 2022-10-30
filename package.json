@@ -4,41 +4,44 @@
   "description": "Compose is a tiny zero dependency library for vanilla javascript component approach and page transitions management.",
   "author": "Willy Brauner",
   "license": "MIT",
-  "types": "dist/index",
-  "source": "src/index.ts",
+  "type": "module",
+  "types": "./dist/index",
+  "source": "./src/index.ts",
   "main": "./dist/index.cjs",
   "module": "./dist/index.module.js",
   "unpkg": "./dist/index.umd.js",
   "private": false,
-  "sideEffects": false,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/willybrauner/libraries.git"
-  },
-  "scripts": {
-    "dev": "vite",
-    "build": "npm run clean && npm run compile",
-    "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
-    "compile": "microbundle",
-    "compile:watch": "microbundle --watch -f modern",
-    "publish:all": "npm run build && npm publish"
-  },
-  "dependencies": {
-    "@wbe/debug": "^1.0.0"
-  },
-  "devDependencies": {
-    "@babel/preset-typescript": "^7.16.7",
-    "gsap": "^3.10.4",
-    "microbundle": "^0.15.0",
-    "prettier": "^2.6.2",
-    "vite": "^2.9.6"
-  },
   "keywords": [
     "compose",
     "component",
     "stack"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/willybrauner/compose.git"
+  },
   "publishConfig": {
     "access": "public"
+  },
+  "scripts": {
+    "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
+    "build": "npm run clean && microbundle",
+    "build:watch": "microbundle watch",
+    "dev:basic": "pnpm --filter ./examples/basic run dev",
+    "test:watch": "vitest --reporter verbose",
+    "test": "vitest run",
+    "pre-publish": "npm run build && npm run test"
+  },
+  "dependencies": {
+    "@wbe/debug": "^1.1.0"
+  },
+  "devDependencies": {
+    "microbundle": "^0.15.1",
+    "prettier": "^2.7.1",
+    "vitest": "^0.24.3"
+  },
+  "prettier": {
+    "printWidth": 90,
+    "semi": false
   }
 }

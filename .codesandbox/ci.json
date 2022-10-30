@@ -1,0 +1,8 @@
+{
+  "buildCommand": "build",
+  "packages": ["./"],
+  "sandboxes": [
+    "/examples/basic"
+  ],
+  "node": "16"
+}

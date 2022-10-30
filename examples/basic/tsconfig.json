@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src",
     "module": "esnext",
     "target": "esnext",
     "lib": ["es2015.promise", "es6", "dom", "esnext"],
