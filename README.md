@@ -167,13 +167,17 @@ bar = this.add(Bar, { myProp: "foo" })
 With typescript, we can type the `props` object:
 
 ```ts
-bar = this.add<Bar, { myProp: string }>(Bar, { myProp: "foo" }, false)
+bar = this.add<Bar, { myProp: string }>(Bar, { myProp: "foo" }, "customAttribute")
 ```
 
 ### <a name="addAll"></a>addAll
 
 ```ts
-addAll<C extends Component, P = TProps>(classComponent: new <P = TProps>(...args: any[]) => C, props?: P, attrName?: string): C[];
+addAll<C extends Component[], P = TProps>(
+    classComponent: new <P = TProps>(...args: any[]) => GetElementType<C>,
+    props?: P,
+    attrName?: string
+  )
 ```
 
 `addAll` will return an array of instances.
@@ -186,13 +190,13 @@ addAll<C extends Component, P = TProps>(classComponent: new <P = TProps>(...args
 ```
 
 ```js
-bar = this.addAll(Bar) // [Bar, Bar]
+bars = this.addAll(Bar) // [Bar, Bar]
 ```
 
 With typescript, we can explicitly state that we are expecting an array.
 
 ```ts
-bar = this.addAll<Bar>(Bar)
+bars = this.addAll<Bar[]>(Bar)
 ```
 
 ### <a name="find"></a>find
@@ -232,13 +236,13 @@ findAll<T extends HTMLElement[]>(bemElementName: string, className?: string): T;
 ```
 
 ```js
-$title = this.findAll("icon") // [div.Bar_icon, div.Bar_icon]
+$icons = this.findAll("icon") // [div.Bar_icon, div.Bar_icon]
 ```
 
 With typescript:
 
 ```ts
-$title = this.find<HTMLElement>("title")
+$icons = this.findAll<HTMLElement[]>("icon")
 ```
 
 ## <a name="Stack"></a>Stack
