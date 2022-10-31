@@ -1,4 +1,4 @@
-import { Component } from "@wbe/compose";
+import { Component } from "@wbe/compose"
 import debug from "@wbe/debug"
 const log = debug(`front:MainButton`)
 
@@ -6,8 +6,5 @@ const log = debug(`front:MainButton`)
  * @name MainButton
  */
 export default class MainButton extends Component {
-  public static attrName = "MainButton";
-
-  mounted () { }
-
+  public static attrName = "MainButton"
 }

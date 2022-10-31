@@ -8,7 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@wbe/compose": "^0.9.0",
+    "@wbe/compose": "latest",
     "gsap": "^3.11.3"
   },
   "devDependencies": {

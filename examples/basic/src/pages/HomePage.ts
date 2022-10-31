@@ -10,13 +10,11 @@ type TStaticProps = {}
  * @name HomePage
  */
 export default class HomePage extends Component<TStaticProps> {
-
   public static attrName = "HomePage"
   public header = this.add(Header)
   public $sections = this.findAll("section")
 
   public mounted() {
-    log("$sections",this.$sections)
     window.addEventListener("resize", this.resizeHandler)
   }
 
@@ -28,7 +26,7 @@ export default class HomePage extends Component<TStaticProps> {
     log("window.innerWidth", window.innerWidth)
   }
 
-  // ------------------------------------------------------------------------------------- PAGE TRANSITION
+  // --------------------------------------------------------------------------- PAGE TRANSITION
 
   public playOut(goTo: string, resolve: () => void) {
     defaultPlayOut(this.$root, goTo, resolve)
@@ -38,4 +36,3 @@ export default class HomePage extends Component<TStaticProps> {
     defaultPlayIn(this.$root, comeFrom, resolve)
   }
 }
-

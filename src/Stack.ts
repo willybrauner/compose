@@ -1,6 +1,7 @@
 import { Component, COMPONENT_ATTR } from "./Component"
 import type { TProps } from "./Component"
 import debug from "@wbe/debug"
+import { BrowserHistory, HashHistory, MemoryHistory } from "history"
 const log = debug("compose:Stack")
 
 export interface IPage {
@@ -39,7 +40,7 @@ const PAGE_URL_ATTR = "data-page-transition-url"
  * `Stack` extended class is a middleware class between our App root component
  * and `Component` extended class.
  */
-export class Stack<Props = TProps> extends Component {
+export class Stack<GProps = TProps> extends Component {
   /**
    * reload if document is fetching
    */
@@ -100,7 +101,7 @@ export class Stack<Props = TProps> extends Component {
   protected $pageWrapper: HTMLElement
 
   /**
-   * promise ref used in playIn and playOut medthods to keep reject promise
+   * promise ref used in playIn and playOut methods to keep reject promise
    */
   protected playInPromiseRef: TPromiseRef = { reject: undefined }
   protected playOutPromiseRef: TPromiseRef = { reject: undefined }
@@ -123,12 +124,28 @@ export class Stack<Props = TProps> extends Component {
   private _cache: { [url: string]: TCache }
 
   /**
+   * History
+   */
+  protected history: BrowserHistory | HashHistory | MemoryHistory
+  protected removeHistory
+
+  /**
    * Construct
    * @param $root
    * @param props
+   * @param history
    */
-  constructor($root: HTMLElement, props: Props) {
+  constructor({
+    $root,
+    props,
+    history,
+  }: {
+    $root: HTMLElement
+    props: GProps
+    history: BrowserHistory | HashHistory | MemoryHistory
+  }) {
     super($root, props)
+    this.history = history
 
     // init
     this.$pageContainer = Stack.getPageContainer()
@@ -136,9 +153,6 @@ export class Stack<Props = TProps> extends Component {
     this.pages = this.addPages()
     this.currentPage = this.getFirstCurrentPage()
     this._cache = {}
-
-    // start patch history
-    this.patchHistoryStates()
 
     // start page events
     this.start()
@@ -151,7 +165,7 @@ export class Stack<Props = TProps> extends Component {
    * @protected
    */
   protected start(): void {
-    this.handleHistory()
+    this.handleHistory(window.location.pathname)
     this.initHistoryEvent()
     this.listenLinks()
   }
@@ -201,8 +215,8 @@ export class Stack<Props = TProps> extends Component {
    * @private
    */
   private initHistoryEvent() {
-    ;["pushState", "replaceState", "popstate"].forEach((event) => {
-      window.addEventListener(event, this.handleHistory.bind(this))
+    this.removeHistory = this.history?.listen(({ location }) => {
+      this.handleHistory(location.pathname)
     })
   }
 
@@ -211,9 +225,7 @@ export class Stack<Props = TProps> extends Component {
    * @private
    */
   private removeHistoryEvent() {
-    ;["pushState", "replaceState", "popstate"].forEach((event) => {
-      window.removeEventListener(event, this.handleHistory)
-    })
+    this.removeHistory()
   }
 
   // --------------------------------------------------------------------------- HANDLERS
@@ -226,7 +238,7 @@ export class Stack<Props = TProps> extends Component {
     if (!event) return
     // get page url attr
     const url = event?.currentTarget?.getAttribute(PAGE_URL_ATTR)
-    // if disable transtiions is active, open new page
+    // if disable transitions is active, open new page
     if (this.forcePageReload) {
       window.open(url, "_self")
     }
@@ -236,23 +248,26 @@ export class Stack<Props = TProps> extends Component {
     if (this.disableLinksDuringTransitions && this._pageIsAnimating) return
 
     // push it in history
-    window.history.pushState({}, null, url)
+    this.history.push(url)
   }
 
   /**
    * Handle history
-   * @param event
+   * @param pathname
    */
-  private async handleHistory(event?): Promise<void> {
+  private handleHistory = async (pathname): Promise<void> => {
     if (this.disableHistoryDuringTransitions && this._pageIsAnimating) return
 
     // get URL to request
-    const requestUrl = event?.["arguments"]?.[2] || window.location.pathname
+    const requestUrl = pathname
 
     log("handleHistory > requestUrl", requestUrl)
     if (!requestUrl || requestUrl === this.currentUrl) return
 
-    if ((this.forcePageReloadIfDocumentIsFetching && this._fetching) || this.forcePageReload) {
+    if (
+      (this.forcePageReloadIfDocumentIsFetching && this._fetching) ||
+      this.forcePageReload
+    ) {
       log("handleHistory > security, force page reload...")
       window.open(requestUrl, "_self")
       return
@@ -594,9 +609,7 @@ export class Stack<Props = TProps> extends Component {
    * Get link with URL ATTR
    */
   private getLinksWithAttr(): HTMLElement[] {
-    return  Array.from(
-      this.$pageContainer?.querySelectorAll(`*[${PAGE_URL_ATTR}]`),
-    )
+    return Array.from(this.$pageContainer?.querySelectorAll(`*[${PAGE_URL_ATTR}]`))
   }
 
   private parseDOM = (html) =>
@@ -608,7 +621,10 @@ export class Stack<Props = TProps> extends Component {
    * @param controller
    * @protected
    */
-  private async fetchNewDocument(url: string, controller: AbortController): Promise<Document> {
+  private async fetchNewDocument(
+    url: string,
+    controller: AbortController
+  ): Promise<Document> {
     // if document is already fetching, abort the current fetch
     if (this._fetching) {
       controller.abort()
@@ -633,28 +649,6 @@ export class Stack<Props = TProps> extends Component {
     } else {
       this._fetching = false
       throw new Error("Something went wrong")
-    }
-  }
-
-  /**
-   * While History API does have `popstate` event, the only
-   * proper way to listen to changes via `push/replaceState`
-   * is to monkey-patch these methods.
-   * https://stackoverflow.com/a/4585031
-   * https://stackoverflow.com/questions/5129386/how-to-detect-when-history-pushstate-and-history-replacestate-are-used
-   */
-  private patchHistoryStates(): void {
-    if (typeof window.history !== "undefined") {
-      for (const type of ["pushState", "replaceState"]) {
-        const original = window.history[type]
-        window.history[type] = function () {
-          const result = original.apply(this, arguments)
-          const event = new Event(type)
-          event["arguments"] = arguments
-          window.dispatchEvent(event)
-          return result
-        }
-      }
     }
   }
 }

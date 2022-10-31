@@ -22,13 +22,12 @@ Compose is a tiny zero dependency library for vanilla javascript component appro
   - [find](#find)
   - [findAll](#findAll)
 - [Stack](#Stack)
-  - [pageTransitions](#pageTransitions)
+  - [Page transitions](#pageTransitions)
   - [Page playIn & playOut](#PageplayIn&playOut)
   - [Stack options](#StackOptions)
-- [debug](#debug)
+- [Debug](#Debug)
 - [Credits](#Credits)
 - [Licence](#Licence)
-
 
 ## <a name="Installation"></a>Installation
 
@@ -94,7 +93,6 @@ class App extends Component {
 }
 ```
 
-
 ### <a name="beforeMount"></a>beforeMount
 
 `beforeMount()`
@@ -114,7 +112,6 @@ Method called after class component is mounted. Children component instances are
 Method called after class component is unmounted.
 The parent component observer will called this unmounted method automatically if the current component is removed from DOM.
 All children component instances are also unmounted after this method is called.
-
 
 ### <a name="attrName"></a>attrName
 
@@ -144,7 +141,6 @@ add<C extends Component, P = TProps>(classComponent: new <P = TProps>(...args: a
 This method allows to 'add' new Component instance to the tree.
 It returns a single instance and associated properties.
 
-
 Add component inside the class:
 
 ```js
@@ -173,7 +169,6 @@ With typescript, we can type the `props` object:
 ```ts
 bar = this.add<Bar, { myProp: string }>(Bar, { myProp: "foo" }, false)
 ```
-
 
 ### <a name="addAll"></a>addAll
 
@@ -229,15 +224,15 @@ $title = this.find<HTMLElement>("title")
 findAll<T extends HTMLElement[]>(bemElementName: string, className?: string): T;
 ```
 
-`finAll` returns a DOM Element array. 
-
+`finAll` returns a DOM Element array.
 
 ```html
 <div class="Bar_icon">icon</div>
 <div class="Bar_icon">icon</div>
 ```
+
 ```js
-$title = this.findAll("icon") // [div.Bar_icon, div.Bar_icon] 
+$title = this.findAll("icon") // [div.Bar_icon, div.Bar_icon]
 ```
 
 With typescript:
@@ -246,13 +241,14 @@ With typescript:
 $title = this.find<HTMLElement>("title")
 ```
 
-
 ## <a name="Stack"></a>Stack
 
+The second part of compose is about Stack.
 In order to get dynamic page fetching and refreshing without reload,
 `Stack` extended class is a middleware class between our App root component and `Component` extended class.
 
-Stack is not a router, it only fetch content of specific page and inject it inside a specific container.
+⚠️ **Stack is not a router**, it only fetch content of specific page and inject it inside a specific container.
+But it uses [history](https://github.com/ReactTraining/history) to manage pages switch by clicking a link or with `history.push()` method.
 
 `index.html`
 
@@ -281,7 +277,7 @@ Stack is not a router, it only fetch content of specific page and inject it insi
 </div>
 ```
 
-`App.js`
+`App.js` will extend `Stack` instead of `Component`.
 
 ```js
 class App extends Stack {
@@ -297,17 +293,53 @@ class App extends Stack {
 }
 ```
 
-### <a name="pageTransitions"></a>pageTransitions
+Stack constructor need these properties:
 
-`pageTransitions()`
+- `$root`: App root element (witch takes data-component="App" attribute)
+- `history`: History mode can
+  be [BROWSER](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#createbrowserhistory)
+  ,
+  [HASH](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#createhashhistory)
+  ,
+  [MEMORY](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#creatememoryhistory)
+  . For more information, check
+  the [history library documentation](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md)
+- `props`: Props key/values object.
 
-It's possible to define custom transition senario with `pageTransitions`:
+```ts
+{
+  $root: HTMLElement
+  history: BrowserHistory | HashHistory | MemoryHistory
+  props?: Props
+}
+```
+
+`index.ts`:
+
+```js
+import { App } from "./App"
+import { createBrowserHistory } from "history"
+
+const app = new App({
+  $root: document.querySelector(".App"),
+  history: createBrowserHistory(),
+  props: { foo: "bar" },
+})
+```
+
+### <a name="pageTransitions"></a>Page transitions
+
+```ts
+pageTransitions(currentPage: IPage, newPage: IPage, complete: () => void): Promise<any>;
+```
+
+Transition scenario is open by `pageTransitions` function in extended Stack class:
 
 ```js
 class App extends Stack {
   // ...
   async pageTransitions(currentPage, newPage, complete) {
-    // New page is already inject in DOM at this step, we need to manage it manually
+    // New page is already inject in DOM at this step, we need to manage it by your own
     newPage.$pageRoot.style.visibility = "hidden"
     // start play out current page
     await currentPage.playOut()
@@ -321,7 +353,13 @@ class App extends Stack {
 
 ### <a name="PageplayIn&playOut"></a>Page playIn & playOut
 
-Each pages can declare it's own page transition `playIn()` & `playOut()`.
+For `Stack.pageTransitions()` each page need to define his own `playIn()` & `playOut()` transitions.
+`Component` expose prepared methods to make it possible:
+
+```ts
+playIn(comeFrom: string, resolve: () => void): void;
+playOut(goTo: string, resolve: () => void): void;
+```
 
 `HomePage.js`
 (same for AboutPage)
@@ -364,7 +402,7 @@ class App extends Stack {
 }
 ```
 
-## <a name="debug"></a>debug
+## <a name="Debug"></a>Debug
 
 Compose comes with [`@wbe/debug`](https://github.com/willybrauner/debug) tool.
 To get some additional logs, add this line on your browser console:
