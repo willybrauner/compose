@@ -11,10 +11,10 @@ type TStaticProps = {}
 export default class Header extends Component<TStaticProps> {
   public static attrName = "Header"
 
-  public mainButton = this.addAll<MainButton>(MainButton)
+  public mainButtons = this.addAll<MainButton[]>(MainButton)
 
   public mounted() {
-    log('mainButton',this.mainButton)
+    log("mainButtons", this.mainButtons)
     window.addEventListener("resize", this.resizeHandler)
   }
 

@@ -2,6 +2,7 @@ import debug from "@wbe/debug"
 const log = debug(`compose:Component`)
 
 export type TProps = { [x: string]: any } | void
+type GetElementType<T extends any[]> = T extends (infer U)[] ? U : never;
 
 /**
  * Glob scope
@@ -140,8 +141,8 @@ export class Component<Props = TProps> {
   /**
    * Add multiple children components
    */
-  public addAll<C extends Component, P = TProps>(
-    classComponent: new <P = TProps>(...args: any[]) => C,
+  public addAll<C extends Component[], P = TProps>(
+    classComponent: new <P = TProps>(...args: any[]) => GetElementType<C>,
     props?: P,
     attrName?: string
   ): C[] {
