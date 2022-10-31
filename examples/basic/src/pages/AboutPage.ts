@@ -28,7 +28,7 @@ export default class AboutPage extends Component<TStaticProps> {
     log("window.innerWidth", window.innerWidth)
   }
 
-  // ------------------------------------------------------------------------------------- PAGE TRANSITION
+  // --------------------------------------------------------------------------- PAGE TRANSITION
 
   public playOut(goTo: string, resolve: () => void) {
     defaultPlayOut(this.$root, goTo, resolve)
