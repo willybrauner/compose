@@ -1,7 +1,7 @@
 import { Component, COMPONENT_ATTR } from "./Component"
 import type { TProps } from "./Component"
 import debug from "@wbe/debug"
-import {BrowserHistory, HashHistory, MemoryHistory} from "history"
+import { BrowserHistory, HashHistory, MemoryHistory } from "history"
 const log = debug("compose:Stack")
 
 export interface IPage {
@@ -40,7 +40,7 @@ const PAGE_URL_ATTR = "data-page-transition-url"
  * `Stack` extended class is a middleware class between our App root component
  * and `Component` extended class.
  */
-export class Stack<Props = TProps> extends Component {
+export class Stack<GProps = TProps> extends Component {
   /**
    * reload if document is fetching
    */
@@ -123,7 +123,6 @@ export class Stack<Props = TProps> extends Component {
    */
   private _cache: { [url: string]: TCache }
 
-
   /**
    * History
    */
@@ -136,9 +135,17 @@ export class Stack<Props = TProps> extends Component {
    * @param props
    * @param history
    */
-  constructor({$root, props, history}: { $root: HTMLElement, props: Props, history: BrowserHistory | HashHistory | MemoryHistory }) {
+  constructor({
+    $root,
+    props,
+    history,
+  }: {
+    $root: HTMLElement
+    props: GProps
+    history: BrowserHistory | HashHistory | MemoryHistory
+  }) {
     super($root, props)
-    this.history = history;
+    this.history = history
 
     // init
     this.$pageContainer = Stack.getPageContainer()
@@ -209,8 +216,8 @@ export class Stack<Props = TProps> extends Component {
    */
   private initHistoryEvent() {
     this.removeHistory = this.history?.listen(({ location }) => {
-      this.handleHistory(location.pathname);
-    });
+      this.handleHistory(location.pathname)
+    })
   }
 
   /**
@@ -248,7 +255,7 @@ export class Stack<Props = TProps> extends Component {
    * Handle history
    * @param pathname
    */
-  private  handleHistory = async (pathname): Promise<void>  => {
+  private handleHistory = async (pathname): Promise<void> => {
     if (this.disableHistoryDuringTransitions && this._pageIsAnimating) return
 
     // get URL to request
@@ -257,7 +264,10 @@ export class Stack<Props = TProps> extends Component {
     log("handleHistory > requestUrl", requestUrl)
     if (!requestUrl || requestUrl === this.currentUrl) return
 
-    if ((this.forcePageReloadIfDocumentIsFetching && this._fetching) || this.forcePageReload) {
+    if (
+      (this.forcePageReloadIfDocumentIsFetching && this._fetching) ||
+      this.forcePageReload
+    ) {
       log("handleHistory > security, force page reload...")
       window.open(requestUrl, "_self")
       return
@@ -599,9 +609,7 @@ export class Stack<Props = TProps> extends Component {
    * Get link with URL ATTR
    */
   private getLinksWithAttr(): HTMLElement[] {
-    return  Array.from(
-      this.$pageContainer?.querySelectorAll(`*[${PAGE_URL_ATTR}]`),
-    )
+    return Array.from(this.$pageContainer?.querySelectorAll(`*[${PAGE_URL_ATTR}]`))
   }
 
   private parseDOM = (html) =>
@@ -613,7 +621,10 @@ export class Stack<Props = TProps> extends Component {
    * @param controller
    * @protected
    */
-  private async fetchNewDocument(url: string, controller: AbortController): Promise<Document> {
+  private async fetchNewDocument(
+    url: string,
+    controller: AbortController
+  ): Promise<Document> {
     // if document is already fetching, abort the current fetch
     if (this._fetching) {
       controller.abort()
@@ -640,6 +651,4 @@ export class Stack<Props = TProps> extends Component {
       throw new Error("Something went wrong")
     }
   }
-
-
 }
