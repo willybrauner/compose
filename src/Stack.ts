@@ -326,13 +326,13 @@ export class Stack<GProps = TProps> extends Component {
 
     // prepare playout
     const playOut = (goTo: string, autoRemoveOnComplete = true) => {
-      // execute unmounted page method
-      page.instance._unmounted()
       // store current playOut (specific anim first, default anim if first doesn't exist)
       const _playOutRef = page.instance._playOutRef.bind(page.instance)
       // return playOut function used by pageTransitons method
       return _playOutRef(goTo, this.playOutPromiseRef)
         .then(() => {
+          // execute unmounted page method
+          page.instance._unmounted()
           autoRemoveOnComplete && _remove()
         })
         .catch(() => {})
