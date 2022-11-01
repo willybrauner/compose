@@ -93,7 +93,7 @@ export class Component<Props = TProps> {
    */
   public mounted(): void {}
   protected _mounted(): void {
-    log(this.name, "mounted")
+    log("🟢 mounted", this.name)    // 
     // instantiate children components just before mounted
     this.mounted()
     this._isMounted = true
@@ -111,7 +111,7 @@ export class Component<Props = TProps> {
       COMPONENT_ID--
       component?._unmounted()
     })
-    log(this.name, "UNmounted")
+    log("🔴 unmounted", this.name)
   }
 
   /**
@@ -237,14 +237,17 @@ export class Component<Props = TProps> {
   }
 
   /**
-   * PlayOut Ref used by stack
+   * PlayOut Ref used by Stack
    * Stack need to access promiseRef object
    * @param goTo
    * @param promiseRef
    */
   public _playOutRef(goTo?: string, promiseRef?: { reject: () => void }): Promise<void> {
     return new Promise((resolve, reject) => {
-      promiseRef.reject = () => reject()
+      promiseRef.reject = () => {
+        reject()
+        this._unmounted()
+      }
       this.playOut(goTo, resolve)
     })
   }

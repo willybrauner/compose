@@ -324,15 +324,16 @@ export class Stack<GProps = TProps> extends Component {
       page.$pageRoot.remove()
     }
 
-    // prepare playout
+    // prepare playOut
     const playOut = (goTo: string, autoRemoveOnComplete = true) => {
       // store current playOut (specific anim first, default anim if first doesn't exist)
       const _playOutRef = page.instance._playOutRef.bind(page.instance)
-      // return playOut function used by pageTransitons method
+      // return playOut function used by pageTransitions method
       return _playOutRef(goTo, this.playOutPromiseRef)
         .then(() => {
-          // execute unmounted page method
+          // Execute unmounted page method AFTER the playOut transition
           page.instance._unmounted()
+          // Remove the page DOM
           autoRemoveOnComplete && _remove()
         })
         .catch(() => {})
@@ -361,7 +362,7 @@ export class Stack<GProps = TProps> extends Component {
   private async prepareMountNewPage(requestUrl: string): Promise<IPage> {
     const { $pageRoot, pageName, instance } = this.currentPage
 
-    // prepare playIn transition for new Page used by pageTransitons method
+    // prepare playIn transition for new Page used by pageTransitions method
     const preparePlayIn = (pageInstance): Promise<any> => {
       const playInRef = pageInstance._playInRef.bind(pageInstance)
       return playInRef(pageName, this.playInPromiseRef)?.catch?.(() => {})
@@ -412,7 +413,6 @@ export class Stack<GProps = TProps> extends Component {
       this.addPageInDOM($newPageRoot)
       Stack.updateMetas(newDocument.title)
 
-      // prettier-ignore
       this.addInCache(
         requestUrl,
         newDocument.title,
