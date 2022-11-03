@@ -81,7 +81,7 @@ export class Component<Props = TProps> {
   }
 
   /**
-   * Before mounted
+   * Before mount
    */
   public beforeMount(): void {}
   protected _beforeMount(): void {
@@ -93,8 +93,7 @@ export class Component<Props = TProps> {
    */
   public mounted(): void {}
   protected _mounted(): void {
-    log("🟢 mounted", this.name)    // 
-    // instantiate children components just before mounted
+    log("🟢 mounted", this.name)
     this.mounted()
     this._isMounted = true
   }

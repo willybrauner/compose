@@ -273,26 +273,24 @@ export class Stack<GProps = TProps> extends Component {
       return
     }
 
-    // keep new request URL
+    // keep new request URL reference
     this.currentUrl = requestUrl
 
     if (this._pageIsAnimating) {
+      log(
+        `
+        handleHistory > New request while page is animating.
+        For security:  
+         - Reject PlayOut & PlayIn anim promises;
+         - Remove page wrapper content.
+         `
+      )
       // reject current promise playIn playOut
       this.playOutPromiseRef.reject?.()
       this.playInPromiseRef.reject?.()
       this._pageIsAnimating = false
-
-      log(
-        `
-        handleHistory > New request while page is animating,
-        For security:  
-         - reject current transitions promises 
-         - remove page wrapper content
-         `
-      )
       // remove all page wrapper children
       this.$pageWrapper.querySelectorAll(":scope > *").forEach((el) => el.remove())
-
       // hack before process the new transition
       await new Promise((resolve) => setTimeout(resolve, 1))
     }
@@ -304,7 +302,6 @@ export class Stack<GProps = TProps> extends Component {
         mountNewPage: () => this.prepareMountNewPage(requestUrl),
       })
       this.isFirstPage = false
-      this._pageIsAnimating = false
       this.prevPage = this.currentPage
       this.currentPage = newPage
       this.updateLinks()
@@ -365,7 +362,11 @@ export class Stack<GProps = TProps> extends Component {
     // prepare playIn transition for new Page used by pageTransitions method
     const preparePlayIn = (pageInstance): Promise<any> => {
       const playInRef = pageInstance._playInRef.bind(pageInstance)
-      return playInRef(pageName, this.playInPromiseRef)?.catch?.(() => {})
+      return playInRef(pageName, this.playInPromiseRef)
+        .then(() => {
+          this._pageIsAnimating = false
+        })
+        ?.catch?.(() => {})
     }
 
     // case of is first page
