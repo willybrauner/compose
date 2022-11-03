@@ -2,7 +2,7 @@ import debug from "@wbe/debug"
 const log = debug(`compose:Component`)
 
 export type TProps = { [x: string]: any } | void
-type GetElementType<T extends any[]> = T extends (infer U)[] ? U : never;
+type GetElementType<T extends any[]> = T extends (infer U)[] ? U : never
 
 /**
  * Glob scope
@@ -39,7 +39,10 @@ export class Component<Props = TProps> {
   /**
    * Flag to know if current instance is mounted
    */
-  private isMounted: boolean
+  private _isMounted: boolean = false
+  public get isMounted() {
+    return this._isMounted
+  }
 
   /**
    * Mutation observer allows to know if current DOM element change
@@ -58,7 +61,7 @@ export class Component<Props = TProps> {
     // keep params in local
     this.props = props
     this.$root = $root
-    this.name = attrName || this.getComponentName(this.$root)
+    this.name = attrName || Component.getComponentName(this.$root)
 
     // set ID on DOM element
     this.$root.setAttribute(ID_ATTR, `${COMPONENT_ID}`)
@@ -90,10 +93,10 @@ export class Component<Props = TProps> {
    */
   public mounted(): void {}
   private _mounted(): void {
+    this._isMounted = true
     log(this.name, "mounted")
     // instantiate children components just before mounted
     this.mounted()
-    this.isMounted = true
   }
 
   /**
@@ -103,7 +106,7 @@ export class Component<Props = TProps> {
   public unmounted() {}
   private _unmounted(): void {
     this.unmounted()
-    this.isMounted = false
+    this._isMounted = false
     this.onChildrenComponents((component: Component) => {
       COMPONENT_ID--
       component?._unmounted()
@@ -153,7 +156,7 @@ export class Component<Props = TProps> {
     // get DOM elements
     const elements = Component.getDomElement(this.$root, name)
     // if no elements, exit
-    if (!elements.length) return
+    if (!elements.length) return localInstances
     // map on each elements (because elements return an array)
     for (let i = 0; i < elements.length; i++) {
       // create child instance
@@ -214,7 +217,10 @@ export class Component<Props = TProps> {
    * @param comeFrom
    * @param promiseRef
    */
-  public _playInRef(comeFrom?: string, promiseRef?: { reject: () => void }): Promise<void> {
+  public _playInRef(
+    comeFrom?: string,
+    promiseRef?: { reject: () => void }
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
       promiseRef.reject = () => reject()
       this.playIn(comeFrom, resolve)
@@ -286,7 +292,7 @@ export class Component<Props = TProps> {
    * This string name need to be de same than the Class component name
    * @param $node
    */
-  private getComponentName($node: HTMLElement = this.$root): string {
+  private static getComponentName($node: HTMLElement): string {
     return $node?.getAttribute?.(COMPONENT_ATTR)
   }
 
@@ -294,7 +300,7 @@ export class Component<Props = TProps> {
    * Get component ID
    * @param $node
    */
-  private getComponentId($node: HTMLElement): number {
+  private static getComponentId($node: HTMLElement): number {
     return $node?.getAttribute?.(ID_ATTR) && parseInt($node.getAttribute(ID_ATTR))
   }
 
@@ -306,7 +312,7 @@ export class Component<Props = TProps> {
       for (const mutation of mutationsList) {
         // add node actions
         for (const node of mutation.addedNodes) {
-          const nodeAddedId = this.getComponentId(node)
+          const nodeAddedId = Component.getComponentId(node)
           if (!nodeAddedId) return
 
           this.onChildrenComponents((component) => {
@@ -319,7 +325,7 @@ export class Component<Props = TProps> {
         }
         // remove nodes actions
         for (const node of mutation.removedNodes) {
-          const nodeRemovedId = this.getComponentId(node)
+          const nodeRemovedId = Component.getComponentId(node)
           if (!nodeRemovedId) return
 
           this.onChildrenComponents((component) => {
