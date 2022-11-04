@@ -6,9 +6,6 @@ import debug from "@wbe/debug"
 import Footer from "./Footer"
 const log = debug(`front:App`)
 
-type TProps = {
-  foo: string
-}
 
 /**
  * @name App

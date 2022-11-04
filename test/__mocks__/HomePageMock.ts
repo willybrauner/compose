@@ -10,9 +10,9 @@ export const HomePageMock = () => `
         <main class="App" data-component="App" data-page-transition-container>
           <header>  
             <nav>
-              <a class="link" href="/" data-page-transition-url="/">home</a>
-              <a class="link" href="/about.html" data-page-transition-url="about.html">about</a>
-              <a class="link" href="/notexist.html" data-page-transition-url="notexist.html">notexist</a>
+              <a class="Link Link_home" href="/" data-page-transition-url="/">home</a>
+              <a class="Link Link_about" href="/about.html" data-page-transition-url="about.html">about</a>
+              <a class="Link Link_notFound" href="/notexist.html" data-page-transition-url="notexist.html">notexist</a>
             </nav>
           </header>
           <!-- WRAPPER -->

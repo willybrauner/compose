@@ -65,10 +65,13 @@ export class Stack<GProps = TProps> extends Component {
    * Register pages from parent class
    * @returns
    */
-  public addPages(): TPages {
+  protected addPages(): TPages {
     return {}
   }
-  private pages: TPages
+  protected _pages: TPages
+  public get pages() {
+    return this._pages
+  }
 
   /**
    *  the current URL to request
@@ -141,16 +144,16 @@ export class Stack<GProps = TProps> extends Component {
     history,
   }: {
     $root: HTMLElement
-    props: GProps
+    props?: GProps
     history: BrowserHistory | HashHistory | MemoryHistory
   }) {
     super($root, props)
     this.history = history
 
     // init
-    this.$pageContainer = Stack.getPageContainer()
-    this.$pageWrapper = Stack.getPageWrapper(this.$pageContainer)
-    this.pages = this.addPages()
+    this.$pageContainer = this.getPageContainer()
+    this.$pageWrapper = this.getPageWrapper(this.$pageContainer)
+    this._pages = this.addPages()
     this.currentPage = this.getFirstCurrentPage()
     this._cache = {}
 
@@ -398,7 +401,7 @@ export class Stack<GProps = TProps> extends Component {
       log("Create new page instance from cache informations", newPageInstance)
 
       this.addPageInDOM($pageRoot)
-      Stack.updateMetas(title)
+      this.updateMetas(title)
 
       return { $pageRoot, pageName, instance: newPageInstance, playIn }
     }
@@ -406,13 +409,13 @@ export class Stack<GProps = TProps> extends Component {
     // fetch new document or use cache
     try {
       const newDocument = await this.fetchNewDocument(requestUrl, new AbortController())
-      const $newPageWrapper = Stack.getPageWrapper(newDocument.body)
-      const $newPageRoot = Stack.getPageRoot($newPageWrapper)
+      const $newPageWrapper = this.getPageWrapper(newDocument.body)
+      const $newPageRoot = this.getPageRoot($newPageWrapper)
       const newPageName = this.getPageName($newPageRoot)
       const newPageInstance = this.createPageInstance(newPageName, $newPageRoot)
 
       this.addPageInDOM($newPageRoot)
-      Stack.updateMetas(newDocument.title)
+      this.updateMetas(newDocument.title)
 
       this.addInCache(
         requestUrl,
@@ -512,8 +515,8 @@ export class Stack<GProps = TProps> extends Component {
    * Get page container HTMLElement
    * @private
    */
-  private static getPageContainer(): HTMLElement {
-    return document.body.querySelector(`*[${PAGE_CONTAINER_ATTR}]`)
+  protected getPageContainer(body = document.body): HTMLElement {
+    return body.querySelector(`*[${PAGE_CONTAINER_ATTR}]`)
   }
 
   /**
@@ -521,7 +524,7 @@ export class Stack<GProps = TProps> extends Component {
    * @param $node
    * @private
    */
-  private static getPageWrapper($node: HTMLElement): HTMLElement {
+  protected getPageWrapper($node: HTMLElement): HTMLElement {
     return $node.querySelector(`*[${PAGE_WRAPPER_ATTR}]`)
   }
 
@@ -530,7 +533,7 @@ export class Stack<GProps = TProps> extends Component {
    * @param $wrapper
    * @private
    */
-  private static getPageRoot($wrapper: HTMLElement): HTMLElement {
+  protected getPageRoot($wrapper: HTMLElement): HTMLElement {
     return $wrapper.children[0] as HTMLElement
   }
 
@@ -540,7 +543,7 @@ export class Stack<GProps = TProps> extends Component {
    * @private
    */
   private getPageName($pageRoot: HTMLElement): string {
-    for (const page of Object.keys(this.pages)) {
+    for (const page of Object.keys(this._pages)) {
       if (page == $pageRoot.getAttribute(COMPONENT_ATTR)) return page
     }
   }
@@ -553,7 +556,7 @@ export class Stack<GProps = TProps> extends Component {
    */
   private createPageInstance(pageName: string, $pageRoot?: HTMLElement): Component {
     log("getPageInstance > pageName:", pageName)
-    const classComponent = this.pages[pageName]
+    const classComponent = this._pages[pageName]
     return classComponent ? new classComponent($pageRoot, {}, pageName) : null
   }
 
@@ -562,7 +565,7 @@ export class Stack<GProps = TProps> extends Component {
    * @private
    */
   private getFirstCurrentPage(): IPage {
-    const $pageRoot = Stack.getPageRoot(this.$pageWrapper)
+    const $pageRoot = this.getPageRoot(this.$pageWrapper)
     const pageName = this.getPageName($pageRoot)
     const instance = this.createPageInstance(pageName, $pageRoot)
     const playIn = () => instance._playInRef()
@@ -582,9 +585,10 @@ export class Stack<GProps = TProps> extends Component {
   /**
    * Update Metas
    * @param title
+   * @param doc
    */
-  private static updateMetas(title: string): void {
-    document.title = title
+  private updateMetas(title: string, doc = document): void {
+    doc.title = title
   }
 
   /**
