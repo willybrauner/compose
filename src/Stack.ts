@@ -117,14 +117,14 @@ export class Stack<GProps = TProps> extends Component {
   /**
    * check if new page document html is in fetching step
    */
-  private _fetching: boolean = false
+  protected _fetching: boolean = false
 
   /**
    * Page requested cache
    * this cache contains all visited/ requested pages information
    * used instead of re-fetch new Document
    */
-  private _cache: { [url: string]: TCache }
+  protected _cache: { [url: string]: TCache }
 
   /**
    * History
@@ -168,7 +168,7 @@ export class Stack<GProps = TProps> extends Component {
    * @protected
    */
   protected start(): void {
-    this.handleHistory(window.location.pathname)
+    this.handleHistory(window.location.pathname || "/")
     this.initHistoryEvent()
     this.listenLinks()
   }
@@ -398,14 +398,13 @@ export class Stack<GProps = TProps> extends Component {
       const { title, $pageRoot, pageName, playIn } = cache
 
       const newPageInstance = this.createPageInstance(pageName, $pageRoot)
-      log("Create new page instance from cache informations", newPageInstance)
+      log("Create new page instance from cache information", newPageInstance)
 
       this.addPageInDOM($pageRoot)
       this.updateMetas(title)
 
       return { $pageRoot, pageName, instance: newPageInstance, playIn }
     }
-
     // fetch new document or use cache
     try {
       const newDocument = await this.fetchNewDocument(requestUrl, new AbortController())
@@ -585,10 +584,9 @@ export class Stack<GProps = TProps> extends Component {
   /**
    * Update Metas
    * @param title
-   * @param doc
    */
-  private updateMetas(title: string, doc = document): void {
-    doc.title = title
+  private updateMetas(title: string): void {
+    if (typeof document !== undefined) document.title = title
   }
 
   /**
@@ -626,7 +624,7 @@ export class Stack<GProps = TProps> extends Component {
    * @param controller
    * @protected
    */
-  private async fetchNewDocument(
+  protected async fetchNewDocument(
     url: string,
     controller: AbortController
   ): Promise<Document> {
