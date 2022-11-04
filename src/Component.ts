@@ -93,10 +93,10 @@ export class Component<Props = TProps> {
    */
   public mounted(): void {}
   protected _mounted(): void {
-    this._isMounted = true
     log(this.name, "mounted")
     // instantiate children components just before mounted
     this.mounted()
+    this._isMounted = true
   }
 
   /**

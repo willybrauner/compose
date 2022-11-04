@@ -21,11 +21,9 @@ it("Life-cycle order should be respected.", async () => {
     static attrName = "HomePage"
     public beforeMount() {
       expect(this.$root).toBeUndefined()
-      expect(this.isMounted).toBe(false)
       beforeMountMock()
     }
     public mounted() {
-      expect(this.isMounted).toBe(true)
       mountedMock()
     }
     public unmounted() {
