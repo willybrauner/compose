@@ -42,10 +42,6 @@ it("Life-cycle order should be respected.", async () => {
   expect(unmountedMock).toBeCalledTimes(1)
 })
 
-// it("Should be automatically unmount if it is removed from DOM.", async () => {
-//   // hard to test because of MutationObserver.
-// })
-
 it("Should mount & unmount children components", async () => {
   let homeMountedMock = vi.fn()
   let homeUnmountedMock = vi.fn()
