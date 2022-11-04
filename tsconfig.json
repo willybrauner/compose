@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDirs": ["./src", "./test"],
+    "baseUrl": "./",
     "module": "esnext",
     "target": "esnext",
     "lib": ["es2015.promise", "es6", "dom", "esnext"],
@@ -14,6 +15,5 @@
     "preserveConstEnums": true,
     "strictNullChecks": false
   },
-  "include": ["./src/**/*"],
-  "exclude": ["node_modules", "dist", "test"]
+  "exclude": ["node_modules", "dist"]
 }
