@@ -45,7 +45,7 @@ it("App should be instance of Stack & Component", () => {
   expect(app.pages).toEqual({ HomePage, AboutPage })
 })
 
-it.only("Should fetch new page we link is clicked", async () => {
+it("Should fetch new page we link is clicked", async () => {
   document.write(HomePageMock())
   const $root = document.querySelector(".App") as any
   const history = createMemoryHistory()
