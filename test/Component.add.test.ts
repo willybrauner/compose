@@ -15,6 +15,7 @@ beforeEach(() => {
 class Button extends Component {
   static attrName = "Button"
 }
+
 class NotExistInDOM extends Component {
   static attrName = "NotExistInDOM"
 }
@@ -54,7 +55,7 @@ it("Should addAll multiple instances properly", async () => {
   $root.innerHTML = new Array(1000)
     .fill(`<div class="Button" data-component="Button">hello</div>`)
     .join("\n")
-  
+
   const homePage = new HomePage($root, {}, "HomePage")
   expect(homePage.buttons.length).toBe(1000)
   homePage.buttons.forEach((e) => expect(e).toBeInstanceOf(Button))

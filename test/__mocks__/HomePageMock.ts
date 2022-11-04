@@ -1,5 +1,3 @@
-import {Window} from "happy-dom"
-
 export const HomePageMock = () => `
   <!DOCTYPE html>
     <html lang="en">
@@ -32,4 +30,3 @@ export const HomePageMock = () => `
       </body>
   </html>
 `
-

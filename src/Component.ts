@@ -84,7 +84,7 @@ export class Component<Props = TProps> {
    * Before mounted
    */
   public beforeMount(): void {}
-  private _beforeMount(): void {
+  protected _beforeMount(): void {
     this.beforeMount()
   }
 
@@ -92,7 +92,7 @@ export class Component<Props = TProps> {
    * When component is mounted
    */
   public mounted(): void {}
-  private _mounted(): void {
+  protected _mounted(): void {
     this._isMounted = true
     log(this.name, "mounted")
     // instantiate children components just before mounted
@@ -104,7 +104,7 @@ export class Component<Props = TProps> {
    * Will execute unmounted() method of children components
    */
   public unmounted() {}
-  private _unmounted(): void {
+  protected _unmounted(): void {
     this.unmounted()
     this._isMounted = false
     this.onChildrenComponents((component: Component) => {
