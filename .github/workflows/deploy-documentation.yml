@@ -3,13 +3,13 @@ name: Build & deploy documentation
 #  push:
 #    tags:
 #      - '*'
-on: [ push ]
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [ 16.x ]
+        node-version: [16.x]
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
@@ -22,25 +22,8 @@ jobs:
           version: 6.32.11
           run_install: true
 
-      - name: build ⚡️
+      - name: build
         run: npm run documentation:build
-
-  deploy:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [ 16.x ]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - uses: pnpm/action-setup@v2.2.2
-        with:
-          version: 6.32.11
-          run_install: true
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.5
