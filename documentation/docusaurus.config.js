@@ -1,15 +1,15 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const lightCodeTheme = require("prism-react-renderer/themes/github")
+const darkCodeTheme = require("prism-react-renderer/themes/dracula")
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "Compose",
   tagline: "Dinosaurs are cool",
   url: "https://willybrauner.github.io",
-  
+
   baseUrl: "/compose/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -37,15 +37,7 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
-        },
-        blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+          editUrl: "https://github.com/willybrauner/compose/blob/main/documentation",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
@@ -100,7 +92,7 @@ const config = {
         //     ],
         //   },
         // ],
-        copyright: `Copyright © ${new Date().getFullYear()} Willy Brauner`,
+        copyright: `Copyright © ${new Date().getFullYear()} <a href="https://github.com/willybrauner" target="_blank">Willy Brauner</a>`,
       },
       prism: {
         theme: lightCodeTheme,
@@ -109,4 +101,4 @@ const config = {
     }),
 }
 
-module.exports = config;
+module.exports = config
