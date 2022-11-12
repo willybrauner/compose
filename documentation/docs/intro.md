@@ -3,7 +3,7 @@ sidebar_position: 0
 title: Compose
 ---
 
-Compose is a small library that links your javascript to your DOM.
+Compose is a small and type-safe library that links your javascript to your DOM.
 
 ![](https://img.shields.io/npm/v/@wbe/compose/latest.svg)
 ![](https://img.shields.io/bundlephobia/minzip/@wbe/compose.svg)

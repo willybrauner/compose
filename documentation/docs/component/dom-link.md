@@ -28,7 +28,7 @@ class App extends Component {
 new App(document.querySelector(".App"))
 ```
 
-## Children component
+## Children components
 
 Compose as been design in order to support atomic design development. Children component of App can be instantiated from app.
 We add `Header` component as `App` child in DOM.

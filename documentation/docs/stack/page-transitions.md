@@ -20,7 +20,7 @@ class App extends Stack {
     // start play out current page
     await currentPage.playOut()
 
-    // Make new page root visible 
+    // Make new page root visible
     newPage.$pageRoot.style.visibility = "visible"
 
     // then play in new page
