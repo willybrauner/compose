@@ -3,62 +3,65 @@ sidebar_position: 1
 title: instance
 ---
 
-In order to use `Component`, set `data-component` name attribute on specific DOM element:
+## Link JS class to DOM element
+
+1. In order to link your javascript class to your DOM, set `data-component` name attribute on specific DOM element.
 
 ```html
-<div data-component="App">
-  <header data-component="Header">Header content</header>
-</div>
+<div data-component="App">App</div>
 ```
 
-Create a class extended by `Component`:
+2. Create a class extended by `Component`.
+   `attrName` should get the same value that `data-component` attribute.
 
 ```js
 import { Component } from "@wbe/compose"
 
 class App extends Component {
-  static attrName = "App" // same value than `data-component` attribute
+  static attrName = "App"
 }
 ```
 
-Then, start component instances chaining by root instance.
+3. Then, start component instances chaining by root instance.
 
 ```js
 new App(document.querySelector(".App"))
 ```
 
-Each Component like `Header` child class component, need to extend `Component` class:
+## Children component
+
+Compose as been design in order to support atomic design development. Children component of App can be instantiated from app.
+We add `Header` component as `App` child in DOM.
+
+```html
+<div data-component="App">
+  <header data-component="Header"></header>
+</div>
+```
+
+`Header.js`:
 
 ```js
-import { Component } from "@wbe/compose"
-
 class Header extends Component {
   static attrName = "Header"
-
-  mounted() {
-    window.addEventListener("resize", this.handleResize)
-  }
-
-  unmounted() {
-    window.removeEventListener("resize", this.handleResize)
-  }
-
-  handleResize = () => {
-    // do something on resize...
-  }
 }
 ```
 
-And because `Header` component is a App child component, it can be instantiated from `App` class:
+Now, app is able to "add" (instantiate) `Header` class component.
 
 ```js
 class App extends Component {
   static attrName = "App"
+   // highlight-next-line
   header = this.add(Header)
 }
 ```
 
-### attrName
+:::info
+The goal is to keep and maintain the same parent/children relation structure in the DOM and in the Javascript class import order.
+:::
+
+## attrName
 
 static `string`
 
@@ -72,7 +75,7 @@ need to be `Foo` too.
 
 ```js
 class Foo extends Component {
-  static attrName = "Foo"
-  // ...
+   // highlight-next-line
+   static attrName = "Foo"
 }
 ```
