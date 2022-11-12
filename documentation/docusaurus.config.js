@@ -9,7 +9,6 @@ const config = {
   title: "Compose",
   tagline: "Dinosaurs are cool",
   url: "https://willybrauner.github.io",
-
   baseUrl: "/compose/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -51,10 +50,10 @@ const config = {
     ({
       navbar: {
         title: "@wbe/compose",
-        // logo: {
-        //   alt: 'My Site Logo',
-        //   src: 'img/logo.svg',
-        // },
+        logo: {
+          alt: 'compose logo',
+          src: 'img/logo.png',
+        },
         items: [
           {
             type: "doc",

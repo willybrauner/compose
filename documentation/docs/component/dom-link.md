@@ -7,7 +7,6 @@ In order to use `Component`, set `data-component` name attribute on specific DOM
 
 ```html
 <div data-component="App">
-  <h1>Hello</h1>
   <header data-component="Header">Header content</header>
 </div>
 ```
@@ -15,7 +14,7 @@ In order to use `Component`, set `data-component` name attribute on specific DOM
 Create a class extended by `Component`:
 
 ```js
-import { Component } from "dist/index"
+import { Component } from "@wbe/compose"
 
 class App extends Component {
   static attrName = "App" // same value than `data-component` attribute
@@ -31,7 +30,7 @@ new App(document.querySelector(".App"))
 Each Component like `Header` child class component, need to extend `Component` class:
 
 ```js
-import { Component } from "dist/index"
+import { Component } from "@wbe/compose"
 
 class Header extends Component {
   static attrName = "Header"
