@@ -3,50 +3,67 @@ sidebar_position: 4
 title: find element
 ---
 
+## `find`
 
+`find` is a simple `this.$root.querySelector` wrapper.  
+This method allows retrieving `BEM` element of current $root component.
 
-### <a name="find"></a>find
+```html
+<div class="Bar" data-component="Bar">
+  <h1 class="Bar_title">Hello</h1>
+</div>
+```
+
+```js
+class Bar extends Component {
+  // <h1 class="Bar_title">Hello</h1>
+  $title = this.find("title")
+}
+```
+
+With typescript:
+
+```ts
+class Bar extends Component {
+  $title = this.find<HTMLElement>("title")
+}
+```
+
+### Definition
 
 ```ts
 find<T extends HTMLElement>(bemElementName: string, className?: string): T;
 ```
 
-This method allows to retrieve B.E.M. element of current $root component.
+## `findAll`
+
+`findAll` is a simple `this.$root.querySelectorAll` wrapper.  
+This method returns a DOM Element array.
 
 ```html
-<h1 class="Bar_title">Hello</h1>
+<div class="Bar" data-component="Bar">
+  <div class="Bar_icon">icon</div>
+  <div class="Bar_icon">icon</div>
+</div>
 ```
 
 ```js
-// if $root is "Bar", "Bar_title" DOM element will be returned
-$title = this.find("title") // <h1 class="Bar_title">Hello</h1>
+class Bar extends Component {
+  // [div.Bar_icon, div.Bar_icon]
+  $icons = this.findAll("icon")
+}
 ```
 
 With typescript:
 
 ```ts
-$title = this.find<HTMLElement>("title")
+class Bar extends Component {
+  $icons = this.findAll<HTMLElement[]>("icon")
+}
 ```
 
-### <a name="findAll"></a>findAll
+### Definition
 
 ```ts
 findAll<T extends HTMLElement[]>(bemElementName: string, className?: string): T;
-```
-
-`finAll` returns a DOM Element array.
-
-```html
-<div class="Bar_icon">icon</div>
-<div class="Bar_icon">icon</div>
-```
-
-```js
-$icons = this.findAll("icon") // [div.Bar_icon, div.Bar_icon]
-```
-
-With typescript:
-
-```ts
-$icons = this.findAll<HTMLElement[]>("icon")
 ```

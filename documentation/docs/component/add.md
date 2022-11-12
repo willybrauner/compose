@@ -3,12 +3,7 @@ sidebar_position: 3
 title: add component
 ---
 
-
-### <a name="add"></a>add
-
-```ts
-add<C extends Component, P = TProps>(classComponent: new <P = TProps>(...args: any[]) => C, props?: P, attrName?: string): C;
-```
+## `add`
 
 This method allows to 'add' new Component instance to the tree.
 It returns a single instance and associated properties.
@@ -16,12 +11,17 @@ It returns a single instance and associated properties.
 Add component inside the class:
 
 ```js
-bar = this.add(Bar)
+class Foo extends Component {
+  bar = this.add(Bar)
 
-// then, access child Bar instance
-this.bar.$root
-this.bar.unmounted()
-// ...
+  customMethod() {
+    // then, access child Bar instance
+    this.bar.$root
+    this.bar.mounted()
+    this.bar.unmounted()
+    // etc...
+  }
+}
 ```
 
 With typescript, we can explicitly state that we are expecting an array.
@@ -42,15 +42,13 @@ With typescript, we can type the `props` object:
 bar = this.add<Bar, { myProp: string }>(Bar, { myProp: "foo" }, "customAttribute")
 ```
 
-### <a name="addAll"></a>addAll
+### Definition
 
 ```ts
-addAll<C extends Component[], P = TProps>(
-    classComponent: new <P = TProps>(...args: any[]) => GetElementType<C>,
-    props?: P,
-    attrName?: string
-  )
+add<C extends Component, P = TProps>(classComponent: new <P = TProps>(...args: any[]) => C, props?: P, attrName?: string): C;
 ```
+
+## `addAll`
 
 `addAll` will return an array of instances.
 
@@ -62,11 +60,25 @@ addAll<C extends Component[], P = TProps>(
 ```
 
 ```js
-bars = this.addAll(Bar) // [Bar, Bar]
+class Foo extends Component {
+  bars = this.addAll(Bar) // return array of Bar: [Bar, Bar]
+}
 ```
 
 With typescript, we can explicitly state that we are expecting an array.
 
 ```ts
-bars = this.addAll<Bar[]>(Bar)
+class Foo extends Component {
+  bars = this.addAll<Bar[]>(Bar)
+}
+```
+
+### Definition
+
+```ts
+addAll<C extends Component[], P = TProps>(
+    classComponent: new <P = TProps>(...args: any[]) => GetElementType<C>,
+    props?: P,
+    attrName?: string
+  )
 ```

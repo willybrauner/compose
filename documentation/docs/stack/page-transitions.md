@@ -13,12 +13,19 @@ Transition scenario is open by `pageTransitions` function in extended Stack clas
 class App extends Stack {
   // ...
   async pageTransitions(currentPage, newPage, complete) {
-    // New page is already inject in DOM at this step, we need to manage it by your own
+    // The new page is already injected into DOM at this stage
+    // we have to manage it ourselves
     newPage.$pageRoot.style.visibility = "hidden"
+
     // start play out current page
     await currentPage.playOut()
+
+    // Make new page root visible 
+    newPage.$pageRoot.style.visibility = "visible"
+
     // then play in new page
     await newPage.playIn()
+
     // resolve the page transition promise returned with `complete()` function
     complete()
   }
