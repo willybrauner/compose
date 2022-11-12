@@ -1,7 +1,7 @@
 {
   "name": "@wbe/compose",
   "version": "0.11.2",
-  "description": "Compose is a tiny zero dependency library for vanilla javascript component approach and page transitions management.",
+  "description": "Compose is a small and type-safe library that links your javascript to your DOM.",
   "author": "Willy Brauner",
   "license": "MIT",
   "type": "module",
@@ -31,7 +31,9 @@
     "dev:basic": "pnpm --filter ./examples/basic run dev",
     "test:watch": "vitest --reporter verbose",
     "test": "vitest run",
-    "pre-publish": "npm run build && npm run test"
+    "pre-publish": "npm run build && npm run test",
+    "documentation:dev": "pnpm --filter ./documentation run start",
+    "documentation:build": "pnpm --filter ./documentation run build"
   },
   "dependencies": {
     "@wbe/debug": "^1.1.0",
