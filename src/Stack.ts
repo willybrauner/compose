@@ -273,26 +273,24 @@ export class Stack<GProps = TProps> extends Component {
       return
     }
 
-    // keep new request URL
+    // keep new request URL reference
     this.currentUrl = requestUrl
 
     if (this._pageIsAnimating) {
+      log(
+        `
+        handleHistory > New request while page is animating.
+        For security:  
+         - Reject PlayOut & PlayIn anim promises;
+         - Remove page wrapper content.
+         `
+      )
       // reject current promise playIn playOut
       this.playOutPromiseRef.reject?.()
       this.playInPromiseRef.reject?.()
       this._pageIsAnimating = false
-
-      log(
-        `
-        handleHistory > New request while page is animating,
-        For security:  
-         - reject current transitions promises 
-         - remove page wrapper content
-         `
-      )
       // remove all page wrapper children
       this.$pageWrapper.querySelectorAll(":scope > *").forEach((el) => el.remove())
-
       // hack before process the new transition
       await new Promise((resolve) => setTimeout(resolve, 1))
     }
@@ -304,7 +302,6 @@ export class Stack<GProps = TProps> extends Component {
         mountNewPage: () => this.prepareMountNewPage(requestUrl),
       })
       this.isFirstPage = false
-      this._pageIsAnimating = false
       this.prevPage = this.currentPage
       this.currentPage = newPage
       this.updateLinks()
@@ -324,15 +321,16 @@ export class Stack<GProps = TProps> extends Component {
       page.$pageRoot.remove()
     }
 
-    // prepare playout
+    // prepare playOut
     const playOut = (goTo: string, autoRemoveOnComplete = true) => {
-      // execute unmounted page method
-      page.instance._unmounted()
       // store current playOut (specific anim first, default anim if first doesn't exist)
       const _playOutRef = page.instance._playOutRef.bind(page.instance)
-      // return playOut function used by pageTransitons method
+      // return playOut function used by pageTransitions method
       return _playOutRef(goTo, this.playOutPromiseRef)
         .then(() => {
+          // Execute unmounted page method AFTER the playOut transition
+          page.instance._unmounted()
+          // Remove the page DOM
           autoRemoveOnComplete && _remove()
         })
         .catch(() => {})
@@ -361,10 +359,14 @@ export class Stack<GProps = TProps> extends Component {
   private async prepareMountNewPage(requestUrl: string): Promise<IPage> {
     const { $pageRoot, pageName, instance } = this.currentPage
 
-    // prepare playIn transition for new Page used by pageTransitons method
+    // prepare playIn transition for new Page used by pageTransitions method
     const preparePlayIn = (pageInstance): Promise<any> => {
       const playInRef = pageInstance._playInRef.bind(pageInstance)
-      return playInRef(pageName, this.playInPromiseRef)?.catch?.(() => {})
+      return playInRef(pageName, this.playInPromiseRef)
+        .then(() => {
+          this._pageIsAnimating = false
+        })
+        ?.catch?.(() => {})
     }
 
     // case of is first page
@@ -412,7 +414,6 @@ export class Stack<GProps = TProps> extends Component {
       this.addPageInDOM($newPageRoot)
       Stack.updateMetas(newDocument.title)
 
-      // prettier-ignore
       this.addInCache(
         requestUrl,
         newDocument.title,
