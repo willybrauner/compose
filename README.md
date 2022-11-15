@@ -69,4 +69,4 @@ $ npm run documentation:dev
 
 ## <a name="Licence"></a>Licence
 
-MIT
+[MIT](./LICENCE)
