@@ -1,4 +1,4 @@
-export const HomePageMock = () => `
+export const AboutPageMock = () => `
   <!DOCTYPE html>
     <html lang="en">
       <head>
@@ -17,12 +17,7 @@ export const HomePageMock = () => `
           </header>
           <!-- WRAPPER -->
           <div class="App_stack" data-page-transition-wrapper>
-            <div class="HomePage" data-component="HomePage">
-              <section class="HomePage_section">Home page section 1</section>
-              <section class="HomePage_section">Home page section 2</section>
-              <div class="Button" data-component="Button">foo</div> 
-              <div class="Button" data-component="Button">foo</div> 
-            </div>
+            <div class="AboutPage" data-component="AboutPage">About</div>
           </div>
           <footer class="App_footer Footer" data-component="Footer">footer</footer>
         </main>
