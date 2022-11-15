@@ -11,8 +11,8 @@
 Compose is a small and type-safe library that links your javascript to your DOM.  
 _⚠️ This library is work in progress, the API is subject to change until the v1.0 release._
 
-[Full documentation website](https://willybrauner.github.io/compose)
-
+<br/>
+<br/>
 </div>
 
 ## Documentation
