@@ -9,10 +9,15 @@
 ![](https://img.shields.io/npm/l/@wbe/compose.svg)
 
 Compose is a small and type-safe library that links your javascript to your DOM.  
-_⚠️ This library is work in progress, the API is subject to change until the v1.0 release._  
+_⚠️ This library is work in progress, the API is subject to change until the v1.0 release._
 
-[Full documentation website](https://willybrauner.github.io/compose)
+<br/>
+<br/>
 </div>
+
+## Documentation
+
+Check the [full documentation website](https://willybrauner.github.io/compose)
 
 ## Preview
 
@@ -28,12 +33,8 @@ import { Component } from "@wbe/compose"
 class App extends Component {
   static attrName = "App"
   header = this.add(Header)
-  mounted() {
-    // Called when component is mounted
-  }
-  unmounted() {
-    // Called when component is unmounted
-  }
+  mounted() {}
+  unmounted() {}
 }
 
 class Header extends Component {
@@ -42,10 +43,30 @@ class Header extends Component {
 }
 ```
 
+## Start examples
+
+- Clone this repo
+
+```shell
+$ git clone git@github.com:willybrauner/compose.git
+```
+
+- Install dependencies with [pnpm](https://pnpm.io/)
+
+```shell
+$ pnpm install
+```
+
+- Start example dev server
+
+```shell
+$ npm run example-basic:dev
+```
+
 ## <a name="Credits"></a>Credits
 
 [© Willy Brauner](https://willybrauner.com)
 
 ## <a name="Licence"></a>Licence
 
-MIT
+[MIT](./LICENCE)

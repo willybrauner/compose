@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: play in-out
+title: page play in/out
 ---
 
 For `Stack.pageTransitions()` each page need to define his own `playIn()` & `playOut()` transitions.

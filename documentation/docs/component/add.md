@@ -1,6 +1,7 @@
 ---
 sidebar_position: 3
 title: add component
+description: Create a child Component instance
 ---
 
 ## `add`
@@ -42,12 +43,6 @@ With typescript, we can type the `props` object:
 bar = this.add<Bar, { myProp: string }>(Bar, { myProp: "foo" }, "customAttribute")
 ```
 
-### Definition
-
-```ts
-add<C extends Component, P = TProps>(classComponent: new <P = TProps>(...args: any[]) => C, props?: P, attrName?: string): C;
-```
-
 ## `addAll`
 
 `addAll` will return an array of instances.
@@ -71,14 +66,4 @@ With typescript, we can explicitly state that we are expecting an array.
 class Foo extends Component {
   bars = this.addAll<Bar[]>(Bar)
 }
-```
-
-### Definition
-
-```ts
-addAll<C extends Component[], P = TProps>(
-    classComponent: new <P = TProps>(...args: any[]) => GetElementType<C>,
-    props?: P,
-    attrName?: string
-  )
 ```

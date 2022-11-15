@@ -1,6 +1,7 @@
 ---
 sidebar_position: 4
 title: find element
+description: Find a DOM element
 ---
 
 ## `find`
@@ -29,12 +30,6 @@ class Bar extends Component {
 }
 ```
 
-### Definition
-
-```ts
-find<T extends HTMLElement>(bemElementName: string, className?: string): T;
-```
-
 ## `findAll`
 
 `findAll` is a simple `this.$root.querySelectorAll` wrapper.  
@@ -60,10 +55,4 @@ With typescript:
 class Bar extends Component {
   $icons = this.findAll<HTMLElement[]>("icon")
 }
-```
-
-### Definition
-
-```ts
-findAll<T extends HTMLElement[]>(bemElementName: string, className?: string): T;
 ```
