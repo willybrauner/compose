@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: instance
+title: DOM link
 ---
 
 ## Link JS class to DOM element

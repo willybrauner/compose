@@ -1,6 +1,7 @@
 ---
 sidebar_position: 2
 title: life cycle
+description: Component lifecycle
 ---
 
 ### <a name="beforeMount"></a>beforeMount
