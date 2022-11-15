@@ -48,11 +48,17 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      colorMode: {
+        defaultMode: "dark",
+        disableSwitch: false,
+        respectPrefersColorScheme: false,
+      },
+
       navbar: {
         title: "@wbe/compose",
         logo: {
-          alt: 'compose logo',
-          src: 'img/logo.png',
+          alt: "compose logo",
+          src: "img/logo.png",
         },
         items: [
           {

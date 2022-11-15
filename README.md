@@ -60,7 +60,7 @@ $ pnpm install
 - Start example dev server
 
 ```shell
-$ npm run documentation:dev
+$ npm run example-basic:dev
 ```
 
 ## <a name="Credits"></a>Credits
