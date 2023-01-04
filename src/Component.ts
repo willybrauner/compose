@@ -313,18 +313,8 @@ export class Component<Props = TProps> {
     const onChange = (mutationsList) => {
       for (const mutation of mutationsList) {
         // add node actions
-        for (const node of mutation.addedNodes) {
-          const nodeAddedId = Component.getComponentId(node)
-          if (!nodeAddedId) return
+        // TODO do we have to do something when a component is inject in DOM?
 
-          this.onChildrenComponents((component) => {
-            if (!component) return
-            if (!component?.isMounted) {
-              // TODO voir si on devrait pas le register plutot ?
-              component._mounted()
-            }
-          })
-        }
         // remove nodes actions
         for (const node of mutation.removedNodes) {
           const nodeRemovedId = Component.getComponentId(node)
