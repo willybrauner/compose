@@ -355,7 +355,6 @@ export class Stack<GProps = TProps> extends Component {
           // Execute unmounted page method AFTER the playOut transition
           page.instance._unmounted()
           // Remove the page DOM
-          log("remove !")
           autoRemoveOnComplete && _remove()
         })
         .catch(() => {})
