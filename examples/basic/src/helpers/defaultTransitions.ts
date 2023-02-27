@@ -21,7 +21,7 @@ export const defaultPlayIn = (
       x: 0,
       autoAlpha: 1,
       duration,
-      ease: "power3.inOut",
+      ease: "power2.inOut",
       onComplete: resolve,
     }
   )
@@ -33,17 +33,13 @@ export const defaultPlayOut = (
   resolve?: () => void
 ): void => {
   // log("goTo: ", goTo)
-  gsap.fromTo(
+  gsap.to(
     $root,
-    {
-      x: 0,
-      autoAlpha: 1,
-    },
     {
       autoAlpha: 0,
       x: -xValue,
       duration,
-      ease: "power3.inOut",
+      ease: "power2.inOut",
       onComplete: resolve,
     }
   )
