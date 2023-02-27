@@ -13,7 +13,10 @@ title: options
   disable links during transition.
 
 - `disableHistoryDuringTransitions` {boolean} _default: false_
-  disable history during transition allow blocking transition on popstate event too.
+  Disable history during transition allow blocking transition on popstate event too.
+- 
+- `enableCache` {boolean} _default: true_
+  Enable page cache. It keeps DOM HTML and JS class instance of each pages visited. 
 
 ```js
 class App extends Stack {
@@ -22,5 +25,6 @@ class App extends Stack {
   forcePageReload = false
   disableLinksDuringTransitions = false
   disableHistoryDuringTransitions = false
+  enableCache = true
 }
 ```

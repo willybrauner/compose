@@ -62,6 +62,11 @@ export class Stack<GProps = TProps> extends Component {
   public disableHistoryDuringTransitions: boolean = false
 
   /**
+   * enable pages cache
+   */
+  public enableCache: boolean = true
+
+  /**
    * Register pages from parent class
    * @returns
    */
@@ -600,6 +605,10 @@ export class Stack<GProps = TProps> extends Component {
     instance,
     playIn: () => Promise<void>
   ): void {
+    if (!this.enableCache) {
+      log("cache is disable, return")
+      return
+    }
     this._cache = {
       ...this._cache,
       [url]: { title, $pageRoot, pageName, instance, playIn },
