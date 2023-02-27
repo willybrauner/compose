@@ -62,6 +62,13 @@ export class Stack<GProps = TProps> extends Component {
   public disableHistoryDuringTransitions: boolean = false
 
   /**
+   * Page number to keep in container if need request is made
+   * during the transition.
+   * Be careful, more than 1 can cause serious UI bugs.
+   */
+  public keepPageNumberDuringTransitions: number = 1
+
+  /**
    * enable pages cache
    */
   public enableCache: boolean = true
@@ -290,15 +297,24 @@ export class Stack<GProps = TProps> extends Component {
         handleHistory > New request while page is animating.
         For security:  
          - Reject PlayOut & PlayIn anim promises;
-         - Remove page wrapper content.
+         - Keep ${this.keepPageNumberDuringTransitions} page(s) inside the wrapper div.
          `
       )
       // reject current promise playIn playOut
       this.playOutPromiseRef.reject?.()
       this.playInPromiseRef.reject?.()
       this._pageIsAnimating = false
-      // remove all page wrapper children
-      this.$pageWrapper.querySelectorAll(":scope > *").forEach((el) => el.remove())
+
+      // remove pages in wrapper div
+      const pages = this.$pageWrapper.querySelectorAll(":scope > *")
+      log("$pageWrapper content before remove", pages)
+
+      if (pages.length > this.keepPageNumberDuringTransitions) {
+        for (let i = 0; i < pages.length - this.keepPageNumberDuringTransitions; i += 1)
+          pages[i].remove()
+        log("$pageWrapper after remove", this.$pageWrapper.querySelectorAll(":scope > *"))
+      }
+
       // hack before process the new transition
       await new Promise((resolve) => setTimeout(resolve, 1))
     }

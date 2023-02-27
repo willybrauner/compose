@@ -1,4 +1,4 @@
-import {IPage, Stack} from "@wbe/compose"
+import { IPage, Stack } from "@wbe/compose"
 import HomePage from "../pages/HomePage"
 import AboutPage from "../pages/AboutPage"
 import WorkPage from "../pages/WorkPage"
@@ -6,13 +6,15 @@ import debug from "@wbe/debug"
 import Footer from "./Footer"
 const log = debug(`front:App`)
 
-
 /**
  * @name App
  */
 export class App extends Stack {
   public static attrName = "App"
   public footer = this.add<Footer>(Footer)
+
+  enableCache = true
+  keepPageNumberDuringTransitions = 2
 
   public addPages() {
     return {
