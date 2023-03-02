@@ -86,6 +86,11 @@ export class Stack<GProps = TProps> extends Component {
   }
 
   /**
+   * the clicked link DOM element with `data-page-transition-url` attribute
+   */
+  public $clickedLink: HTMLElement
+
+  /**
    *  the current URL to request
    */
   protected currentUrl: string = null
@@ -143,6 +148,8 @@ export class Stack<GProps = TProps> extends Component {
    */
   protected history: BrowserHistory | HashHistory | MemoryHistory
   protected removeHistory
+
+
 
   /**
    * Construct
@@ -251,6 +258,8 @@ export class Stack<GProps = TProps> extends Component {
    */
   private handleLinks = (event): void => {
     if (!event) return
+    this.$clickedLink = event.currentTarget
+
     // get page url attr
     const url = event?.currentTarget?.getAttribute(PAGE_URL_ATTR)
     // if disable transitions is active, open new page
@@ -472,7 +481,7 @@ export class Stack<GProps = TProps> extends Component {
       // inject new page in DOM + create page class instance
       try {
         // before fetch promise
-        await this.beforeFetch()
+        await this.beforeFetch(this.$clickedLink)
 
         // fetch and get new page
         const newPage = await mountNewPage()
@@ -526,7 +535,7 @@ export class Stack<GProps = TProps> extends Component {
    * Method to overwrite from parent class
    * @protected
    */
-  protected beforeFetch(): Promise<void> {
+  protected beforeFetch($clickedLink: HTMLElement): Promise<void> {
     return Promise.resolve()
   }
   // --------------------------------------------------------------------------- PREPARE PAGE
