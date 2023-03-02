@@ -149,8 +149,6 @@ export class Stack<GProps = TProps> extends Component {
   protected history: BrowserHistory | HashHistory | MemoryHistory
   protected removeHistory
 
-
-
   /**
    * Construct
    * @param $root
@@ -481,7 +479,7 @@ export class Stack<GProps = TProps> extends Component {
       // inject new page in DOM + create page class instance
       try {
         // before fetch promise
-        await this.beforeFetch(this.$clickedLink)
+        await this.beforeFetch()
 
         // fetch and get new page
         const newPage = await mountNewPage()
@@ -535,7 +533,7 @@ export class Stack<GProps = TProps> extends Component {
    * Method to overwrite from parent class
    * @protected
    */
-  protected beforeFetch($clickedLink: HTMLElement): Promise<void> {
+  protected beforeFetch(): Promise<void> {
     return Promise.resolve()
   }
   // --------------------------------------------------------------------------- PREPARE PAGE

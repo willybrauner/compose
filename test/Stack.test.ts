@@ -24,8 +24,8 @@ export class App extends Stack {
     return super.getPageContainer(body)
   }
 
-  protected beforeFetch($clickedLink: HTMLElement): Promise<void> {
-    return super.beforeFetch($clickedLink)
+  protected beforeFetch(): Promise<void> {
+    return super.beforeFetch()
   }
 
   // need to overwrite in order to fake fetch the data
@@ -93,7 +93,7 @@ it("Should fetch and inject new page in DOM when history change", async () => {
   expect(app.$root.querySelector(".AboutPage").innerHTML).toEqual("About")
 })
 
-it("beforeFetch should be called when a link is clicked", async () => {
+it("$clickedLink should be updated on link clicked", async () => {
   document.write(HomePageMock())
   const $root = document.querySelector(".App") as any
   const history = createMemoryHistory()
@@ -104,5 +104,4 @@ it("beforeFetch should be called when a link is clicked", async () => {
 
   $root.querySelector(".Link_home").click()
   expect(app.$clickedLink.innerHTML).toEqual("home")
-
 })
