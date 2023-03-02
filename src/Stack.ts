@@ -86,6 +86,11 @@ export class Stack<GProps = TProps> extends Component {
   }
 
   /**
+   * the clicked link DOM element with `data-page-transition-url` attribute
+   */
+  public $clickedLink: HTMLElement
+
+  /**
    *  the current URL to request
    */
   protected currentUrl: string = null
@@ -251,6 +256,8 @@ export class Stack<GProps = TProps> extends Component {
    */
   private handleLinks = (event): void => {
     if (!event) return
+    this.$clickedLink = event.currentTarget
+
     // get page url attr
     const url = event?.currentTarget?.getAttribute(PAGE_URL_ATTR)
     // if disable transitions is active, open new page
