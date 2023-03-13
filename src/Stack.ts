@@ -431,7 +431,12 @@ export class Stack<GProps = TProps> extends Component {
       this.addPageInDOM($pageRoot)
       this.updateMetas(title)
 
-      return { $pageRoot, pageName, instance: newPageInstance, playIn }
+      return {
+        $pageRoot,
+        pageName,
+        instance: newPageInstance,
+        playIn: () => preparePlayIn(newPageInstance),
+      }
     }
     // fetch new document or use cache
     try {

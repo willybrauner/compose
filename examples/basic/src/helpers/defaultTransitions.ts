@@ -10,7 +10,7 @@ export const defaultPlayIn = (
   comeFrom?: string,
   resolve?: () => void
 ): void => {
-  // log("comeFrom:", comeFrom)
+   log("dir comeFrom:", comeFrom)
   gsap.fromTo(
     $root,
     {
@@ -32,7 +32,7 @@ export const defaultPlayOut = (
   goTo?: string,
   resolve?: () => void
 ): void => {
-  // log("goTo: ", goTo)
+   log("dir goTo: ", goTo)
   gsap.to(
     $root,
     {
