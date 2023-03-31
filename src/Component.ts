@@ -146,9 +146,9 @@ export class Component<Props = TProps> {
     classComponent: new <P = TProps>(...args: any[]) => GetElementType<C>,
     props?: P,
     attrName?: string
-  ): C[] {
+  ): C {
     // prepare instances array
-    const localInstances = []
+    const localInstances = [] as any
     // get string name instance from param or static attrName property
     const name: string = attrName || classComponent?.["attrName"]
     // get DOM elements
