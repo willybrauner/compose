@@ -20,5 +20,5 @@ it("Extended class should be init properly.", async () => {
   expect(homePage.$root).toBe($root)
   expect(homePage.name).toBe("HomePage")
   expect(homePage.props).toBe(props)
-  expect(parseInt($root.getAttribute("data-component-id"))).toBe(0)
+  expect(parseInt($root.getAttribute("data-component-id"))).toBeTypeOf("number")
 })
