@@ -1,4 +1,5 @@
 import debug from "@wbe/debug"
+import { uniqueID } from "./utils/uniqueID"
 const log = debug(`compose:Component`)
 
 export type TProps = { [x: string]: any } | void
@@ -7,7 +8,7 @@ type GetElementType<T extends any[]> = T extends (infer U)[] ? U : never
 /**
  * Glob scope
  */
-let COMPONENT_ID = 0
+
 export const COMPONENT_ATTR = "data-component"
 export const ID_ATTR = "data-component-id"
 
@@ -64,9 +65,8 @@ export class Component<Props = TProps> {
     this.name = attrName || Component.getComponentName(this.$root)
 
     // set ID on DOM element
-    this.$root.setAttribute(ID_ATTR, `${COMPONENT_ID}`)
-    this.id = COMPONENT_ID
-    COMPONENT_ID++
+    this.id = uniqueID()
+    this.$root.setAttribute(ID_ATTR, `${this.id}`)
 
     // hack: exe init method with timeout to access `this` inside component methods
     window.setTimeout(() => this.init(), 0)
@@ -107,7 +107,6 @@ export class Component<Props = TProps> {
     this.unmounted()
     this._isMounted = false
     this.onChildrenComponents((component: Component) => {
-      COMPONENT_ID--
       component?._unmounted()
     })
     log("🔴 unmounted", this.name)
@@ -312,14 +311,13 @@ export class Component<Props = TProps> {
   private _watchChildren(): void {
     const onChange = (mutationsList) => {
       for (const mutation of mutationsList) {
-        // add node actions
-        // TODO do we have to do something when a component is inject in DOM?
-
         // remove nodes actions
         for (const node of mutation.removedNodes) {
           const nodeRemovedId = Component.getComponentId(node)
-          if (!nodeRemovedId) return
-
+          const parentNodeElement = node.parentNode?.querySelector(
+            `*[${ID_ATTR}='${nodeRemovedId}']`
+          )
+          if (nodeRemovedId && parentNodeElement) continue
           this.onChildrenComponents((component) => {
             if (!component) return
             if (nodeRemovedId === component?.id && component?.isMounted) {
