@@ -1,7 +1,6 @@
 import { Component, COMPONENT_ATTR } from "./Component"
 import type { TProps } from "./Component"
 import debug from "@wbe/debug"
-import { BrowserHistory, HashHistory, MemoryHistory } from "history"
 const log = debug("compose:Stack")
 
 export interface IPage {
@@ -146,7 +145,7 @@ export class Stack<GProps = TProps> extends Component {
   /**
    * History
    */
-  protected history: BrowserHistory | HashHistory | MemoryHistory
+  protected history
   protected removeHistory
 
   /**
@@ -162,10 +161,11 @@ export class Stack<GProps = TProps> extends Component {
   }: {
     $root: HTMLElement
     props?: GProps
-    history: BrowserHistory | HashHistory | MemoryHistory
+    history?
   }) {
     super($root, props)
     this.history = history
+    log(this.history ? "use history lib" : "use browser history")
 
     // init
     this.$pageContainer = this.getPageContainer()
@@ -173,6 +173,8 @@ export class Stack<GProps = TProps> extends Component {
     this._pages = this.addPages()
     this.currentPage = this.getFirstCurrentPage()
     this._cache = {}
+
+    if (!this.history) this.patchHistoryStates()
 
     // start page events
     this.start()
@@ -235,9 +237,15 @@ export class Stack<GProps = TProps> extends Component {
    * @private
    */
   private initHistoryEvent() {
-    this.removeHistory = this.history?.listen(({ location }) => {
-      this.handleHistory(location.pathname)
-    })
+    if (this.history) {
+      this.removeHistory = this.history.listen(({ location }) => {
+        this.handleHistory(location.pathname)
+      })
+    } else {
+      ;["pushState", "replaceState", "popstate"].forEach((event) => {
+        window.addEventListener(event, this.handleHistory.bind(this))
+      })
+    }
   }
 
   /**
@@ -245,7 +253,13 @@ export class Stack<GProps = TProps> extends Component {
    * @private
    */
   private removeHistoryEvent() {
-    this.removeHistory()
+    if (this.history) {
+      this.removeHistory()
+    } else {
+      ;["pushState", "replaceState", "popstate"].forEach((event) => {
+        window.removeEventListener(event, this.handleHistory)
+      })
+    }
   }
 
   // --------------------------------------------------------------------------- HANDLERS
@@ -270,18 +284,21 @@ export class Stack<GProps = TProps> extends Component {
     if (this.disableLinksDuringTransitions && this._pageIsAnimating) return
 
     // push it in history
-    this.history.push(url)
+    if (this.history) this.history.push(url)
+    else window.history.pushState({}, null, url)
   }
 
   /**
    * Handle history
-   * @param pathname
+   * @param eventOrPathname
    */
-  private handleHistory = async (pathname): Promise<void> => {
+  private handleHistory = async (eventOrPathname?): Promise<void> => {
     if (this.disableHistoryDuringTransitions && this._pageIsAnimating) return
 
     // get URL to request
-    const requestUrl = pathname
+    const requestUrl = this.history
+      ? eventOrPathname
+      : eventOrPathname?.["arguments"]?.[2] || window.location.pathname
 
     log("handleHistory > requestUrl", requestUrl)
     if (!requestUrl || requestUrl === this.currentUrl) return
@@ -689,6 +706,28 @@ export class Stack<GProps = TProps> extends Component {
     } else {
       this._fetching = false
       throw new Error("Something went wrong")
+    }
+  }
+
+  /**
+   * While History API does have `popstate` event, the only
+   * proper way to listen to changes via `push/replaceState`
+   * is to monkey-patch these methods.
+   * https://stackoverflow.com/a/4585031
+   * https://stackoverflow.com/questions/5129386/how-to-detect-when-history-pushstate-and-history-replacestate-are-used
+   */
+  private patchHistoryStates(): void {
+    if (typeof window.history !== "undefined") {
+      for (const type of ["pushState", "replaceState"]) {
+        const original = window.history[type]
+        window.history[type] = function () {
+          const result = original.apply(this, arguments)
+          const event = new Event(type)
+          event["arguments"] = arguments
+          window.dispatchEvent(event)
+          return result
+        }
+      }
     }
   }
 }
