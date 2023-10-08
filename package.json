@@ -19,7 +19,6 @@
     "pre-publish": "npm run build && npm run test"
   },
   "devDependencies": {
-    "microbundle": "^0.15.1",
     "@changesets/cli": "^2.26.2",
     "@size-limit/esbuild-why": "^9.0.0",
     "@size-limit/preset-small-lib": "^9.0.0",

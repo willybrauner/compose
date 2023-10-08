@@ -1,7 +1,7 @@
 name: ci
 on: [push]
 jobs:
-  ci:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
