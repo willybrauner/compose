@@ -1,5 +1,5 @@
 {
-  "name": "basic",
+  "name": "example-basic",
   "version": "0.1.0",
   "main": "src/index.ts",
   "scripts": {
@@ -8,11 +8,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@wbe/compose": "latest",
-    "gsap": "^3.11.3"
+    "@wbe/compose": "^0.15.2",
+    "@wbe/debug": "latest",
+    "@wbe/interpol": "^0.8.1",
+    "@wbe/low-router": "^0.1.0",
+    "gsap": "^3.12.2"
   },
   "devDependencies": {
-    "typescript": "^4.8.4",
-    "vite": "^3.2.1"
+    "typescript": "^5.2.2",
+    "vite": "^4.4.11"
   }
 }

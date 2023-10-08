@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
@@ -7,38 +7,24 @@
 
   <body>
     <div id="root">
-      <main class="App" data-component="App" data-page-transition-container>
+      <main class="App">
         <nav>
-          <a class="link" href="/" data-page-transition-url="/">home</a>
-          <a class="link" href="/about.html" data-page-transition-url="about.html">about</a>
-          <a class="link" href="/work.html" data-page-transition-url="work.html">work</a>
-          <a class="link" href="/notexist.html" data-page-transition-url="notexist.html">notexist</a>
+          <a class="link" href="/">home</a>
+          <a class="link" href="/about">about</a>
+          <a class="link" href="/contact">contact</a>
+          <a class="link" href="/notexist">notexist</a>
         </nav>
-
-        <div class="App_stack" data-page-transition-wrapper>
-          <div class="HomePage Page" data-component="HomePage">
-            <code>Header</code>
-
-            <header class="Header HomePage_header" data-component="Header">
+        <div class="App_stack stack">
+          <div class="Home Page">
+            <header class="Header Home_header">
               <h1 class="Header_title">Home</h1>
-              <code>MainButton</code>
-              <button class="MainButton MainButton-1" data-component="MainButton">
-                I'm a button
-              </button>
-              <button class="MainButton MainButton-1" data-component="MainButton">
-                I'm a button 2
-              </button>
+              <button class="MainButton MainButton-1 Header_mainButton">MainButton</button>
             </header>
-
-            <section class="HomePage_section">Home page section 1</section>
-            <section class="HomePage_section">Home page section 2</section>
-
           </div>
         </div>
-        <footer class="App_footer Footer" data-component="Footer">footer</footer>
+        <footer class="Footer App_footer">footer</footer>
       </main>
     </div>
-
     <script type="module" src="./src/index.ts"></script>
   </body>
 </html>

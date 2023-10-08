@@ -1,0 +1,40 @@
+{
+  "name": "@wbe/compose",
+  "version": "0.15.2",
+  "description": "Compose is a small and type-safe library that links your javascript to your DOM.",
+  "author": "Willy Brauner",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "main": "./dist/compose.js",
+  "module": "./dist/compose.js",
+  "types": "./dist/compose.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/willybrauner/compose.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "compose",
+    "component"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "tsup",
+    "build:watch": "tsup --watch --sourcemap"
+  },
+  "dependencies": {
+    "@wbe/debug": "latest"
+  },
+  "devDependencies": {
+    "terser": "^5.21.0",
+    "tsup": "^7.2.0",
+    "typescript": "^5.2.2",
+    "vitest": "^0.34.6"
+  }
+}
