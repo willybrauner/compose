@@ -15,31 +15,55 @@ _⚠️ This library is work in progress, the API is subject to change until the
 <br/>
 </div>
 
-## Documentation
+## Installation
 
-Check the [full documentation website](https://willybrauner.github.io/compose)
+```shell
+$ npm i @wbe/compose
+```
 
-## Preview
+## Components
+
+### add
+
+This method allows to 'add' new Component instance to the tree.
+It returns a single instance and associated properties.
+
+Add component inside the class:
+
+```js
+class Foo extends Component {
+  bar = this.add(Bar)
+
+  customMethod() {
+    // then, access child Bar instance
+    this.bar.root
+    this.bar.mounted()
+    this.bar.unmounted()
+    // etc...
+  }
+}
+```
+
+The method accepts a static props parameter which we can access from the new Bar component via `this.props`.
+
+```js
+bar = this.add(Bar, { props: { foo: "bar" } })
+```
+
+### addAll
+
+`addAll` will return an array of instances.
 
 ```html
-<div data-component="App">
-  <header data-component="Header"></header>
+<div>
+  <div class="Bar"></div>
+  <div class="Bar"></div>
 </div>
 ```
 
 ```js
-import { Component } from "@wbe/compose"
-
-class App extends Component {
-  static attrName = "App"
-  header = this.add(Header)
-  mounted() {}
-  unmounted() {}
-}
-
-class Header extends Component {
-  static attrName = "Header"
-  // ...
+class Foo extends Component {
+  bars = this.addAll(Bar) // return array of Bar: [Bar, Bar]
 }
 ```
 
