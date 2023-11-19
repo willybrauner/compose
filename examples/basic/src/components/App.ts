@@ -19,54 +19,40 @@ export class App extends Component {
   isAnimating = false
   browserHistory = createBrowserHistory()
 
-  /**
-   * Mounted
-   */
   mounted() {
-    // Create router
-    this.router = new LowRouter(
-      [
-        {
-          path: "/",
-          action: () => Home,
-        },
-        {
-          path: "/about",
-          action: () => About as any,
-        },
-        {
-          path: "/contact",
-          action: () => Contact as any,
-        },
-      ],
-      {
-        base: "/",
-        debug: true,
-        onResolve: (ctx) => this.#onRouteResolve(ctx),
-      },
-    )
-
+    this.#createRouter()
     // Update links to set click listener on it
     this.#updateLinks()
-
-    // implement a history listener
-    // each time the history change, the router will resolve the new location
-    const handleHistory = (location, action?): void => {
-      this.router.resolve(location.pathname + location.search + location.hash)
-    }
-    // first call to resolve the current location
-    handleHistory({
-      pathname: window.location.pathname,
-      search: window.location.search,
-      hash: window.location.hash,
-    })
-    // listen to history and return the unlisten function
-    const unlistenBrowser = this.browserHistory.listen(handleHistory)
-
+    // call & listen to history
+    this.#handleHistory()
+    const unlistenBrowser = this.browserHistory.listen(this.#handleHistory)
     // unmounted
     return () => {
       unlistenBrowser()
     }
+  }
+
+  // --------------------------------------------------------------------------- ROUTER
+
+  /**
+   * Create router
+   * Need to create it in App for now because onResolve callback has to be set
+   * as option on router creation.
+   */
+  #createRouter(): void {
+    const routes = [
+      { path: "/", action: () => Home },
+      { path: "/about", action: () => About as any },
+      { path: "/contact", action: () => Contact as any },
+    ]
+
+    const options = {
+      base: "/",
+      debug: true,
+      onResolve: (ctx) => this.#onRouteResolve(ctx),
+    }
+
+    this.router = new LowRouter(routes, options)
   }
 
   /**
@@ -85,6 +71,19 @@ export class App extends Component {
   }
 
   // --------------------------------------------------------------------------- INTERNAL
+
+  // implement a history listener
+  // each time the history change, the router will resolve the new location
+  #handleHistory = (
+    location = {
+      pathname: window.location.pathname,
+      search: window.location.search,
+      hash: window.location.hash,
+    },
+    action?,
+  ): void => {
+    this.router.resolve(location.pathname + location.search + location.hash)
+  }
 
   /**
    * on Route Update
