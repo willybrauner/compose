@@ -8,7 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@wbe/compose": "^0.15.2",
+    "@wbe/compose": "workspace:^",
     "@wbe/debug": "latest",
     "@wbe/interpol": "^0.8.1",
     "@wbe/low-router": "^0.1.0",
@@ -16,6 +16,6 @@
   },
   "devDependencies": {
     "typescript": "^5.2.2",
-    "vite": "^4.4.11"
+    "vite": "^4.5.0"
   }
 }

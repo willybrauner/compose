@@ -108,6 +108,9 @@ export class App {
     this.isAnimating = false
   }
 
+  /**
+   * Manage transitions between routes
+   */
   public async manageTransitions(
     prevContext: RouteContext,
     currContext: RouteContext,
