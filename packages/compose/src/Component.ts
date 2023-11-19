@@ -33,7 +33,7 @@ export class Component<P = Props> {
     this.name = options.name ?? this.root?.classList?.[0]
     this.props = options.props
     this.id = ID++
-    this.root.setAttribute(ID_ATTR, `${this.id}`)
+    this.root?.setAttribute(ID_ATTR, `${this.id}`)
 
     // hack: exe init method with timeout to access `this` inside
     // the component witch extends Component
