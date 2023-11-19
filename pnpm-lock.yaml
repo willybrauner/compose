@@ -44,6 +44,9 @@ importers:
 
   examples/basic:
     dependencies:
+      '@cher-ami/utils':
+        specifier: ^1.4.1
+        version: 1.4.1
       '@wbe/compose':
         specifier: workspace:^
         version: link:../../packages/compose
@@ -299,6 +302,10 @@ packages:
       human-id: 1.0.2
       prettier: 2.8.8
     dev: true
+
+  /@cher-ami/utils@1.4.1:
+    resolution: {integrity: sha512-4FE2ais6TduClhDpOaBCSbwPyJz4iV8za1MDCFKfQ3gU4r3jyQJHiNinjKMvMTwNvytdfM1+NF4xGT4uBdEwZA==}
+    dev: false
 
   /@esbuild/android-arm64@0.18.20:
     resolution: {integrity: sha512-Nz4rJcchGDtENV0eMKUNa6L12zz2zBDXuhj/Vjh18zGqB44Bi7MBMSXjgunJgjRhCmKOjnPuZp4Mb6OKqtMHLQ==}

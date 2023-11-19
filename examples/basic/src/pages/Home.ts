@@ -2,6 +2,7 @@ import { Component } from "@wbe/compose"
 import Header from "../components/Header"
 import debug from "@wbe/debug"
 import { defaultTransitions } from "../helpers/defaultTransitions"
+import { listen } from "@cher-ami/utils"
 const log = debug(`front:Home`)
 
 type TStaticProps = {}
@@ -13,15 +14,9 @@ export default class Home extends Component<TStaticProps> {
   public header = this.add(Header)
 
   public mounted() {
-    window.addEventListener("resize", this.resizeHandler)
-  }
-
-  public unmounted() {
-    window.removeEventListener("resize", this.resizeHandler)
-  }
-
-  protected resizeHandler = () => {
-    log("window.innerWidth", window.innerWidth)
+    return listen(window, "resize", () => {
+      log("window.innerWidth", window.innerWidth)
+    })
   }
 
   // --------------------------------------------------------------------------- PAGE TRANSITION

@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@cher-ami/utils": "^1.4.1",
     "@wbe/compose": "workspace:^",
     "@wbe/debug": "latest",
     "@wbe/interpol": "^0.8.1",

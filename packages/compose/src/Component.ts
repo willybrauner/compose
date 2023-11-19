@@ -22,6 +22,7 @@ export class Component<P = Props> {
 
   #observer: MutationObserver
   #isMounted: boolean = false
+  #unmountedFromMounted: (() => void) | void
   public get isMounted() {
     return this.#isMounted
   }
@@ -44,10 +45,13 @@ export class Component<P = Props> {
 
   public beforeMount(): void {}
 
-  public mounted(): void {}
+  public mounted(): (() => void) | void {
+    return () => {}
+  }
+
   #mounted(): void {
     log(`🟢 ${this.name} mounted`)
-    this.mounted()
+    this.#unmountedFromMounted = this.mounted()
     this.#isMounted = true
   }
 
@@ -55,6 +59,7 @@ export class Component<P = Props> {
 
   protected _unmounted(): void {
     log(`🔴 ${this.name} unmounted`)
+    if (this.#unmountedFromMounted) this.#unmountedFromMounted()
     this.unmounted()
     this.#isMounted = false
     this.#onChildrenComponents((component: Component) => {
