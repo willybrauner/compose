@@ -8,12 +8,28 @@
 ![](https://img.shields.io/npm/dt/@wbe/compose.svg)
 ![](https://img.shields.io/npm/l/@wbe/compose.svg)
 
-Compose is a small and type-safe library that links your javascript to your DOM.  
+Compose is a small and type-safe library that help to links your javascript to your DOM.  
 _⚠️ This library is work in progress, the API is subject to change until the v1.0 release._
 
 <br/>
 <br/>
 </div>
+
+## Summary
+
+- [Installation](#Installation)
+- [Component](#Component)
+  - [add](#add)
+  - [addAll](#addAll)
+  - [find](#find)
+  - [findAll](#findAll)
+- [lifecycle](#lifecycle)
+  - [beforeMount](#beforeMount)
+  - [mounted](#mounted)
+  - [unmounted](#unmounted)
+- [examples](#Examples)
+- [Credits](#Credits)
+- [Licence](#Licence)
 
 ## Installation
 
@@ -21,7 +37,7 @@ _⚠️ This library is work in progress, the API is subject to change until the
 $ npm i @wbe/compose
 ```
 
-## Components
+## Component
 
 ### add
 
@@ -34,7 +50,7 @@ Add component inside the class:
 class Foo extends Component {
   bar = this.add(Bar)
 
-  customMethod() {
+  method() {
     // then, access child Bar instance
     this.bar.root
     this.bar.mounted()
@@ -63,11 +79,77 @@ bar = this.add(Bar, { props: { foo: "bar" } })
 
 ```js
 class Foo extends Component {
-  bars = this.addAll(Bar) // return array of Bar: [Bar, Bar]
+  bars = this.addAll(Bar)
+  // Returns array of Bar: [Bar, Bar]
 }
 ```
 
-## Start examples
+### `find`
+
+`find` is a simple `this.root.querySelector()` wrapper.  
+This method allows retrieving `BEM` element of current $root component.
+
+```html
+<div class="Bar" data-component="Bar">
+  <h1 class="Bar_title">Hello</h1>
+</div>
+```
+
+```js
+class Bar extends Component {
+  // <h1 class="Bar_title">Hello</h1> can be query with:
+  $title = this.find("_title")
+  // or
+  $title = this.find("Bar_title")
+}
+```
+
+### `findAll`
+
+`findAll` is a simple `this.$root.querySelectorAll()` wrapper.  
+This method returns a DOM Element array.
+
+```html
+<div class="Bar" data-component="Bar">
+  <div class="Bar_icon">icon</div>
+  <div class="Bar_icon">icon</div>
+</div>
+```
+
+```js
+class Bar extends Component {
+  $icons = this.findAll("_icon")
+  // [div.Bar_icon, div.Bar_icon]
+}
+```
+
+## lifecycle
+
+### beforeMount
+
+Each class extended by `Component` provide a life-cycle methods collection.
+It's particularly useful when `Stack` class is used.
+
+`beforeMount(): void`
+
+Method called before class component is mounted, in at begining of class constructor.
+
+### mounted
+
+`mounted(): (()=> void) | void`
+
+Method called after class component is mounted. Children component instances are now available.
+It can return a function to be called when the component is unmounted.
+
+### unmounted
+
+`unmounted(): void`
+
+Method called after class component is unmounted.
+The parent component observer will called this unmounted method automatically if the current component is removed from DOM.
+All children component instances are also unmounted after this method is called.
+
+## Examples
 
 - Clone this repo
 
@@ -84,13 +166,13 @@ $ pnpm install
 - Start example dev server
 
 ```shell
-$ npm run example-basic:dev
+$ npm run dev
 ```
 
-## <a name="Credits"></a>Credits
+## Credits
 
 [© Willy Brauner](https://willybrauner.com)
 
-## <a name="Licence"></a>Licence
+## Licence
 
 [MIT](./LICENCE)
