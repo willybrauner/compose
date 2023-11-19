@@ -8,7 +8,6 @@ type TProps = {}
  * @name Footer
  */
 export default class Footer extends Component<TProps> {
-  public static attrName = "Footer";
   mounted () {
     log('Footer is mounted', this)
   }

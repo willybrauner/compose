@@ -9,7 +9,6 @@ type TStaticProps = {}
  * @name Header
  */
 export default class Header extends Component<TStaticProps> {
-  public static attrName = "Header"
 
   public mainButtons = this.addAll<MainButton[]>(MainButton)
 
