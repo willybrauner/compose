@@ -90,7 +90,7 @@ class Foo extends Component {
 This method allows retrieving `BEM` element of current $root component.
 
 ```html
-<div class="Bar" data-component="Bar">
+<div class="Bar">
   <h1 class="Bar_title">Hello</h1>
 </div>
 ```
@@ -110,7 +110,7 @@ class Bar extends Component {
 This method returns a DOM Element array.
 
 ```html
-<div class="Bar" data-component="Bar">
+<div class="Bar">
   <div class="Bar_icon">icon</div>
   <div class="Bar_icon">icon</div>
 </div>
