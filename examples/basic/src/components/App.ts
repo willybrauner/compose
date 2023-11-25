@@ -59,15 +59,15 @@ export class App extends Component {
    * Manage transitions between routes
    */
   async #manageTransitions(prevContext: RouteContext, currContext: RouteContext): Promise<void> {
-    const prevInstance = prevContext?.route.props.instance
-    const currInstance = currContext.route.props.instance
+    const prev = prevContext?.route.props.instance
+    const curr = currContext.route.props.instance
 
-    currInstance.root.style.opacity = "0"
-    prevInstance?.playOut().then(() => {
-      prevInstance.root.remove()
-      prevInstance._unmounted()
+    curr.root.style.opacity = "0"
+    prev?.playOut().then(() => {
+      prev.root.remove()
+      prev._unmounted()
     })
-    await currInstance.playIn?.()
+    await curr.playIn?.()
   }
 
   // --------------------------------------------------------------------------- INTERNAL

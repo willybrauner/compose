@@ -57,8 +57,8 @@ importers:
         specifier: ^0.8.1
         version: 0.8.1
       '@wbe/low-router':
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.1.1
+        version: 0.1.1
       gsap:
         specifier: ^3.12.2
         version: 3.12.2
@@ -1210,8 +1210,8 @@ packages:
     resolution: {integrity: sha512-RnRXa6Sgmc+lRuuAMUiarDViAMCQvmFSIEWdBHbMMaSGSeNmjdYDCrBN8ExIZsOoAWvD4q3X6m2I14YEWmAEPg==}
     dev: false
 
-  /@wbe/low-router@0.1.0:
-    resolution: {integrity: sha512-QyltDyntHpXaaDPwvIM09KtK0MWptBTL+sMmtWYSKH1LNefDmlOIXZ5wz/bVHY58+6kUFQK6CmRCm1SKteOJVw==}
+  /@wbe/low-router@0.1.1:
+    resolution: {integrity: sha512-e00hPQElmIVTmOqCNn/M+cipFUpFh20xRAIxdSIbdTaepJsgd5lh0C4TulIyyPZjLR3dfALMrzQj+zyI4GC8jw==}
     dev: false
 
   /acorn-walk@8.2.0:
