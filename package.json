@@ -11,6 +11,7 @@
     "build": "FORCE_COLOR=1 turbo run build --filter=@wbe/*",
     "build:watch": "FORCE_COLOR=1 turbo run build --filter=@wbe/* -- --watch",
     "dev": "FORCE_COLOR=1 turbo run dev",
+    "ncu": "ncu -u && FORCE_COLOR=1 turbo run ncu",
     "test:watch": "vitest --reporter verbose",
     "test": "vitest run",
     "size": "size-limit",
@@ -19,17 +20,16 @@
     "pre-publish": "npm run build && npm run test"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.26.2",
-    "@size-limit/esbuild-why": "^9.0.0",
-    "@size-limit/preset-small-lib": "^9.0.0",
-    "happy-dom": "^12.9.0",
-    "prettier": "^3.0.3",
-    "size-limit": "^9.0.0",
-    "turbo": "^1.10.15",
-    "typescript": "^5.2.2",
-    "vite": "^4.4.11",
+    "@changesets/cli": "^2.27.1",
+    "@size-limit/preset-small-lib": "^11.0.0",
+    "happy-dom": "^12.10.3",
+    "prettier": "^3.1.0",
+    "size-limit": "^11.0.0",
+    "turbo": "^1.10.16",
+    "typescript": "^5.3.2",
+    "vite": "^5.0.4",
     "vitest": "^0.34.6",
-    "@types/node": "^20.8.3"
+    "@types/node": "^20.10.3"
   },
   "prettier": {
     "printWidth": 100,

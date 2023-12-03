@@ -26,15 +26,16 @@
   "scripts": {
     "clean": "rm -rf dist",
     "build": "tsup",
-    "build:watch": "tsup --watch --sourcemap"
+    "build:watch": "tsup --watch --sourcemap",
+    "ncu": "ncu -u"
   },
   "dependencies": {
     "@wbe/debug": "latest"
   },
   "devDependencies": {
-    "terser": "^5.21.0",
-    "tsup": "^7.2.0",
-    "typescript": "^5.2.2",
+    "terser": "^5.24.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.2",
     "vitest": "^0.34.6"
   }
 }
