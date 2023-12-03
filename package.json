@@ -15,12 +15,9 @@
     "test:watch": "vitest --reporter verbose",
     "test": "vitest run",
     "size": "size-limit",
-    "ci:version": "pnpm changeset version && pnpm --filter \"@wbe/*\" install --lockfile-only",
-    "ci:publish": "pnpm build && pnpm changeset publish",
     "pre-publish": "npm run build && npm run test"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.1",
     "@size-limit/preset-small-lib": "^11.0.0",
     "happy-dom": "^12.10.3",
     "prettier": "^3.1.0",
