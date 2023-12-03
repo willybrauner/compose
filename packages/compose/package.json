@@ -1,6 +1,6 @@
 {
   "name": "@wbe/compose",
-  "version": "0.15.2",
+  "version": "0.16.0",
   "description": "Compose is a small and type-safe library that links your javascript to your DOM.",
   "author": "Willy Brauner",
   "license": "MIT",
