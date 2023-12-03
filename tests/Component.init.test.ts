@@ -7,8 +7,7 @@ import { Component } from "../src"
 let window = new Window()
 let document = window.document
 
-class HomePage extends Component {
-}
+class HomePage extends Component {}
 
 it("Extended class should be init properly.", async () => {
   document.write(HomePageMock())

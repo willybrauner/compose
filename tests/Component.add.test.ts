@@ -51,9 +51,7 @@ it("Should addAll multiple instances properly", async () => {
   }
   document.write(HomePageMock())
   const root = document.querySelector(".HomePage") as any
-  root.innerHTML = new Array(1000)
-    .fill(`<div class="Button">hello</div>`)
-    .join("\n")
+  root.innerHTML = new Array(1000).fill(`<div class="Button">hello</div>`).join("\n")
 
   const homePage = new HomePage(root)
   expect(homePage.buttons.length).toBe(1000)
