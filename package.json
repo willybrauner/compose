@@ -1,15 +1,32 @@
 {
-  "name": "compose",
-  "private": true,
+  "name": "@wbe/compose",
+  "version": "0.17.0",
+  "description": "Compose is a small and type-safe library that links your javascript to your DOM.",
+  "author": "Willy Brauner",
+  "license": "MIT",
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "main": "./dist/compose.js",
+  "module": "./dist/compose.js",
+  "types": "./dist/compose.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/willybrauner/compose.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "compose",
+    "component"
+  ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "FORCE_COLOR=1 turbo run build --filter=@wbe/*",
-    "build:watch": "FORCE_COLOR=1 turbo run build --filter=@wbe/* -- --watch",
+    "build": "tsup",
+    "build:watch": "tsup --watch --sourcemap",
     "dev": "FORCE_COLOR=1 turbo run dev",
     "ncu": "ncu -u && FORCE_COLOR=1 turbo run ncu",
     "test:watch": "vitest --reporter verbose",
@@ -17,7 +34,12 @@
     "size": "size-limit",
     "pre-publish": "npm run build && npm run test"
   },
+  "dependencies": {
+    "@wbe/debug": "latest"
+  },
   "devDependencies": {
+    "terser": "^5.24.0",
+    "tsup": "^8.0.1",
     "@size-limit/preset-small-lib": "^11.0.0",
     "happy-dom": "^12.10.3",
     "prettier": "^3.1.0",
@@ -35,7 +57,7 @@
   "size-limit": [
     {
       "name": "@wbe/compose",
-      "path": "packages/compose/dist/compose.js",
+      "path": "dist/compose.js",
       "limit": "2 KB"
     }
   ]
