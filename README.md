@@ -8,7 +8,7 @@
 ![](https://img.shields.io/npm/dt/@wbe/compose.svg)
 ![](https://img.shields.io/npm/l/@wbe/compose.svg)
 
-Compose is a small and type-safe library that help to links your javascript to your DOM.  
+Compose is a small library that help to links your javascript to your DOM.  
 _⚠️ This library is work in progress, the API is subject to change until the v1.0 release._
 
 <br/>
@@ -27,7 +27,7 @@ _⚠️ This library is work in progress, the API is subject to change until the
   - [beforeMount](#beforeMount)
   - [mounted](#mounted)
   - [unmounted](#unmounted)
-- [examples](#Examples)
+- [workflow](#Workflow)
 - [Credits](#Credits)
 - [Licence](#Licence)
 
@@ -149,24 +149,25 @@ Method called after class component is unmounted.
 The parent component observer will called this unmounted method automatically if the current component is removed from DOM.
 All children component instances are also unmounted after this method is called.
 
-## Examples
+## Workflow
 
 - Clone this repo
 
 ```shell
-$ git clone git@github.com:willybrauner/compose.git
-```
+# install dependencies
+pnpm i
 
-- Install dependencies with [pnpm](https://pnpm.io/)
+# build and watch lib changes
+pnpm run build:watch
 
-```shell
-$ pnpm install
-```
+# start tests and watch
+pnpm run test:watch
 
-- Start example dev server
+# start dev server for all examples
+pnpm run dev
 
-```shell
-$ npm run dev
+# Or run a specific example
+pnpm run dev --scope {example-name}
 ```
 
 ## Credits
