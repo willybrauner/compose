@@ -167,7 +167,7 @@ export class Component<P = Props> {
             if (!component) return
             if (nodeRemovedId === component?.id && component?.isMounted) {
               component._unmounted()
-              component.observer.disconnect()
+              component?.observer?.disconnect()
             }
           })
         }
