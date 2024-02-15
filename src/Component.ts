@@ -22,7 +22,6 @@ export class Component<P = Props> {
 
   #observer: MutationObserver
   #isMounted: boolean = false
-  #unmountedFromMounted: (() => void) | void
   public get isMounted() {
     return this.#isMounted
   }
@@ -39,19 +38,19 @@ export class Component<P = Props> {
     // the component witch extends Component
     setTimeout(() => {
       this.#mounted()
+      this.#playIn()
       this.#watchChildren()
     }, 0)
   }
 
   public beforeMount(): void {}
 
-  public mounted(): (() => void) | void {
-    return () => {}
-  }
+  // this method ca return a promise too
+  public mounted(): Promise<any | void> | void {}
 
   #mounted(): void {
     log(`🟢 ${this.name} mounted`)
-    this.#unmountedFromMounted = this.mounted()
+    this.mounted()
     this.#isMounted = true
   }
 
@@ -59,7 +58,6 @@ export class Component<P = Props> {
 
   protected _unmounted(): void {
     log(`🔴 ${this.name} unmounted`)
-    if (this.#unmountedFromMounted) this.#unmountedFromMounted()
     this.unmounted()
     this.#isMounted = false
     this.#onChildrenComponents((component: Component) => {
@@ -125,6 +123,13 @@ export class Component<P = Props> {
 
   // --------------------------------------------------------------------------- TRANSITIONS
 
+  /**
+   * Play in transition method will be delayed until the component is mounted
+   */
+  #playIn(): Promise<any | void> {
+    return this.playIn()
+  }
+
   public playIn(): Promise<any | void> {
     return Promise.resolve()
   }
@@ -167,7 +172,7 @@ export class Component<P = Props> {
             if (!component) return
             if (nodeRemovedId === component?.id && component?.isMounted) {
               component._unmounted()
-              component?.observer?.disconnect()
+              component?.observer?.disconnect?.()
             }
           })
         }
